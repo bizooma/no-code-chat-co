@@ -12,6 +12,8 @@ import PlatformNotifications from "./pages/PlatformNotifications";
 import Chatbots from "./pages/Chatbots";
 import CreateChatbot from "./pages/CreateChatbot";
 import ChatbotEditor from "./pages/ChatbotEditor";
+import Widget from "./pages/Widget";
+import EmbedDemo from "./pages/EmbedDemo";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -113,6 +115,15 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <ChatbotEditor />
+                </ProtectedRoute>
+              } 
+            />
+            <Route path="/widget" element={<Widget />} />
+            <Route 
+              path="/embed-demo" 
+              element={
+                <ProtectedRoute>
+                  <EmbedDemo />
                 </ProtectedRoute>
               } 
             />

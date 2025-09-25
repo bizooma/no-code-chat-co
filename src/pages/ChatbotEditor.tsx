@@ -182,7 +182,7 @@ const ChatbotEditor = () => {
     return `<script>
   (function() {
     var script = document.createElement('script');
-    script.src = 'https://supportbots.dev/widget.js';
+    script.src = '${window.location.origin}/widget.js';
     script.setAttribute('data-chatbot-id', '${id}');
     document.head.appendChild(script);
   })();
@@ -463,9 +463,16 @@ const ChatbotEditor = () => {
                         <code>{getEmbedCode()}</code>
                       </pre>
                     </div>
-                    <Button onClick={copyEmbedCode} className="w-full">
-                      Copy Embed Code
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button onClick={copyEmbedCode} className="flex-1">
+                        Copy Embed Code
+                      </Button>
+                      <Link to={`/embed-demo?id=${id}`}>
+                        <Button variant="outline">
+                          Test Widget
+                        </Button>
+                      </Link>
+                    </div>
                   </div>
                 </CardContent>
               </Card>

@@ -121,7 +121,14 @@ const Chatbots = () => {
   };
 
   const copyEmbedCode = (botId: string) => {
-    const embedCode = `<script src="https://supportbots.dev/embed/${botId}"></script>`;
+    const embedCode = `<script>
+  (function() {
+    var script = document.createElement('script');
+    script.src = '${window.location.origin}/widget.js';
+    script.setAttribute('data-chatbot-id', '${botId}');
+    document.head.appendChild(script);
+  })();
+</script>`;
     navigator.clipboard.writeText(embedCode);
     toast({
       title: "Copied!",
