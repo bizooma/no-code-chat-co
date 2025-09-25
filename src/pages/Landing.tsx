@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Bot, Zap, Code, Users, ArrowRight, CheckCircle } from 'lucide-react';
+import heroBackground from '@/assets/hero-background.jpg';
 
 const Landing = () => {
   return (
@@ -21,14 +22,20 @@ const Landing = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="py-20 px-4">
-        <div className="container mx-auto text-center">
+      <section 
+        className="py-20 px-4 relative bg-cover bg-center bg-no-repeat min-h-[80vh] flex items-center"
+        style={{ backgroundImage: `url(${heroBackground})` }}
+      >
+        {/* Overlay for better text readability */}
+        <div className="absolute inset-0 bg-black/40"></div>
+        
+        <div className="container mx-auto text-center relative z-10">
           <div className="max-w-3xl mx-auto mb-12">
-            <h2 className="text-4xl md:text-6xl font-bold text-foreground mb-6">
+            <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
               Build Chatbots
               <span className="text-primary"> Without Code</span>
             </h2>
-            <p className="text-xl text-muted-foreground mb-8">
+            <p className="text-xl text-white/90 mb-8">
               Create powerful chatbots for your website in minutes. Generate leads, 
               provide support, and engage customers with our visual bot builder.
             </p>
@@ -40,7 +47,7 @@ const Landing = () => {
                 </Button>
               </Link>
               <Link to="/templates">
-                <Button variant="outline" size="lg">
+                <Button variant="secondary" size="lg" className="bg-white/90 text-foreground hover:bg-white">
                   Browse Templates
                 </Button>
               </Link>
