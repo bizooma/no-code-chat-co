@@ -2,7 +2,7 @@ import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, Bot, Users, BarChart3, Bell, Settings } from 'lucide-react';
+import { Plus, Bot, Users, BarChart3, Bell, Settings, Target } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
@@ -125,7 +125,50 @@ const Dashboard = () => {
           </div>
         )}
 
-        {/* My Bots Section */}
+        {/* Quick Actions Section */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-semibold text-foreground">Quick Actions</h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Link to="/chatbots">
+              <Button variant="outline" className="w-full justify-start h-auto p-4">
+                <Bot className="mr-3 h-5 w-5" />
+                <div className="text-left">
+                  <div className="font-medium">Manage Bots</div>
+                  <div className="text-sm text-muted-foreground">Create and edit chatbots</div>
+                </div>
+              </Button>
+            </Link>
+            <Link to="/analytics">
+              <Button variant="outline" className="w-full justify-start h-auto p-4">
+                <BarChart3 className="mr-3 h-5 w-5" />
+                <div className="text-left">
+                  <div className="font-medium">Analytics</div>
+                  <div className="text-sm text-muted-foreground">View performance metrics</div>
+                </div>
+              </Button>
+            </Link>
+            <Link to="/leads">
+              <Button variant="outline" className="w-full justify-start h-auto p-4">
+                <Users className="mr-3 h-5 w-5" />
+                <div className="text-left">
+                  <div className="font-medium">Leads</div>
+                  <div className="text-sm text-muted-foreground">Manage captured leads</div>
+                </div>
+              </Button>
+            </Link>
+            <Link to="/embed-demo">
+              <Button variant="outline" className="w-full justify-start h-auto p-4">
+                <Settings className="mr-3 h-5 w-5" />
+                <div className="text-left">
+                  <div className="font-medium">Embed Demo</div>
+                  <div className="text-sm text-muted-foreground">Test widget integration</div>
+                </div>
+              </Button>
+            </Link>
+          </div>
+        </div>
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-semibold text-foreground">My Chatbots</h3>

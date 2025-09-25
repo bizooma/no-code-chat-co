@@ -14,6 +14,9 @@ import CreateChatbot from "./pages/CreateChatbot";
 import ChatbotEditor from "./pages/ChatbotEditor";
 import Widget from "./pages/Widget";
 import EmbedDemo from "./pages/EmbedDemo";
+import Analytics from "./pages/Analytics";
+import Leads from "./pages/Leads";
+import LeadIntegrations from "./pages/LeadIntegrations";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -115,6 +118,30 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <ChatbotEditor />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/analytics" 
+              element={
+                <ProtectedRoute>
+                  <Analytics />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/leads" 
+              element={
+                <ProtectedRoute>
+                  <Leads />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/leads/integrations" 
+              element={
+                <ProtectedRoute>
+                  <LeadIntegrations />
                 </ProtectedRoute>
               } 
             />
