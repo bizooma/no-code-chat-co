@@ -210,30 +210,39 @@ export type Database = {
       }
       conversation_messages: {
         Row: {
+          channel: string | null
           conversation_id: string
           created_at: string
+          external_message_id: string | null
           id: string
           message_text: string
           message_type: Database["public"]["Enums"]["message_type"]
           metadata: Json | null
+          platform_metadata: Json | null
           sender: Database["public"]["Enums"]["message_sender"]
         }
         Insert: {
+          channel?: string | null
           conversation_id: string
           created_at?: string
+          external_message_id?: string | null
           id?: string
           message_text: string
           message_type?: Database["public"]["Enums"]["message_type"]
           metadata?: Json | null
+          platform_metadata?: Json | null
           sender: Database["public"]["Enums"]["message_sender"]
         }
         Update: {
+          channel?: string | null
           conversation_id?: string
           created_at?: string
+          external_message_id?: string | null
           id?: string
           message_text?: string
           message_type?: Database["public"]["Enums"]["message_type"]
           metadata?: Json | null
+          platform_metadata?: Json | null
           sender?: Database["public"]["Enums"]["message_sender"]
         }
         Relationships: [
@@ -249,6 +258,7 @@ export type Database = {
       conversations: {
         Row: {
           assigned_agent_id: string | null
+          channel: string | null
           chatbot_id: string
           ended_at: string | null
           id: string
@@ -260,6 +270,7 @@ export type Database = {
         }
         Insert: {
           assigned_agent_id?: string | null
+          channel?: string | null
           chatbot_id: string
           ended_at?: string | null
           id?: string
@@ -271,6 +282,7 @@ export type Database = {
         }
         Update: {
           assigned_agent_id?: string | null
+          channel?: string | null
           chatbot_id?: string
           ended_at?: string | null
           id?: string
@@ -507,6 +519,50 @@ export type Database = {
         }
         Relationships: []
       }
+      webhook_logs: {
+        Row: {
+          created_at: string | null
+          delivered_at: string | null
+          event_type: string
+          id: string
+          payload: Json
+          response_body: string | null
+          response_status: number | null
+          webhook_url: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          delivered_at?: string | null
+          event_type: string
+          id?: string
+          payload: Json
+          response_body?: string | null
+          response_status?: number | null
+          webhook_url: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string | null
+          delivered_at?: string | null
+          event_type?: string
+          id?: string
+          payload?: Json
+          response_body?: string | null
+          response_status?: number | null
+          webhook_url?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webhook_logs_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_members: {
         Row: {
           accepted_at: string | null
@@ -663,6 +719,9 @@ export type Database = {
         | "facebook"
         | "whatsapp"
         | "email"
+        | "facebook_messenger"
+        | "whatsapp_business"
+        | "webhook"
       lead_status: "new" | "contacted" | "qualified" | "converted" | "lost"
       message_sender: "bot" | "user" | "agent"
       message_type: "text" | "image" | "file" | "form" | "button"
@@ -810,6 +869,9 @@ export const Constants = {
         "facebook",
         "whatsapp",
         "email",
+        "facebook_messenger",
+        "whatsapp_business",
+        "webhook",
       ],
       lead_status: ["new", "contacted", "qualified", "converted", "lost"],
       message_sender: ["bot", "user", "agent"],
