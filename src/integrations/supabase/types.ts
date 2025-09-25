@@ -14,6 +14,400 @@ export type Database = {
   }
   public: {
     Tables: {
+      analytics_events: {
+        Row: {
+          chatbot_id: string
+          conversation_id: string | null
+          created_at: string
+          event_data: Json | null
+          event_type: Database["public"]["Enums"]["event_type"]
+          id: string
+          visitor_id: string | null
+        }
+        Insert: {
+          chatbot_id: string
+          conversation_id?: string | null
+          created_at?: string
+          event_data?: Json | null
+          event_type: Database["public"]["Enums"]["event_type"]
+          id?: string
+          visitor_id?: string | null
+        }
+        Update: {
+          chatbot_id?: string
+          conversation_id?: string | null
+          created_at?: string
+          event_data?: Json | null
+          event_type?: Database["public"]["Enums"]["event_type"]
+          id?: string
+          visitor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analytics_events_chatbot_id_fkey"
+            columns: ["chatbot_id"]
+            isOneToOne: false
+            referencedRelation: "chatbots"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analytics_events_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chatbot_messages: {
+        Row: {
+          buttons: Json | null
+          chatbot_id: string
+          collect_lead_info: boolean
+          conditions: Json | null
+          created_at: string
+          id: string
+          message_key: string
+          message_text: string
+          message_type: Database["public"]["Enums"]["message_type"]
+          next_message_key: string | null
+          updated_at: string
+        }
+        Insert: {
+          buttons?: Json | null
+          chatbot_id: string
+          collect_lead_info?: boolean
+          conditions?: Json | null
+          created_at?: string
+          id?: string
+          message_key: string
+          message_text: string
+          message_type?: Database["public"]["Enums"]["message_type"]
+          next_message_key?: string | null
+          updated_at?: string
+        }
+        Update: {
+          buttons?: Json | null
+          chatbot_id?: string
+          collect_lead_info?: boolean
+          conditions?: Json | null
+          created_at?: string
+          id?: string
+          message_key?: string
+          message_text?: string
+          message_type?: Database["public"]["Enums"]["message_type"]
+          next_message_key?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chatbot_messages_chatbot_id_fkey"
+            columns: ["chatbot_id"]
+            isOneToOne: false
+            referencedRelation: "chatbots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chatbot_templates: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          preview_image: string | null
+          template_config: Json
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          preview_image?: string | null
+          template_config: Json
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          preview_image?: string | null
+          template_config?: Json
+        }
+        Relationships: []
+      }
+      chatbots: {
+        Row: {
+          ai_enabled: boolean
+          ai_model: string | null
+          ai_prompt: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          fallback_message: string
+          id: string
+          name: string
+          status: Database["public"]["Enums"]["chatbot_status"]
+          updated_at: string
+          welcome_message: string
+          widget_config: Json | null
+          workspace_id: string
+        }
+        Insert: {
+          ai_enabled?: boolean
+          ai_model?: string | null
+          ai_prompt?: string | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          fallback_message?: string
+          id?: string
+          name: string
+          status?: Database["public"]["Enums"]["chatbot_status"]
+          updated_at?: string
+          welcome_message?: string
+          widget_config?: Json | null
+          workspace_id: string
+        }
+        Update: {
+          ai_enabled?: boolean
+          ai_model?: string | null
+          ai_prompt?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          fallback_message?: string
+          id?: string
+          name?: string
+          status?: Database["public"]["Enums"]["chatbot_status"]
+          updated_at?: string
+          welcome_message?: string
+          widget_config?: Json | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chatbots_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "chatbots_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversation_messages: {
+        Row: {
+          conversation_id: string
+          created_at: string
+          id: string
+          message_text: string
+          message_type: Database["public"]["Enums"]["message_type"]
+          metadata: Json | null
+          sender: Database["public"]["Enums"]["message_sender"]
+        }
+        Insert: {
+          conversation_id: string
+          created_at?: string
+          id?: string
+          message_text: string
+          message_type?: Database["public"]["Enums"]["message_type"]
+          metadata?: Json | null
+          sender: Database["public"]["Enums"]["message_sender"]
+        }
+        Update: {
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          message_text?: string
+          message_type?: Database["public"]["Enums"]["message_type"]
+          metadata?: Json | null
+          sender?: Database["public"]["Enums"]["message_sender"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversation_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversations: {
+        Row: {
+          assigned_agent_id: string | null
+          chatbot_id: string
+          ended_at: string | null
+          id: string
+          lead_captured: boolean
+          started_at: string
+          status: Database["public"]["Enums"]["conversation_status"]
+          visitor_id: string
+          visitor_info: Json | null
+        }
+        Insert: {
+          assigned_agent_id?: string | null
+          chatbot_id: string
+          ended_at?: string | null
+          id?: string
+          lead_captured?: boolean
+          started_at?: string
+          status?: Database["public"]["Enums"]["conversation_status"]
+          visitor_id: string
+          visitor_info?: Json | null
+        }
+        Update: {
+          assigned_agent_id?: string | null
+          chatbot_id?: string
+          ended_at?: string | null
+          id?: string
+          lead_captured?: boolean
+          started_at?: string
+          status?: Database["public"]["Enums"]["conversation_status"]
+          visitor_id?: string
+          visitor_info?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_assigned_agent_id_fkey"
+            columns: ["assigned_agent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "conversations_chatbot_id_fkey"
+            columns: ["chatbot_id"]
+            isOneToOne: false
+            referencedRelation: "chatbots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      integrations: {
+        Row: {
+          config: Json
+          created_at: string
+          id: string
+          integration_type: Database["public"]["Enums"]["integration_type"]
+          is_active: boolean
+          name: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          config: Json
+          created_at?: string
+          id?: string
+          integration_type: Database["public"]["Enums"]["integration_type"]
+          is_active?: boolean
+          name: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          config?: Json
+          created_at?: string
+          id?: string
+          integration_type?: Database["public"]["Enums"]["integration_type"]
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "integrations_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leads: {
+        Row: {
+          additional_data: Json | null
+          chatbot_id: string
+          company: string | null
+          conversation_id: string
+          created_at: string
+          email: string | null
+          id: string
+          name: string | null
+          phone: string | null
+          source: string
+          status: Database["public"]["Enums"]["lead_status"]
+          value: number | null
+          workspace_id: string
+        }
+        Insert: {
+          additional_data?: Json | null
+          chatbot_id: string
+          company?: string | null
+          conversation_id: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string | null
+          phone?: string | null
+          source?: string
+          status?: Database["public"]["Enums"]["lead_status"]
+          value?: number | null
+          workspace_id: string
+        }
+        Update: {
+          additional_data?: Json | null
+          chatbot_id?: string
+          company?: string | null
+          conversation_id?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string | null
+          phone?: string | null
+          source?: string
+          status?: Database["public"]["Enums"]["lead_status"]
+          value?: number | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_chatbot_id_fkey"
+            columns: ["chatbot_id"]
+            isOneToOne: false
+            referencedRelation: "chatbots"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       platform_notifications: {
         Row: {
           created_at: string | null
@@ -113,6 +507,44 @@ export type Database = {
         }
         Relationships: []
       }
+      workspaces: {
+        Row: {
+          created_at: string
+          domain: string | null
+          id: string
+          is_active: boolean
+          name: string
+          owner_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          domain?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          owner_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          domain?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          owner_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspaces_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -130,6 +562,12 @@ export type Database = {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
       }
+      get_user_workspaces: {
+        Args: { user_uuid: string }
+        Returns: {
+          workspace_id: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -137,9 +575,30 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_workspace_member: {
+        Args: { user_uuid: string; workspace_uuid: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "platform_owner" | "user"
+      chatbot_status: "draft" | "active" | "inactive"
+      conversation_status: "active" | "ended" | "transferred_to_human"
+      event_type:
+        | "conversation_started"
+        | "message_sent"
+        | "lead_captured"
+        | "bot_triggered"
+      integration_type:
+        | "zapier"
+        | "hubspot"
+        | "mailchimp"
+        | "slack"
+        | "facebook"
+        | "whatsapp"
+      lead_status: "new" | "contacted" | "qualified" | "converted" | "lost"
+      message_sender: "bot" | "user" | "agent"
+      message_type: "text" | "image" | "file" | "form" | "button"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -268,6 +727,25 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["platform_owner", "user"],
+      chatbot_status: ["draft", "active", "inactive"],
+      conversation_status: ["active", "ended", "transferred_to_human"],
+      event_type: [
+        "conversation_started",
+        "message_sent",
+        "lead_captured",
+        "bot_triggered",
+      ],
+      integration_type: [
+        "zapier",
+        "hubspot",
+        "mailchimp",
+        "slack",
+        "facebook",
+        "whatsapp",
+      ],
+      lead_status: ["new", "contacted", "qualified", "converted", "lost"],
+      message_sender: ["bot", "user", "agent"],
+      message_type: ["text", "image", "file", "form", "button"],
     },
   },
 } as const
