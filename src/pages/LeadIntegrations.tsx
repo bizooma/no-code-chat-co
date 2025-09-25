@@ -19,7 +19,10 @@ import {
   AlertCircle,
   Settings,
   Zap,
-  RefreshCw
+  RefreshCw,
+  MessageSquare,
+  Phone,
+  Slack
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -57,6 +60,24 @@ const LeadIntegrations = () => {
   });
   const [googleSheetsConfig, setGoogleSheetsConfig] = useState({
     sheet_url: '',
+    enabled: false
+  });
+
+  // New multi-channel integrations
+  const [facebookConfig, setFacebookConfig] = useState({
+    access_token: '',
+    page_id: '',
+    verify_token: '',
+    enabled: false
+  });
+  const [whatsappConfig, setWhatsappConfig] = useState({
+    access_token: '',
+    phone_number_id: '',
+    verify_token: '',
+    enabled: false
+  });
+  const [slackConfig, setSlackConfig] = useState({
+    webhook_url: '',
     enabled: false
   });
 
@@ -110,6 +131,28 @@ const LeadIntegrations = () => {
         case 'google_sheets':
           setGoogleSheetsConfig({
             sheet_url: integration.config?.sheet_url || '',
+            enabled: integration.is_active
+          });
+          break;
+        case 'facebook_messenger':
+          setFacebookConfig({
+            access_token: integration.config?.access_token || '',
+            page_id: integration.config?.page_id || '',
+            verify_token: integration.config?.verify_token || '',
+            enabled: integration.is_active
+          });
+          break;
+        case 'whatsapp_business':
+          setWhatsappConfig({
+            access_token: integration.config?.access_token || '',
+            phone_number_id: integration.config?.phone_number_id || '',
+            verify_token: integration.config?.verify_token || '',
+            enabled: integration.is_active
+          });
+          break;
+        case 'slack':
+          setSlackConfig({
+            webhook_url: integration.config?.webhook_url || '',
             enabled: integration.is_active
           });
           break;
@@ -306,22 +349,34 @@ const LeadIntegrations = () => {
         </div>
 
         <Tabs defaultValue="zapier" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="zapier" className="flex items-center gap-2">
-              <Zap className="h-4 w-4" />
+          <TabsList className="grid w-full grid-cols-7 text-xs">
+            <TabsTrigger value="zapier" className="flex items-center gap-1">
+              <Zap className="h-3 w-3" />
               Zapier
             </TabsTrigger>
-            <TabsTrigger value="email" className="flex items-center gap-2">
-              <Mail className="h-4 w-4" />
+            <TabsTrigger value="email" className="flex items-center gap-1">
+              <Mail className="h-3 w-3" />
               Email
             </TabsTrigger>
-            <TabsTrigger value="hubspot" className="flex items-center gap-2">
-              <ExternalLink className="h-4 w-4" />
+            <TabsTrigger value="facebook" className="flex items-center gap-1">
+              <MessageSquare className="h-3 w-3" />
+              Facebook
+            </TabsTrigger>
+            <TabsTrigger value="whatsapp" className="flex items-center gap-1">
+              <Phone className="h-3 w-3" />
+              WhatsApp
+            </TabsTrigger>
+            <TabsTrigger value="slack" className="flex items-center gap-1">
+              <Slack className="h-3 w-3" />
+              Slack
+            </TabsTrigger>
+            <TabsTrigger value="hubspot" className="flex items-center gap-1">
+              <ExternalLink className="h-3 w-3" />
               HubSpot
             </TabsTrigger>
-            <TabsTrigger value="sheets" className="flex items-center gap-2">
-              <FileSpreadsheet className="h-4 w-4" />
-              Google Sheets
+            <TabsTrigger value="sheets" className="flex items-center gap-1">
+              <FileSpreadsheet className="h-3 w-3" />
+              Sheets
             </TabsTrigger>
           </TabsList>
 
@@ -511,6 +566,301 @@ const LeadIntegrations = () => {
                   >
                     Save Settings
                   </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Facebook Messenger Integration */}
+          <TabsContent value="facebook">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <MessageSquare className="h-5 w-5" />
+                      Facebook Messenger
+                    </CardTitle>
+                    <CardDescription>
+                      Connect your Facebook Page to receive messages
+                    </CardDescription>
+                  </div>
+                  {getIntegrationStatus('facebook_messenger') && (
+                    <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                      <CheckCircle className="mr-1 h-3 w-3" />
+                      Active
+                    </Badge>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="fb-page-id">Page ID</Label>
+                    <Input
+                      id="fb-page-id"
+                      placeholder="Your Facebook Page ID"
+                      value={facebookConfig.page_id}
+                      onChange={(e) => setFacebookConfig(prev => ({ ...prev, page_id: e.target.value }))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="fb-access-token">Page Access Token</Label>
+                    <Input
+                      id="fb-access-token"
+                      type="password"
+                      placeholder="Your Page Access Token"
+                      value={facebookConfig.access_token}
+                      onChange={(e) => setFacebookConfig(prev => ({ ...prev, access_token: e.target.value }))}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="fb-verify-token">Verify Token</Label>
+                  <Input
+                    id="fb-verify-token"
+                    placeholder="Create a unique verify token"
+                    value={facebookConfig.verify_token}
+                    onChange={(e) => setFacebookConfig(prev => ({ ...prev, verify_token: e.target.value }))}
+                  />
+                </div>
+
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg space-y-2">
+                  <h4 className="font-medium">Webhook URL</h4>
+                  <code className="text-sm bg-muted p-2 rounded block">
+                    https://jsyqavxvspkqitrwbeay.functions.supabase.co/facebook-messenger-webhook
+                  </code>
+                  <p className="text-sm text-muted-foreground">
+                    Use this URL when setting up your Facebook webhook
+                  </p>
+                </div>
+
+                <Button
+                  onClick={() => saveIntegration(
+                    'facebook_messenger',
+                    'Facebook Messenger',
+                    {
+                      access_token: facebookConfig.access_token,
+                      page_id: facebookConfig.page_id,
+                      verify_token: facebookConfig.verify_token
+                    },
+                    !!(facebookConfig.access_token && facebookConfig.page_id)
+                  )}
+                  disabled={!facebookConfig.access_token || !facebookConfig.page_id}
+                >
+                  Save Integration
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* WhatsApp Business Integration */}
+          <TabsContent value="whatsapp">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Phone className="h-5 w-5" />
+                      WhatsApp Business
+                    </CardTitle>
+                    <CardDescription>
+                      Connect WhatsApp Business API for messaging
+                    </CardDescription>
+                  </div>
+                  {getIntegrationStatus('whatsapp_business') && (
+                    <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                      <CheckCircle className="mr-1 h-3 w-3" />
+                      Active
+                    </Badge>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="wa-phone-id">Phone Number ID</Label>
+                    <Input
+                      id="wa-phone-id"
+                      placeholder="Your WhatsApp Phone Number ID"
+                      value={whatsappConfig.phone_number_id}
+                      onChange={(e) => setWhatsappConfig(prev => ({ ...prev, phone_number_id: e.target.value }))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="wa-access-token">Access Token</Label>
+                    <Input
+                      id="wa-access-token"
+                      type="password"
+                      placeholder="Your WhatsApp Access Token"
+                      value={whatsappConfig.access_token}
+                      onChange={(e) => setWhatsappConfig(prev => ({ ...prev, access_token: e.target.value }))}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="wa-verify-token">Verify Token</Label>
+                  <Input
+                    id="wa-verify-token"
+                    placeholder="Create a unique verify token"
+                    value={whatsappConfig.verify_token}
+                    onChange={(e) => setWhatsappConfig(prev => ({ ...prev, verify_token: e.target.value }))}
+                  />
+                </div>
+
+                <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg space-y-2">
+                  <h4 className="font-medium">Webhook URL</h4>
+                  <code className="text-sm bg-muted p-2 rounded block">
+                    https://jsyqavxvspkqitrwbeay.functions.supabase.co/whatsapp-business-webhook
+                  </code>
+                  <p className="text-sm text-muted-foreground">
+                    Use this URL when setting up your WhatsApp webhook
+                  </p>
+                </div>
+
+                <Button
+                  onClick={() => saveIntegration(
+                    'whatsapp_business',
+                    'WhatsApp Business',
+                    {
+                      access_token: whatsappConfig.access_token,
+                      phone_number_id: whatsappConfig.phone_number_id,
+                      verify_token: whatsappConfig.verify_token
+                    },
+                    !!(whatsappConfig.access_token && whatsappConfig.phone_number_id)
+                  )}
+                  disabled={!whatsappConfig.access_token || !whatsappConfig.phone_number_id}
+                >
+                  Save Integration
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Slack Integration */}
+          <TabsContent value="slack">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Slack className="h-5 w-5" />
+                      Slack Notifications
+                    </CardTitle>
+                    <CardDescription>
+                      Send lead notifications to your Slack channels
+                    </CardDescription>
+                  </div>
+                  {getIntegrationStatus('slack') && (
+                    <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                      <CheckCircle className="mr-1 h-3 w-3" />
+                      Active
+                    </Badge>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="slack-webhook">Slack Webhook URL</Label>
+                  <Input
+                    id="slack-webhook"
+                    placeholder="https://hooks.slack.com/services/..."
+                    value={slackConfig.webhook_url}
+                    onChange={(e) => setSlackConfig(prev => ({ ...prev, webhook_url: e.target.value }))}
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    Create a Slack app and incoming webhook to get this URL
+                  </p>
+                </div>
+
+                <div className="flex gap-2">
+                  <Button
+                    onClick={async () => {
+                      if (!slackConfig.webhook_url) {
+                        toast({
+                          title: "Error",
+                          description: "Please enter a Slack webhook URL",
+                          variant: "destructive",
+                        });
+                        return;
+                      }
+
+                      setTestingIntegration('slack');
+                      try {
+                        const { data: workspaceData } = await supabase
+                          .from('workspaces')
+                          .select('id')
+                          .limit(1)
+                          .single();
+
+                        const { error } = await supabase.functions.invoke('slack-notifications', {
+                          body: {
+                            workspace_id: workspaceData?.id,
+                            test: true,
+                            lead: {
+                              name: "Test User",
+                              email: "test@example.com",
+                              phone: "+1234567890",
+                              company: "Test Company",
+                              chatbot: "Test Bot"
+                            }
+                          }
+                        });
+
+                        if (error) throw error;
+
+                        toast({
+                          title: "Test Sent",
+                          description: "Test notification sent to Slack successfully",
+                        });
+                      } catch (error) {
+                        console.error("Error testing Slack:", error);
+                        toast({
+                          title: "Error",
+                          description: "Failed to send test notification",
+                          variant: "destructive",
+                        });
+                      } finally {
+                        setTestingIntegration(null);
+                      }
+                    }}
+                    variant="outline"
+                    disabled={testingIntegration === 'slack' || !slackConfig.webhook_url}
+                  >
+                    {testingIntegration === 'slack' ? (
+                      <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Send className="mr-2 h-4 w-4" />
+                    )}
+                    Test Notification
+                  </Button>
+                  <Button
+                    onClick={() => saveIntegration(
+                      'slack',
+                      'Slack Notifications',
+                      { webhook_url: slackConfig.webhook_url },
+                      !!slackConfig.webhook_url
+                    )}
+                    disabled={!slackConfig.webhook_url}
+                  >
+                    Save Integration
+                  </Button>
+                </div>
+
+                <Separator />
+
+                <div className="text-sm text-muted-foreground space-y-2">
+                  <h4 className="font-medium text-foreground">Setup Instructions:</h4>
+                  <ol className="list-decimal list-inside space-y-1">
+                    <li>Go to <a href="https://api.slack.com/apps" target="_blank" className="text-primary hover:underline">api.slack.com/apps</a> and create a new app</li>
+                    <li>Choose "From scratch" and select your workspace</li>
+                    <li>Go to "Incoming Webhooks" and activate them</li>
+                    <li>Click "Add New Webhook to Workspace" and select a channel</li>
+                    <li>Copy the webhook URL and paste it above</li>
+                    <li>Test the integration using the button above</li>
+                  </ol>
                 </div>
               </CardContent>
             </Card>
