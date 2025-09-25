@@ -346,6 +346,20 @@ const Landing = () => {
 
       {/* Footer */}
       <footer className="border-t border-border py-12 px-4">
+        {/* Google Map */}
+        <div className="w-full mb-8">
+          <iframe 
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3443.794538479383!2d-81.6591862!3d30.3283615!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x88e5b7ba8c79c7b7%3A0x29d0d337ce7701c4!2sBizooma%20Digital%20Marketing%20Agency!5e0!3m2!1sen!2sus!4v1758842732390!5m2!1sen!2sus"
+            width="100%"
+            height="300"
+            style={{ border: 0 }}
+            allowFullScreen={true}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            className="w-full"
+          />
+        </div>
+        
         <div className="container mx-auto text-center">
           <div className="flex items-center justify-center space-x-2 mb-4">
             <Bot className="h-6 w-6 text-primary" />
