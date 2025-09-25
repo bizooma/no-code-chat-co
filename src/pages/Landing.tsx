@@ -352,7 +352,16 @@ const Landing = () => {
             <span className="font-bold text-foreground">SupportBots.dev</span>
           </div>
           <p className="text-sm text-muted-foreground">
-            © 2025 Support Bots.dev, A Bizooma, LLC Company | All rights reserved.
+            © 2025 Support Bots.dev, A{" "}
+            <a 
+              href="https://bizooma.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              Bizooma, LLC
+            </a>{" "}
+            Company | All rights reserved.
           </p>
         </div>
       </footer>
