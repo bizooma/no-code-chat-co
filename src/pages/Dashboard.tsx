@@ -2,10 +2,11 @@ import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, Bot, Users, BarChart3 } from 'lucide-react';
+import { Plus, Bot, Users, BarChart3, Bell, Settings } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
-  const { user, signOut } = useAuth();
+  const { user, signOut, isPlatformOwner } = useAuth();
 
   return (
     <div className="min-h-screen bg-background">
@@ -76,6 +77,53 @@ const Dashboard = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Platform Management Section - Only for Platform Owners */}
+        {isPlatformOwner && (
+          <div className="mb-8">
+            <h3 className="text-xl font-semibold text-foreground mb-6">Platform Management</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="h-5 w-5" />
+                    User Management
+                  </CardTitle>
+                  <CardDescription>
+                    Manage platform users and their roles
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Link to="/user-management">
+                    <Button className="w-full">
+                      <Settings className="mr-2 h-4 w-4" />
+                      Manage Users
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Bell className="h-5 w-5" />
+                    Platform Notifications
+                  </CardTitle>
+                  <CardDescription>
+                    Send notifications to all platform users
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Link to="/platform-notifications">
+                    <Button className="w-full">
+                      <Bell className="mr-2 h-4 w-4" />
+                      Manage Notifications
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        )}
 
         {/* My Bots Section */}
         <div className="mb-8">
