@@ -72,6 +72,11 @@ export type Database = {
           message_type: Database["public"]["Enums"]["message_type"]
           next_message_key: string | null
           updated_at: string
+          video_autoplay: boolean | null
+          video_controls: boolean | null
+          video_duration: number | null
+          video_thumbnail: string | null
+          video_url: string | null
         }
         Insert: {
           buttons?: Json | null
@@ -85,6 +90,11 @@ export type Database = {
           message_type?: Database["public"]["Enums"]["message_type"]
           next_message_key?: string | null
           updated_at?: string
+          video_autoplay?: boolean | null
+          video_controls?: boolean | null
+          video_duration?: number | null
+          video_thumbnail?: string | null
+          video_url?: string | null
         }
         Update: {
           buttons?: Json | null
@@ -98,6 +108,11 @@ export type Database = {
           message_type?: Database["public"]["Enums"]["message_type"]
           next_message_key?: string | null
           updated_at?: string
+          video_autoplay?: boolean | null
+          video_controls?: boolean | null
+          video_duration?: number | null
+          video_thumbnail?: string | null
+          video_url?: string | null
         }
         Relationships: [
           {
@@ -155,6 +170,8 @@ export type Database = {
           name: string
           status: Database["public"]["Enums"]["chatbot_status"]
           updated_at: string
+          video_config: Json | null
+          video_type: string | null
           welcome_message: string
           widget_config: Json | null
           workspace_id: string
@@ -171,6 +188,8 @@ export type Database = {
           name: string
           status?: Database["public"]["Enums"]["chatbot_status"]
           updated_at?: string
+          video_config?: Json | null
+          video_type?: string | null
           welcome_message?: string
           widget_config?: Json | null
           workspace_id: string
@@ -187,6 +206,8 @@ export type Database = {
           name?: string
           status?: Database["public"]["Enums"]["chatbot_status"]
           updated_at?: string
+          video_config?: Json | null
+          video_type?: string | null
           welcome_message?: string
           widget_config?: Json | null
           workspace_id?: string
@@ -724,7 +745,15 @@ export type Database = {
         | "webhook"
       lead_status: "new" | "contacted" | "qualified" | "converted" | "lost"
       message_sender: "bot" | "user" | "agent"
-      message_type: "text" | "image" | "file" | "form" | "button"
+      message_type:
+        | "text"
+        | "image"
+        | "file"
+        | "form"
+        | "button"
+        | "youtube_video"
+        | "uploaded_video"
+        | "video_intro"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -875,7 +904,16 @@ export const Constants = {
       ],
       lead_status: ["new", "contacted", "qualified", "converted", "lost"],
       message_sender: ["bot", "user", "agent"],
-      message_type: ["text", "image", "file", "form", "button"],
+      message_type: [
+        "text",
+        "image",
+        "file",
+        "form",
+        "button",
+        "youtube_video",
+        "uploaded_video",
+        "video_intro",
+      ],
     },
   },
 } as const

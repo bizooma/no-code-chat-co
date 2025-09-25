@@ -47,11 +47,16 @@ interface ChatbotMessage {
   id: string;
   message_key: string;
   message_text: string;
-  message_type: 'text' | 'image' | 'file' | 'form' | 'button';
+  message_type: 'text' | 'image' | 'file' | 'form' | 'button' | 'youtube_video' | 'uploaded_video' | 'video_intro';
   next_message_key: string | null;
   conditions: any;
   buttons: any;
   collect_lead_info: boolean;
+  video_url?: string;
+  video_thumbnail?: string;
+  video_duration?: number;
+  video_autoplay?: boolean;
+  video_controls?: boolean;
 }
 
 const ChatbotEditor = () => {

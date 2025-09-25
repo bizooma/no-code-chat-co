@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { X, Send, Bot, User, Minimize2 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { VideoPlayer } from '@/components/video/VideoPlayer';
 
 interface Chatbot {
   id: string;
@@ -18,11 +19,16 @@ interface ChatbotMessage {
   id: string;
   message_key: string;
   message_text: string;
-  message_type: 'text' | 'image' | 'file' | 'form' | 'button';
+  message_type: 'text' | 'image' | 'file' | 'form' | 'button' | 'youtube_video' | 'uploaded_video' | 'video_intro';
   next_message_key: string | null;
   conditions: any;
   buttons: any;
   collect_lead_info: boolean;
+  video_url?: string;
+  video_thumbnail?: string;
+  video_duration?: number;
+  video_autoplay?: boolean;
+  video_controls?: boolean;
 }
 
 interface ConversationMessage {
@@ -33,6 +39,10 @@ interface ConversationMessage {
   buttons?: { text: string; next_key: string }[];
   isForm?: boolean;
   formFields?: string[];
+  messageType?: 'text' | 'image' | 'file' | 'form' | 'button' | 'youtube_video' | 'uploaded_video' | 'video_intro';
+  videoUrl?: string;
+  videoAutoplay?: boolean;
+  videoControls?: boolean;
 }
 
 interface ChatPreviewProps {
@@ -94,7 +104,11 @@ export const ChatPreview: React.FC<ChatPreviewProps> = ({
       timestamp: new Date(),
       buttons: message.buttons && Array.isArray(message.buttons) ? message.buttons : undefined,
       isForm: message.collect_lead_info,
-      formFields: message.collect_lead_info && message.conditions?.lead_fields ? message.conditions.lead_fields : undefined
+      formFields: message.collect_lead_info && message.conditions?.lead_fields ? message.conditions.lead_fields : undefined,
+      messageType: message.message_type,
+      videoUrl: message.video_url,
+      videoAutoplay: message.video_autoplay,
+      videoControls: message.video_controls
     };
 
     setConversation(prev => [...prev, newMessage]);
@@ -183,6 +197,30 @@ export const ChatPreview: React.FC<ChatPreviewProps> = ({
         >
           <p className="text-sm whitespace-pre-wrap">{message.text}</p>
         </div>
+
+        {/* Video content for video message types */}
+        {message.messageType && 
+         (message.messageType === 'youtube_video' || 
+          message.messageType === 'uploaded_video' || 
+          message.messageType === 'video_intro') && 
+         message.videoUrl && (
+          <div className="mt-2">
+            <VideoPlayer
+              type={message.messageType === 'youtube_video' ? 'youtube' : 
+                    message.messageType === 'uploaded_video' ? 'uploaded' : 'video_intro'}
+              url={message.videoUrl}
+              autoplay={message.videoAutoplay}
+              controls={message.videoControls}
+              className="max-w-sm"
+              onVideoEnd={() => {
+                // Continue to next message or chat flow after video ends
+                if (message.messageType === 'video_intro') {
+                  // Logic for continuing after intro video
+                }
+              }}
+            />
+          </div>
+        )}
         
         {message.buttons && message.buttons.length > 0 && (
           <div className="mt-2 space-y-1">

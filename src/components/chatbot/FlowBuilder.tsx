@@ -17,7 +17,10 @@ import {
   Phone,
   User,
   Building,
-  FileText
+  FileText,
+  Video,
+  Youtube,
+  Play
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -42,11 +45,16 @@ interface ChatbotMessage {
   id: string;
   message_key: string;
   message_text: string;
-  message_type: 'text' | 'image' | 'file' | 'form' | 'button';
+  message_type: 'text' | 'image' | 'file' | 'form' | 'button' | 'youtube_video' | 'uploaded_video' | 'video_intro';
   next_message_key: string | null;
   conditions: any;
   buttons: any;
   collect_lead_info: boolean;
+  video_url?: string;
+  video_thumbnail?: string;
+  video_duration?: number;
+  video_autoplay?: boolean;
+  video_controls?: boolean;
 }
 
 interface FlowBuilderProps {
@@ -58,10 +66,14 @@ interface FlowBuilderProps {
 interface NewMessageData {
   message_key: string;
   message_text: string;
-  message_type: 'text' | 'form' | 'button';
+  message_type: 'text' | 'form' | 'button' | 'youtube_video' | 'uploaded_video' | 'video_intro';
   buttons: { text: string; next_key: string }[];
   collect_lead_info: boolean;
   lead_fields: string[];
+  video_url?: string;
+  video_thumbnail?: string;
+  video_autoplay?: boolean;
+  video_controls?: boolean;
 }
 
 export const FlowBuilder: React.FC<FlowBuilderProps> = ({
@@ -78,7 +90,10 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
     message_type: 'text',
     buttons: [],
     collect_lead_info: false,
-    lead_fields: []
+    lead_fields: [],
+    video_url: '',
+    video_autoplay: false,
+    video_controls: true
   });
 
   const addMessage = async () => {
@@ -110,6 +125,9 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
         buttons: newMessage.message_type === 'button' ? newMessage.buttons : null,
         collect_lead_info: newMessage.collect_lead_info,
         conditions: newMessage.collect_lead_info ? { lead_fields: newMessage.lead_fields } : null,
+        video_url: newMessage.video_url || null,
+        video_autoplay: newMessage.video_autoplay || false,
+        video_controls: newMessage.video_controls !== false,
       };
 
       const { data, error } = await supabase
@@ -128,7 +146,10 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
         message_type: 'text',
         buttons: [],
         collect_lead_info: false,
-        lead_fields: []
+        lead_fields: [],
+        video_url: '',
+        video_autoplay: false,
+        video_controls: true
       });
 
       toast({
@@ -233,6 +254,9 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
     switch (type) {
       case 'form': return <Mail className="h-4 w-4" />;
       case 'button': return <FileText className="h-4 w-4" />;
+      case 'youtube_video': return <Youtube className="h-4 w-4" />;
+      case 'uploaded_video': return <Video className="h-4 w-4" />;
+      case 'video_intro': return <Play className="h-4 w-4" />;
       default: return <MessageSquare className="h-4 w-4" />;
     }
   };
@@ -282,7 +306,7 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
                   <Label htmlFor="message_type">Message Type</Label>
                   <Select
                     value={newMessage.message_type}
-                    onValueChange={(value: 'text' | 'form' | 'button') => 
+                    onValueChange={(value: NewMessageData['message_type']) => 
                       setNewMessage(prev => ({ ...prev, message_type: value }))
                     }
                   >
@@ -293,6 +317,9 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
                       <SelectItem value="text">Text Message</SelectItem>
                       <SelectItem value="button">Button Options</SelectItem>
                       <SelectItem value="form">Lead Capture Form</SelectItem>
+                      <SelectItem value="youtube_video">YouTube Video</SelectItem>
+                      <SelectItem value="uploaded_video">Uploaded Video</SelectItem>
+                      <SelectItem value="video_intro">Video Introduction</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -386,6 +413,46 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
                       </div>
                     </div>
                   )}
+                </div>
+              )}
+
+              {(newMessage.message_type === 'youtube_video' || 
+                newMessage.message_type === 'uploaded_video' || 
+                newMessage.message_type === 'video_intro') && (
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="video_url">Video URL</Label>
+                    <Input
+                      id="video_url"
+                      placeholder={newMessage.message_type === 'youtube_video' 
+                        ? "https://www.youtube.com/watch?v=..." 
+                        : "Video file URL"}
+                      value={newMessage.video_url || ''}
+                      onChange={(e) => setNewMessage(prev => ({ ...prev, video_url: e.target.value }))}
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        checked={newMessage.video_autoplay || false}
+                        onCheckedChange={(checked) => 
+                          setNewMessage(prev => ({ ...prev, video_autoplay: checked }))
+                        }
+                      />
+                      <Label>Autoplay</Label>
+                    </div>
+                    
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        checked={newMessage.video_controls !== false}
+                        onCheckedChange={(checked) => 
+                          setNewMessage(prev => ({ ...prev, video_controls: checked }))
+                        }
+                      />
+                      <Label>Show Controls</Label>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
