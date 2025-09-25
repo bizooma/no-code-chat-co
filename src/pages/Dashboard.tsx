@@ -1,22 +1,62 @@
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useWorkspace } from '@/contexts/WorkspaceContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Bot, Users, BarChart3, Bell, Settings, Target, Crown } from 'lucide-react';
+import { Plus, Bot, Users, BarChart3, Bell, Settings, Target, Crown, Building2, Palette } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import WorkspaceSwitcher from '@/components/WorkspaceSwitcher';
 
 const Dashboard = () => {
   const { user, signOut, isPlatformOwner, subscription } = useAuth();
+  const { currentWorkspace } = useWorkspace();
+
+  const brandColor = currentWorkspace?.brand_color || '#3B82F6';
+  const isWhiteLabeled = currentWorkspace?.white_label_enabled;
+  const brandName = isWhiteLabeled ? (currentWorkspace?.agency_name || 'SupportBots') : 'SupportBots';
 
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <h1 className="text-2xl font-bold text-foreground">SupportBots.dev</h1>
+          <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-2">
+              {currentWorkspace?.logo_url && !isWhiteLabeled ? (
+                <img 
+                  src={currentWorkspace.logo_url} 
+                  alt={brandName}
+                  className="h-8 w-auto"
+                />
+              ) : (
+                <div 
+                  className="h-8 w-8 rounded flex items-center justify-center text-white font-bold text-sm"
+                  style={{ backgroundColor: brandColor }}
+                >
+                  {brandName.charAt(0)}
+                </div>
+              )}
+              <h1 className="text-xl font-bold">{isWhiteLabeled ? brandName : 'SupportBots.dev'}</h1>
+            </div>
+            
+            <WorkspaceSwitcher />
+            
+            {currentWorkspace && (
+              <div className="flex items-center gap-2">
+                {currentWorkspace.white_label_enabled && (
+                  <Badge variant="outline" className="gap-1">
+                    <Crown className="w-3 h-3" />
+                    White Label
+                  </Badge>
+                )}
+                <Badge variant="secondary">
+                  {currentWorkspace.subscription_tier}
+                </Badge>
+              </div>
+            )}
           </div>
+          
           <div className="flex items-center space-x-4">
             <span className="text-sm text-muted-foreground">
               Welcome, {user?.user_metadata?.full_name || user?.email}
@@ -139,7 +179,7 @@ const Dashboard = () => {
         {isPlatformOwner && (
           <div className="mb-8">
             <h3 className="text-xl font-semibold text-foreground mb-6">Platform Management</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -159,6 +199,27 @@ const Dashboard = () => {
                   </Link>
                 </CardContent>
               </Card>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Building2 className="h-5 w-5" />
+                    Workspace Management
+                  </CardTitle>
+                  <CardDescription>
+                    Manage client workspaces and agency settings
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Link to="/workspaces">
+                    <Button className="w-full">
+                      <Building2 className="mr-2 h-4 w-4" />
+                      Manage Workspaces
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+              
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -187,7 +248,7 @@ const Dashboard = () => {
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-semibold text-foreground">Quick Actions</h3>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             <Link to="/chatbots">
               <Button variant="outline" className="w-full justify-start h-auto p-4">
                 <Bot className="mr-3 h-5 w-5" />
@@ -212,6 +273,15 @@ const Dashboard = () => {
                 <div className="text-left">
                   <div className="font-medium">Leads</div>
                   <div className="text-sm text-muted-foreground">Manage captured leads</div>
+                </div>
+              </Button>
+            </Link>
+            <Link to="/portal">
+              <Button variant="outline" className="w-full justify-start h-auto p-4">
+                <Building2 className="mr-3 h-5 w-5" />
+                <div className="text-left">
+                  <div className="font-medium">Client Portal</div>
+                  <div className="text-sm text-muted-foreground">View as client</div>
                 </div>
               </Button>
             </Link>

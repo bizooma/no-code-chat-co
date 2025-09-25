@@ -507,33 +507,95 @@ export type Database = {
         }
         Relationships: []
       }
+      workspace_members: {
+        Row: {
+          accepted_at: string | null
+          created_at: string | null
+          id: string
+          invited_at: string | null
+          invited_by: string | null
+          role: string
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string | null
+          id?: string
+          invited_at?: string | null
+          invited_by?: string | null
+          role?: string
+          user_id: string
+          workspace_id: string
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string | null
+          id?: string
+          invited_at?: string | null
+          invited_by?: string | null
+          role?: string
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_members_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspaces: {
         Row: {
+          agency_name: string | null
+          brand_color: string | null
+          client_name: string | null
           created_at: string
+          custom_domain: string | null
           domain: string | null
           id: string
           is_active: boolean
+          logo_url: string | null
           name: string
           owner_id: string
+          subscription_tier: string | null
           updated_at: string
+          white_label_enabled: boolean | null
         }
         Insert: {
+          agency_name?: string | null
+          brand_color?: string | null
+          client_name?: string | null
           created_at?: string
+          custom_domain?: string | null
           domain?: string | null
           id?: string
           is_active?: boolean
+          logo_url?: string | null
           name: string
           owner_id: string
+          subscription_tier?: string | null
           updated_at?: string
+          white_label_enabled?: boolean | null
         }
         Update: {
+          agency_name?: string | null
+          brand_color?: string | null
+          client_name?: string | null
           created_at?: string
+          custom_domain?: string | null
           domain?: string | null
           id?: string
           is_active?: boolean
+          logo_url?: string | null
           name?: string
           owner_id?: string
+          subscription_tier?: string | null
           updated_at?: string
+          white_label_enabled?: boolean | null
         }
         Relationships: [
           {
@@ -573,6 +635,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_workspace_admin: {
+        Args: { user_uuid: string; workspace_uuid: string }
         Returns: boolean
       }
       is_workspace_member: {
