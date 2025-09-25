@@ -67,14 +67,17 @@ export type Database = {
           conditions: Json | null
           created_at: string
           id: string
+          interactive_elements: Json | null
           message_key: string
           message_text: string
           message_type: Database["public"]["Enums"]["message_type"]
           next_message_key: string | null
           updated_at: string
           video_autoplay: boolean | null
+          video_chapters: Json | null
           video_controls: boolean | null
           video_duration: number | null
+          video_layout: string | null
           video_thumbnail: string | null
           video_url: string | null
         }
@@ -85,14 +88,17 @@ export type Database = {
           conditions?: Json | null
           created_at?: string
           id?: string
+          interactive_elements?: Json | null
           message_key: string
           message_text: string
           message_type?: Database["public"]["Enums"]["message_type"]
           next_message_key?: string | null
           updated_at?: string
           video_autoplay?: boolean | null
+          video_chapters?: Json | null
           video_controls?: boolean | null
           video_duration?: number | null
+          video_layout?: string | null
           video_thumbnail?: string | null
           video_url?: string | null
         }
@@ -103,14 +109,17 @@ export type Database = {
           conditions?: Json | null
           created_at?: string
           id?: string
+          interactive_elements?: Json | null
           message_key?: string
           message_text?: string
           message_type?: Database["public"]["Enums"]["message_type"]
           next_message_key?: string | null
           updated_at?: string
           video_autoplay?: boolean | null
+          video_chapters?: Json | null
           video_controls?: boolean | null
           video_duration?: number | null
+          video_layout?: string | null
           video_thumbnail?: string | null
           video_url?: string | null
         }
@@ -539,6 +548,66 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      video_analytics: {
+        Row: {
+          chatbot_id: string
+          completion_rate: number | null
+          conversation_id: string | null
+          created_at: string
+          event_data: Json | null
+          event_type: string
+          id: string
+          session_duration: number | null
+          timestamp: string
+          video_type: string
+          video_url: string
+          visitor_id: string | null
+        }
+        Insert: {
+          chatbot_id: string
+          completion_rate?: number | null
+          conversation_id?: string | null
+          created_at?: string
+          event_data?: Json | null
+          event_type: string
+          id?: string
+          session_duration?: number | null
+          timestamp?: string
+          video_type: string
+          video_url: string
+          visitor_id?: string | null
+        }
+        Update: {
+          chatbot_id?: string
+          completion_rate?: number | null
+          conversation_id?: string | null
+          created_at?: string
+          event_data?: Json | null
+          event_type?: string
+          id?: string
+          session_duration?: number | null
+          timestamp?: string
+          video_type?: string
+          video_url?: string
+          visitor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_analytics_chatbot_id_fkey"
+            columns: ["chatbot_id"]
+            isOneToOne: false
+            referencedRelation: "chatbots"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "video_analytics_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       webhook_logs: {
         Row: {

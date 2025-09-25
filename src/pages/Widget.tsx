@@ -16,6 +16,7 @@ import {
   Building,
   UserIcon
 } from 'lucide-react';
+import { VideoPlayer } from '@/components/video/VideoPlayer';
 import { supabase } from '@/integrations/supabase/client';
 import { useSearchParams } from 'react-router-dom';
 
@@ -36,6 +37,15 @@ interface ChatbotMessage {
   buttons: any;
   collect_lead_info: boolean;
   conditions: any;
+  video_url?: string;
+  video_type?: string;
+  video_thumbnail?: string;
+  video_duration?: number;
+  video_autoplay?: boolean;
+  video_controls?: boolean;
+  video_layout?: string;
+  interactive_elements?: any;
+  video_chapters?: any;
 }
 
 interface ConversationMessage {
@@ -46,6 +56,16 @@ interface ConversationMessage {
   buttons?: { text: string; next_key: string }[];
   isForm?: boolean;
   formFields?: string[];
+  hasVideo?: boolean;
+  videoProps?: {
+    type: 'youtube' | 'uploaded' | 'video_intro';
+    url: string;
+    autoplay?: boolean;
+    controls?: boolean;
+    layout?: string;
+    interactive_elements?: any[];
+    chapters?: any[];
+  };
 }
 
 const Widget = () => {
@@ -220,6 +240,8 @@ const Widget = () => {
   };
 
   const sendBotMessage = async (message: ChatbotMessage, convId?: string) => {
+    const hasVideo = ['youtube_video', 'uploaded_video', 'video_intro'].includes(message.message_type);
+    
     const newMessage: ConversationMessage = {
       id: Date.now().toString(),
       sender: 'bot',
@@ -227,7 +249,17 @@ const Widget = () => {
       timestamp: new Date(),
       buttons: message.buttons ? message.buttons : undefined,
       isForm: message.collect_lead_info,
-      formFields: message.collect_lead_info && message.conditions?.lead_fields ? message.conditions.lead_fields : undefined
+      formFields: message.collect_lead_info && message.conditions?.lead_fields ? message.conditions.lead_fields : undefined,
+      hasVideo,
+      videoProps: hasVideo ? {
+        type: message.video_type as 'youtube' | 'uploaded' | 'video_intro',
+        url: message.video_url!,
+        autoplay: message.video_autoplay,
+        controls: message.video_controls,
+        layout: message.video_layout,
+        interactive_elements: message.interactive_elements,
+        chapters: message.video_chapters
+      } : undefined
     };
 
     setConversation(prev => [...prev, newMessage]);
@@ -365,6 +397,25 @@ const Widget = () => {
         >
           <p className="text-sm whitespace-pre-wrap">{message.text}</p>
         </div>
+
+        {/* Video Content */}
+        {message.hasVideo && message.videoProps && (
+          <div className="mt-3">
+            <VideoPlayer
+              type={message.videoProps.type}
+              url={message.videoProps.url}
+              autoplay={message.videoProps.autoplay}
+              controls={message.videoProps.controls !== false}
+              layout={message.videoProps.layout as any}
+              chatbotId={chatbotId || undefined}
+              conversationId={conversationId || undefined}
+              visitorId={visitorId}
+              interactiveElements={message.videoProps.interactive_elements}
+              chapters={message.videoProps.chapters}
+              className="max-w-full"
+            />
+          </div>
+        )}
         
         {message.buttons && message.buttons.length > 0 && (
           <div className="mt-2 space-y-1">

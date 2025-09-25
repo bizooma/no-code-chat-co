@@ -7,7 +7,24 @@ All colors MUST be HSL.
 */
 
 @layer base {
-  :root {
+:root {
+    /* Video Layout Tokens */
+    --video-primary: 214.3 78% 51%;
+    --video-primary-glow: 214.3 78% 61%;
+    --video-secondary: 214.3 32% 17%;
+    --video-accent: 271.5 81% 56%;
+    
+    /* Video Gradients */
+    --gradient-video-overlay: linear-gradient(135deg, hsl(var(--video-primary) / 0.9), hsl(var(--video-accent) / 0.8));
+    --gradient-video-controls: linear-gradient(180deg, transparent, hsl(0 0% 0% / 0.6));
+    
+    /* Video Shadows */
+    --shadow-video: 0 10px 30px -10px hsl(var(--video-primary) / 0.3);
+    --shadow-video-interactive: 0 0 20px hsl(var(--video-accent) / 0.4);
+    
+    /* Animations */
+    --transition-video: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
 
@@ -56,6 +73,12 @@ All colors MUST be HSL.
   }
 
   .dark {
+    /* Video Layout Tokens - Dark Mode */
+    --video-primary: 214.3 78% 61%;
+    --video-primary-glow: 214.3 78% 71%;
+    --video-secondary: 214.3 32% 27%;
+    --video-accent: 271.5 81% 66%;
+    
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
 

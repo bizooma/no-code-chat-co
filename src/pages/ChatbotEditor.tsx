@@ -18,6 +18,7 @@ import {
   Palette, 
   Code,
   Plus,
+  TrendingUp,
   Trash2,
   Eye,
   Bot
@@ -26,6 +27,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { FlowBuilder } from '@/components/chatbot/FlowBuilder';
+import { VideoAnalytics } from '@/components/video/VideoAnalytics';
 import { ChatPreview } from '@/components/chatbot/ChatPreview';
 
 interface Chatbot {
@@ -289,7 +291,7 @@ const ChatbotEditor = () => {
         <div className={`${previewOpen ? 'w-2/3' : 'w-full'} transition-all duration-300`}>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
             <div className="border-b px-4">
-              <TabsList className="grid w-full max-w-md grid-cols-4">
+              <TabsList className="grid w-full max-w-md grid-cols-5">
                 <TabsTrigger value="flow" className="flex items-center gap-2">
                   <MessageSquare className="h-4 w-4" />
                   Flow
@@ -301,6 +303,10 @@ const ChatbotEditor = () => {
                 <TabsTrigger value="design" className="flex items-center gap-2">
                   <Palette className="h-4 w-4" />
                   Design
+                </TabsTrigger>
+                <TabsTrigger value="analytics" className="flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4" />
+                  Analytics
                 </TabsTrigger>
                 <TabsTrigger value="embed" className="flex items-center gap-2">
                   <Code className="h-4 w-4" />
@@ -451,6 +457,10 @@ const ChatbotEditor = () => {
                   </div>
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            <TabsContent value="analytics" className="space-y-6 p-4 overflow-y-auto h-full">
+              <VideoAnalytics chatbotId={id!} />
             </TabsContent>
 
             <TabsContent value="embed" className="p-4 space-y-6 overflow-y-auto h-full">

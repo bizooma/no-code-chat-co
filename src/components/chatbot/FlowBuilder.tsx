@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   Plus, 
   MessageSquare, 
@@ -416,48 +417,48 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
                 </div>
               )}
 
-              {(newMessage.message_type === 'youtube_video' || 
-                newMessage.message_type === 'uploaded_video' || 
-                newMessage.message_type === 'video_intro') && (
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="video_url">Video URL</Label>
-                    <Input
-                      id="video_url"
-                      placeholder={newMessage.message_type === 'youtube_video' 
-                        ? "https://www.youtube.com/watch?v=..." 
-                        : "Video file URL"}
-                      value={newMessage.video_url || ''}
-                      onChange={(e) => setNewMessage(prev => ({ ...prev, video_url: e.target.value }))}
-                    />
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="flex items-center space-x-2">
-                      <Switch
-                        checked={newMessage.video_autoplay || false}
-                        onCheckedChange={(checked) => 
-                          setNewMessage(prev => ({ ...prev, video_autoplay: checked }))
-                        }
+                {(newMessage.message_type === 'youtube_video' || 
+                  newMessage.message_type === 'uploaded_video' || 
+                  newMessage.message_type === 'video_intro') && (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="video_url">Video URL</Label>
+                      <Input
+                        id="video_url"
+                        placeholder={newMessage.message_type === 'youtube_video' 
+                          ? "https://www.youtube.com/watch?v=..." 
+                          : "Video file URL"}
+                        value={newMessage.video_url || ''}
+                        onChange={(e) => setNewMessage(prev => ({ ...prev, video_url: e.target.value }))}
                       />
-                      <Label>Autoplay</Label>
                     </div>
                     
-                    <div className="flex items-center space-x-2">
-                      <Switch
-                        checked={newMessage.video_controls !== false}
-                        onCheckedChange={(checked) => 
-                          setNewMessage(prev => ({ ...prev, video_controls: checked }))
-                        }
-                      />
-                      <Label>Show Controls</Label>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="flex items-center space-x-2">
+                        <Switch
+                          checked={newMessage.video_autoplay || false}
+                          onCheckedChange={(checked) => 
+                            setNewMessage(prev => ({ ...prev, video_autoplay: checked }))
+                          }
+                        />
+                        <Label>Autoplay</Label>
+                      </div>
+                      
+                      <div className="flex items-center space-x-2">
+                        <Switch
+                          checked={newMessage.video_controls !== false}
+                          onCheckedChange={(checked) => 
+                            setNewMessage(prev => ({ ...prev, video_controls: checked }))
+                          }
+                        />
+                        <Label>Show Controls</Label>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
 
-            <DialogFooter>
+              <DialogFooter>
               <Button variant="outline" onClick={() => setDialogOpen(false)}>
                 Cancel
               </Button>
