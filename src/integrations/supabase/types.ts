@@ -596,6 +596,7 @@ export type Database = {
         | "slack"
         | "facebook"
         | "whatsapp"
+        | "email"
       lead_status: "new" | "contacted" | "qualified" | "converted" | "lost"
       message_sender: "bot" | "user" | "agent"
       message_type: "text" | "image" | "file" | "form" | "button"
@@ -742,6 +743,7 @@ export const Constants = {
         "slack",
         "facebook",
         "whatsapp",
+        "email",
       ],
       lead_status: ["new", "contacted", "qualified", "converted", "lost"],
       message_sender: ["bot", "user", "agent"],
