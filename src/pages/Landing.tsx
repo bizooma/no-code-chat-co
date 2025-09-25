@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Bot, Zap, Code, Users, ArrowRight, CheckCircle } from 'lucide-react';
 import heroBackground from '@/assets/hero-background.jpg';
 
@@ -321,6 +322,114 @@ const Landing = () => {
                 </Link>
               </CardContent>
             </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-16 px-4 bg-muted/50">
+        <div className="container mx-auto">
+          <div className="text-center mb-12">
+            <h3 className="text-3xl font-bold text-foreground mb-4">
+              Frequently Asked Questions
+            </h3>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Got questions? We have answers. Learn more about our chatbot platform.
+            </p>
+          </div>
+
+          <div className="max-w-4xl mx-auto">
+            <Accordion type="single" collapsible className="space-y-4">
+              <AccordionItem value="item-1" className="bg-card rounded-lg px-6">
+                <AccordionTrigger className="text-left">
+                  What is a website support chatbot and how does it work?
+                </AccordionTrigger>
+                <AccordionContent>
+                  A website support chatbot is a digital assistant that answers customer questions 24/7. It works by either following pre-set conversation flows or using AI to provide instant, natural responses. Our chatbot platform lets you add it to your site in minutes with a simple embed code.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-2" className="bg-card rounded-lg px-6">
+                <AccordionTrigger className="text-left">
+                  Can I build a custom chatbot for my business without coding?
+                </AccordionTrigger>
+                <AccordionContent>
+                  Yes. Our chatbot builder is 100% no-code. You can use drag-and-drop flows, upload FAQs, or train the bot with AI. In just a few clicks, your chatbot is live on your website.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-3" className="bg-card rounded-lg px-6">
+                <AccordionTrigger className="text-left">
+                  How do chatbots capture leads from website visitors?
+                </AccordionTrigger>
+                <AccordionContent>
+                  Our chatbot collects visitor details like name, email, and phone directly inside the chat. Leads are saved in your dashboard, exported to CSV, or synced automatically to your CRM.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-4" className="bg-card rounded-lg px-6">
+                <AccordionTrigger className="text-left">
+                  Does your chatbot integrate with popular tools like Google Sheets, HubSpot, or Slack?
+                </AccordionTrigger>
+                <AccordionContent>
+                  Yes. You can connect your chatbot to Google Sheets, HubSpot, Slack, Mailchimp, or any app through Zapier and Make. This way, new leads and chat data flow directly into your existing systems.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-5" className="bg-card rounded-lg px-6">
+                <AccordionTrigger className="text-left">
+                  Can a human agent take over the conversation from the chatbot?
+                </AccordionTrigger>
+                <AccordionContent>
+                  Absolutely. Our platform offers live chat takeover. If the bot can't answer, a human can jump into the conversation in real time from the dashboard or mobile app.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-6" className="bg-card rounded-lg px-6">
+                <AccordionTrigger className="text-left">
+                  What industries can benefit from using a chatbot on their website?
+                </AccordionTrigger>
+                <AccordionContent>
+                  Any industry that serves customers online can use a chatbot. Common examples include law firms, real estate, e-commerce stores, nonprofits, SaaS companies, restaurants, and healthcare clinics.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-7" className="bg-card rounded-lg px-6">
+                <AccordionTrigger className="text-left">
+                  Is your chatbot white-label so I can use it for my agency clients?
+                </AccordionTrigger>
+                <AccordionContent>
+                  Yes. With agency mode, you can rebrand the chatbot with your client's logo and colors. You can even give clients their own login and custom dashboard under your brand.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-8" className="bg-card rounded-lg px-6">
+                <AccordionTrigger className="text-left">
+                  How fast can I set up a chatbot on my website?
+                </AccordionTrigger>
+                <AccordionContent>
+                  Most users set up their first chatbot in under 5 minutes. Simply sign up, customize your chatbot, and paste a one-line code into your website. No coding or developers required.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-9" className="bg-card rounded-lg px-6">
+                <AccordionTrigger className="text-left">
+                  Does your chatbot support multiple languages?
+                </AccordionTrigger>
+                <AccordionContent>
+                  Yes. Our chatbot can automatically detect and respond in multiple languages, making it ideal for businesses with international customers.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-10" className="bg-card rounded-lg px-6">
+                <AccordionTrigger className="text-left">
+                  What makes your chatbot platform different from other chatbot software?
+                </AccordionTrigger>
+                <AccordionContent>
+                  Unlike other chatbot tools, our platform offers unlimited conversations, pre-built industry templates, live chat takeover, AI + rule-based options, and full white-label agency features — all without expensive monthly fees.
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </div>
         </div>
       </section>
