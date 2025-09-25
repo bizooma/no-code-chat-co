@@ -118,6 +118,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      assign_platform_owner_role: {
+        Args: { user_id: string }
+        Returns: undefined
+      }
+      create_platform_owner: {
+        Args: { email: string; full_name: string; password: string }
+        Returns: string
+      }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
