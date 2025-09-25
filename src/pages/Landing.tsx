@@ -165,6 +165,166 @@ const Landing = () => {
         </div>
       </section>
 
+      {/* Pricing Section */}
+      <section className="py-16 px-4">
+        <div className="container mx-auto">
+          <div className="text-center mb-12">
+            <h3 className="text-3xl font-bold text-foreground mb-4">
+              Choose Your Plan
+            </h3>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Select the perfect plan for your business needs. Upgrade or downgrade at any time.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {/* Individual Plan */}
+            <Card className="relative">
+              <CardHeader>
+                <CardTitle className="text-2xl">Individual</CardTitle>
+                <CardDescription>Perfect for solo entrepreneurs and small projects</CardDescription>
+                <div className="mt-4">
+                  <span className="text-4xl font-bold text-foreground">$9</span>
+                  <span className="text-muted-foreground">/month</span>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3 mb-6">
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-primary" />
+                    <span className="text-sm">Up to 3 chatbots</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-primary" />
+                    <span className="text-sm">1,000 conversations/month</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-primary" />
+                    <span className="text-sm">Basic analytics</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-primary" />
+                    <span className="text-sm">Email support</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-primary" />
+                    <span className="text-sm">Template library access</span>
+                  </div>
+                </div>
+                <Link to="/auth">
+                  <Button className="w-full" variant="outline">
+                    Get Started
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            {/* Pro Plan */}
+            <Card className="relative border-primary">
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                <span className="bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-medium">
+                  Most Popular
+                </span>
+              </div>
+              <CardHeader>
+                <CardTitle className="text-2xl">Pro</CardTitle>
+                <CardDescription>Ideal for growing businesses and teams</CardDescription>
+                <div className="mt-4">
+                  <span className="text-4xl font-bold text-foreground">$29</span>
+                  <span className="text-muted-foreground">/month</span>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3 mb-6">
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-primary" />
+                    <span className="text-sm">Up to 10 chatbots</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-primary" />
+                    <span className="text-sm">10,000 conversations/month</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-primary" />
+                    <span className="text-sm">Advanced analytics & reporting</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-primary" />
+                    <span className="text-sm">Priority support</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-primary" />
+                    <span className="text-sm">Video chatbot features</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-primary" />
+                    <span className="text-sm">Lead integrations</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-primary" />
+                    <span className="text-sm">Custom branding</span>
+                  </div>
+                </div>
+                <Link to="/auth">
+                  <Button className="w-full">
+                    Start Pro Trial
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            {/* Enterprise Plan */}
+            <Card className="relative">
+              <CardHeader>
+                <CardTitle className="text-2xl">Enterprise</CardTitle>
+                <CardDescription>For large organizations with custom needs</CardDescription>
+                <div className="mt-4">
+                  <span className="text-4xl font-bold text-foreground">$99</span>
+                  <span className="text-muted-foreground">/month</span>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3 mb-6">
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-primary" />
+                    <span className="text-sm">Unlimited chatbots</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-primary" />
+                    <span className="text-sm">100,000 conversations/month</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-primary" />
+                    <span className="text-sm">Custom analytics dashboard</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-primary" />
+                    <span className="text-sm">24/7 dedicated support</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-primary" />
+                    <span className="text-sm">White-label solution</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-primary" />
+                    <span className="text-sm">API access</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-primary" />
+                    <span className="text-sm">Custom integrations</span>
+                  </div>
+                </div>
+                <Link to="/auth">
+                  <Button className="w-full" variant="outline">
+                    Contact Sales
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-16 px-4 bg-primary text-primary-foreground">
         <div className="container mx-auto text-center">
