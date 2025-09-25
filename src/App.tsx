@@ -17,6 +17,7 @@ import EmbedDemo from "./pages/EmbedDemo";
 import Analytics from "./pages/Analytics";
 import Leads from "./pages/Leads";
 import LeadIntegrations from "./pages/LeadIntegrations";
+import Pricing from "./pages/Pricing";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -142,6 +143,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <LeadIntegrations />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/pricing" 
+              element={
+                <ProtectedRoute>
+                  <Pricing />
                 </ProtectedRoute>
               } 
             />

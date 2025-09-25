@@ -2,11 +2,12 @@ import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, Bot, Users, BarChart3, Bell, Settings, Target } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Plus, Bot, Users, BarChart3, Bell, Settings, Target, Crown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
-  const { user, signOut, isPlatformOwner } = useAuth();
+  const { user, signOut, isPlatformOwner, subscription } = useAuth();
 
   return (
     <div className="min-h-screen bg-background">
@@ -20,6 +21,12 @@ const Dashboard = () => {
             <span className="text-sm text-muted-foreground">
               Welcome, {user?.user_metadata?.full_name || user?.email}
             </span>
+            {subscription?.subscribed && (
+              <Badge variant="secondary" className="bg-primary/10 text-primary">
+                {subscription.tier === 'professional' ? 'Pro' : 
+                 subscription.tier === 'enterprise' ? 'Enterprise' : 'Pro'}
+              </Badge>
+            )}
             <Button variant="outline" onClick={signOut}>
               Sign Out
             </Button>
@@ -78,7 +85,57 @@ const Dashboard = () => {
           </Card>
         </div>
 
-        {/* Platform Management Section - Only for Platform Owners */}
+        {/* Subscription Status */}
+        {!subscription?.subscribed && (
+          <Card className="mb-8 bg-gradient-to-r from-primary/10 to-secondary/10 border-primary/20">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <Crown className="h-8 w-8 text-primary" />
+                  <div>
+                    <h3 className="text-lg font-semibold">Upgrade to unlock more features</h3>
+                    <p className="text-muted-foreground">
+                      Get unlimited chatbots, advanced analytics, and priority support
+                    </p>
+                  </div>
+                </div>
+                <Link to="/pricing">
+                  <Button className="bg-primary hover:bg-primary/90">
+                    <Crown className="mr-2 h-4 w-4" />
+                    View Plans
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {subscription?.subscribed && (
+          <Card className="mb-8 bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 border-green-200 dark:border-green-800">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <Crown className="h-8 w-8 text-green-600" />
+                  <div>
+                    <h3 className="text-lg font-semibold">
+                      {subscription.tier === 'professional' ? 'SupportBots Professional' : 
+                       subscription.tier === 'enterprise' ? 'SupportBots Enterprise' : 'Premium Plan'}
+                    </h3>
+                    <p className="text-muted-foreground">
+                      {subscription.subscription_end && 
+                        `Renews on ${new Date(subscription.subscription_end).toLocaleDateString()}`}
+                    </p>
+                  </div>
+                </div>
+                <Link to="/pricing">
+                  <Button variant="outline">
+                    Manage Subscription
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        )}
         {isPlatformOwner && (
           <div className="mb-8">
             <h3 className="text-xl font-semibold text-foreground mb-6">Platform Management</h3>
@@ -158,12 +215,16 @@ const Dashboard = () => {
                 </div>
               </Button>
             </Link>
-            <Link to="/embed-demo">
+            <Link to="/pricing">
               <Button variant="outline" className="w-full justify-start h-auto p-4">
-                <Settings className="mr-3 h-5 w-5" />
+                <Crown className="mr-3 h-5 w-5" />
                 <div className="text-left">
-                  <div className="font-medium">Embed Demo</div>
-                  <div className="text-sm text-muted-foreground">Test widget integration</div>
+                  <div className="font-medium">
+                    {subscription?.subscribed ? 'Manage Plan' : 'Upgrade Plan'}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {subscription?.subscribed ? 'View billing and usage' : 'Unlock premium features'}
+                  </div>
                 </div>
               </Button>
             </Link>
