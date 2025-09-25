@@ -9,6 +9,9 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import UserManagement from "./pages/UserManagement";
 import PlatformNotifications from "./pages/PlatformNotifications";
+import Chatbots from "./pages/Chatbots";
+import CreateChatbot from "./pages/CreateChatbot";
+import ChatbotEditor from "./pages/ChatbotEditor";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -86,6 +89,30 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <PlatformNotifications />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/chatbots" 
+              element={
+                <ProtectedRoute>
+                  <Chatbots />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/chatbots/create" 
+              element={
+                <ProtectedRoute>
+                  <CreateChatbot />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/chatbots/:id/editor" 
+              element={
+                <ProtectedRoute>
+                  <ChatbotEditor />
                 </ProtectedRoute>
               } 
             />

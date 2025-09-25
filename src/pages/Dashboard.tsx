@@ -129,10 +129,12 @@ const Dashboard = () => {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-semibold text-foreground">My Chatbots</h3>
-            <Button className="flex items-center space-x-2">
-              <Plus className="h-4 w-4" />
-              <span>Create New Bot</span>
-            </Button>
+            <Link to="/chatbots/create">
+              <Button className="flex items-center space-x-2">
+                <Plus className="h-4 w-4" />
+                <span>Create New Bot</span>
+              </Button>
+            </Link>
           </div>
 
           {/* Empty State */}
@@ -143,10 +145,17 @@ const Dashboard = () => {
               <CardDescription className="mb-4">
                 Create your first chatbot to get started with lead generation and customer support.
               </CardDescription>
-              <Button className="flex items-center space-x-2 mx-auto">
-                <Plus className="h-4 w-4" />
-                <span>Create Your First Bot</span>
-              </Button>
+              <Link to="/chatbots/create">
+                <Button className="flex items-center space-x-2 mx-auto">
+                  <Plus className="h-4 w-4" />
+                  <span>Create Your First Bot</span>
+                </Button>
+              </Link>
+              <div className="mt-4">
+                <Link to="/chatbots" className="text-primary hover:underline text-sm">
+                  View all chatbots →
+                </Link>
+              </div>
             </CardContent>
           </Card>
         </div>
