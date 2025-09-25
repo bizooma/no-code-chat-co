@@ -4,7 +4,7 @@ import { useWorkspace } from '@/contexts/WorkspaceContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Bot, Users, BarChart3, Bell, Settings, Target, Crown, Building2, Palette } from 'lucide-react';
+import { Plus, Bot, Users, BarChart3, Bell, Settings, Target, Crown, Building2, Palette, Home } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import WorkspaceSwitcher from '@/components/WorkspaceSwitcher';
 
@@ -58,6 +58,12 @@ const Dashboard = () => {
           </div>
           
           <div className="flex items-center space-x-4">
+            <Link to="/">
+              <Button variant="ghost" size="sm">
+                <Home className="mr-2 h-4 w-4" />
+                Home
+              </Button>
+            </Link>
             <span className="text-sm text-muted-foreground">
               Welcome, {user?.user_metadata?.full_name || user?.email}
             </span>
