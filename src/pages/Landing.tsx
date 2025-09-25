@@ -23,7 +23,7 @@ const Landing = () => {
 
       {/* Hero Section */}
       <section 
-        className="py-20 px-4 relative bg-cover bg-center bg-no-repeat min-h-[80vh] flex items-center"
+        className="py-12 px-4 relative bg-cover bg-center bg-no-repeat min-h-[60vh] flex items-center"
         style={{ backgroundImage: `url(${heroBackground})` }}
       >
         {/* Overlay for better text readability */}
