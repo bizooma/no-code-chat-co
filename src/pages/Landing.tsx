@@ -16,9 +16,14 @@ const Landing = () => {
             <Bot className="h-8 w-8 text-primary" />
             <h1 className="text-2xl font-bold text-foreground">SupportBots.dev</h1>
           </div>
-          <Link to="/auth">
-            <Button>Get Started</Button>
-          </Link>
+          <div className="flex items-center space-x-4">
+            <Link to="/auth" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              Login
+            </Link>
+            <Link to="/auth">
+              <Button>Get Started</Button>
+            </Link>
+          </div>
         </div>
       </header>
 
