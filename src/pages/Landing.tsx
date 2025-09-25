@@ -352,7 +352,7 @@ const Landing = () => {
             <span className="font-bold text-foreground">SupportBots.dev</span>
           </div>
           <p className="text-sm text-muted-foreground">
-            © 2024 SupportBots.dev. All rights reserved.
+            © 2025 Support Bots.dev, A Bizooma, LLC Company | All rights reserved.
           </p>
         </div>
       </footer>
