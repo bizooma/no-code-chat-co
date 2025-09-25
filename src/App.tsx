@@ -21,6 +21,9 @@ import Analytics from "./pages/Analytics";
 import Leads from "./pages/Leads";
 import LeadIntegrations from "./pages/LeadIntegrations";
 import Pricing from "./pages/Pricing";
+import TemplateLibrary from "./pages/TemplateLibrary";
+import TemplateAnalytics from "./pages/TemplateAnalytics";
+import OnboardingWizard from "./components/templates/OnboardingWizard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -138,6 +141,30 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <ChatbotEditor />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/templates" 
+                element={
+                  <ProtectedRoute>
+                    <TemplateLibrary />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/templates/analytics" 
+                element={
+                  <ProtectedRoute>
+                    <TemplateAnalytics />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/onboarding" 
+                element={
+                  <ProtectedRoute>
+                    <OnboardingWizard />
                   </ProtectedRoute>
                 } 
               />

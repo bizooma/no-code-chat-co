@@ -33,15 +33,17 @@ const Landing = () => {
               provide support, and engage customers with our visual bot builder.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/auth">
+              <Link to="/onboarding">
                 <Button size="lg" className="flex items-center space-x-2">
-                  <span>Start Building Free</span>
+                  <span>Start 5-Min Setup</span>
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
-              <Button variant="outline" size="lg">
-                Watch Demo
-              </Button>
+              <Link to="/templates">
+                <Button variant="outline" size="lg">
+                  Browse Templates
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

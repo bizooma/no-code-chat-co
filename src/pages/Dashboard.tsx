@@ -300,15 +300,23 @@ const Dashboard = () => {
             </Link>
           </div>
         </div>
-        <div className="mb-8">
+          <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-semibold text-foreground">My Chatbots</h3>
-            <Link to="/chatbots/create">
-              <Button className="flex items-center space-x-2">
-                <Plus className="h-4 w-4" />
-                <span>Create New Bot</span>
+            <div className="flex items-center gap-4">
+              <Button variant="outline" asChild>
+                <Link to="/templates">
+                  <Bot className="mr-2 h-4 w-4" />
+                  Browse Templates
+                </Link>
               </Button>
-            </Link>
+              <Button asChild>
+                <Link to="/onboarding">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Quick Setup
+                </Link>
+              </Button>
+            </div>
           </div>
 
           {/* Empty State */}
@@ -319,12 +327,20 @@ const Dashboard = () => {
               <CardDescription className="mb-4">
                 Create your first chatbot to get started with lead generation and customer support.
               </CardDescription>
-              <Link to="/chatbots/create">
-                <Button className="flex items-center space-x-2 mx-auto">
-                  <Plus className="h-4 w-4" />
-                  <span>Create Your First Bot</span>
-                </Button>
-              </Link>
+              <div className="flex gap-4 justify-center">
+                <Link to="/onboarding">
+                  <Button className="flex items-center space-x-2">
+                    <Plus className="h-4 w-4" />
+                    <span>5-Min Setup</span>
+                  </Button>
+                </Link>
+                <Link to="/templates">
+                  <Button variant="outline" className="flex items-center space-x-2">
+                    <Bot className="h-4 w-4" />
+                    <span>Browse Templates</span>
+                  </Button>
+                </Link>
+              </div>
               <div className="mt-4">
                 <Link to="/chatbots" className="text-primary hover:underline text-sm">
                   View all chatbots →
