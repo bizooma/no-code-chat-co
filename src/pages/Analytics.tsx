@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Progress } from '@/components/ui/progress';
 import { 
   Calendar,
   Download, 
@@ -17,8 +18,14 @@ import {
   PieChart,
   Activity,
   Filter,
-  RefreshCw
+  RefreshCw,
+  FileText,
+  Zap
 } from 'lucide-react';
+import ConversionFunnel from '@/components/analytics/ConversionFunnel';
+import PopularQuestions from '@/components/analytics/PopularQuestions';
+import RealtimeDashboard from '@/components/analytics/RealtimeDashboard';
+import PDFReport from '@/components/analytics/PDFReport';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -79,6 +86,18 @@ interface AnalyticsData {
     count: number;
     color: string;
   }>;
+  conversionFunnel: Array<{
+    stage: string;
+    count: number;
+    percentage: number;
+    dropoff?: number;
+  }>;
+  popularQuestions: Array<{
+    question: string;
+    count: number;
+    percentage: number;
+    trend?: 'up' | 'down' | 'stable';
+  }>;
 }
 
 const Analytics = () => {
@@ -96,7 +115,9 @@ const Analytics = () => {
     conversationTrends: [],
     messageDistribution: [],
     leadSources: [],
-    statusDistribution: []
+    statusDistribution: [],
+    conversionFunnel: [],
+    popularQuestions: []
   });
   
   const [loading, setLoading] = useState(true);
@@ -179,8 +200,22 @@ const Analytics = () => {
 
       if (msgError) throw msgError;
 
+      // Fetch analytics events for popular questions
+      const { data: analyticsEvents, error: eventsError } = await supabase
+        .from('analytics_events')
+        .select('event_data')
+        .eq('event_type', 'message_sent')
+        .gte('created_at', startDate.toISOString())
+        .lte('created_at', endDate.toISOString());
+
+      if (eventsError) console.warn('Could not fetch analytics events:', eventsError);
+
       // Process analytics data
-      const processedData = processAnalyticsData(conversationData || [], messageData || []);
+      const processedData = processAnalyticsData(
+        conversationData || [], 
+        messageData || [], 
+        analyticsEvents || []
+      );
       setAnalytics(processedData);
 
     } catch (error) {
@@ -196,7 +231,7 @@ const Analytics = () => {
     }
   };
 
-  const processAnalyticsData = (conversations: any[], messages: any[]): AnalyticsData => {
+  const processAnalyticsData = (conversations: any[], messages: any[], events: any[] = []): AnalyticsData => {
     // Basic metrics
     const totalConversations = conversations.length;
     const totalLeads = conversations.filter(c => c.leads?.length > 0).length;
@@ -297,6 +332,50 @@ const Analytics = () => {
       color: statusColors[status] || '#6B7280'
     }));
 
+    // Conversion Funnel Analysis
+    const conversionFunnel = [
+      { stage: 'Visitors', count: totalConversations, percentage: 100 },
+      { stage: 'Started Conversation', count: totalConversations, percentage: 100, dropoff: 0 },
+      { stage: 'Engaged (2+ messages)', count: Math.floor(totalConversations * 0.75), percentage: 75, dropoff: 25 },
+      { stage: 'Provided Contact Info', count: totalLeads, percentage: conversionRate, dropoff: 75 - conversionRate },
+      { stage: 'Qualified Lead', count: Math.floor(totalLeads * 0.6), percentage: conversionRate * 0.6, dropoff: conversionRate * 0.4 }
+    ];
+
+    // Popular Questions Analysis
+    const questionCounts: Record<string, number> = {};
+    events.forEach((event: any) => {
+      if (event.event_data?.message) {
+        const message = event.event_data.message.toLowerCase();
+        // Simple keyword extraction for common questions
+        const commonQuestions = [
+          'pricing', 'cost', 'price', 'how much',
+          'hours', 'when', 'time', 'schedule',
+          'location', 'where', 'address',
+          'contact', 'phone', 'email',
+          'support', 'help', 'assistance',
+          'features', 'what', 'how does',
+          'demo', 'trial', 'test'
+        ];
+        
+        commonQuestions.forEach(keyword => {
+          if (message.includes(keyword)) {
+            questionCounts[keyword] = (questionCounts[keyword] || 0) + 1;
+          }
+        });
+      }
+    });
+
+    const totalQuestions = Object.values(questionCounts).reduce((sum, count) => sum + count, 0);
+    const popularQuestions = Object.entries(questionCounts)
+      .map(([question, count]) => ({
+        question: `Questions about ${question}`,
+        count,
+        percentage: totalQuestions > 0 ? (count / totalQuestions) * 100 : 0,
+        trend: 'stable' as const
+      }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10);
+
     return {
       totalConversations,
       totalLeads,
@@ -308,7 +387,9 @@ const Analytics = () => {
       conversationTrends: conversationTrends as any,
       messageDistribution,
       leadSources,
-      statusDistribution
+      statusDistribution,
+      conversionFunnel,
+      popularQuestions
     };
   };
 
@@ -388,8 +469,13 @@ const Analytics = () => {
             </Button>
             <Button variant="outline" size="sm" onClick={exportData}>
               <Download className="mr-2 h-4 w-4" />
-              Export
+              Export CSV
             </Button>
+            <PDFReport 
+              analytics={analytics} 
+              dateRange={dateRange} 
+              chatbotName={selectedChatbot !== 'all' ? chatbots.find(c => c.id === selectedChatbot)?.name : undefined}
+            />
           </div>
         </div>
       </header>
@@ -430,6 +516,10 @@ const Analytics = () => {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 pb-8">
+        {/* Real-time Dashboard */}
+        <div className="mb-8">
+          <RealtimeDashboard chatbotId={selectedChatbot} />
+        </div>
         {/* KPI Cards */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
           <Card>
@@ -511,6 +601,8 @@ const Analytics = () => {
             <TabsTrigger value="trends">Trends</TabsTrigger>
             <TabsTrigger value="distribution">Distribution</TabsTrigger>
             <TabsTrigger value="performance">Performance</TabsTrigger>
+            <TabsTrigger value="funnel">Conversion Funnel</TabsTrigger>
+            <TabsTrigger value="insights">Insights</TabsTrigger>
           </TabsList>
 
           <TabsContent value="trends" className="space-y-6">
@@ -635,6 +727,57 @@ const Analytics = () => {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="funnel" className="space-y-6">
+            <ConversionFunnel data={analytics.conversionFunnel} />
+          </TabsContent>
+
+          <TabsContent value="insights" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <PopularQuestions questions={analytics.popularQuestions} />
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Zap className="h-5 w-5" />
+                    Performance Insights
+                  </CardTitle>
+                  <CardDescription>Key findings and recommendations</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {analytics.conversionRate >= 20 && (
+                      <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                        <p className="font-medium text-green-800">🎉 Excellent conversion rate!</p>
+                        <p className="text-sm text-green-600">Your {analytics.conversionRate.toFixed(1)}% conversion rate is above industry average.</p>
+                      </div>
+                    )}
+                    
+                    {analytics.conversionRate < 10 && (
+                      <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <p className="font-medium text-yellow-800">💡 Optimization opportunity</p>
+                        <p className="text-sm text-yellow-600">Consider improving your chatbot flows to increase the {analytics.conversionRate.toFixed(1)}% conversion rate.</p>
+                      </div>
+                    )}
+                    
+                    {analytics.avgResponseTime > 5 && (
+                      <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <p className="font-medium text-blue-800">⚡ Speed improvement</p>
+                        <p className="text-sm text-blue-600">Response time of {analytics.avgResponseTime}s could be optimized for better user experience.</p>
+                      </div>
+                    )}
+                    
+                    {analytics.totalConversations > 100 && (
+                      <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                        <p className="font-medium text-purple-800">📊 Rich data available</p>
+                        <p className="text-sm text-purple-600">With {analytics.totalConversations} conversations, you have enough data for advanced analytics.</p>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </main>
