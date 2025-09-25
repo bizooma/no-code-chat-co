@@ -179,7 +179,7 @@ const Leads = () => {
     try {
       const { error } = await supabase
         .from('leads')
-        .update({ status: newStatus })
+        .update({ status: newStatus as any })
         .eq('id', leadId);
 
       if (error) throw error;

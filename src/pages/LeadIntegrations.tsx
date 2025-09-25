@@ -148,7 +148,7 @@ const LeadIntegrations = () => {
           .from('integrations')
           .insert({
             workspace_id: workspaceData.id,
-            integration_type: type,
+            integration_type: type as any,
             name,
             config,
             is_active: enabled
