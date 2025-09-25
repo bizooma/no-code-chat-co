@@ -28,6 +28,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { FlowBuilder } from '@/components/chatbot/FlowBuilder';
 import { VideoAnalytics } from '@/components/video/VideoAnalytics';
+import { VideoTemplateLibrary } from '@/components/templates/VideoTemplateLibrary';
+import { ABTestDashboard } from '@/components/analytics/ABTestDashboard';
+import { HeatMapVisualizer } from '@/components/analytics/HeatMapVisualizer';
 import { ChatPreview } from '@/components/chatbot/ChatPreview';
 
 interface Chatbot {
@@ -459,9 +462,39 @@ const ChatbotEditor = () => {
               </Card>
             </TabsContent>
 
-            <TabsContent value="analytics" className="space-y-6 p-4 overflow-y-auto h-full">
+          <Tabs defaultValue="templates" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="templates">Video Templates</TabsTrigger>
+              <TabsTrigger value="analytics">Advanced Analytics</TabsTrigger>
+              <TabsTrigger value="ab-testing">A/B Testing</TabsTrigger>
+              <TabsTrigger value="heatmaps">Interaction Heatmaps</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="templates">
+              <VideoTemplateLibrary
+                onTemplateSelect={(template) => {
+                  // Handle template selection
+                  console.log('Selected template:', template);
+                }}
+                onPreview={(template) => {
+                  // Handle template preview
+                  console.log('Preview template:', template);
+                }}
+              />
+            </TabsContent>
+
+            <TabsContent value="analytics">
               <VideoAnalytics chatbotId={id!} />
             </TabsContent>
+
+            <TabsContent value="ab-testing">
+              <ABTestDashboard chatbotId={id!} workspaceId="workspace-id" />
+            </TabsContent>
+
+            <TabsContent value="heatmaps">
+              <HeatMapVisualizer chatbotId={id!} />
+            </TabsContent>
+          </Tabs>
 
             <TabsContent value="embed" className="p-4 space-y-6 overflow-y-auto h-full">
               <Card>

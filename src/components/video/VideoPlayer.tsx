@@ -97,6 +97,37 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     setShowInteractive(activeElements);
   }, [currentTime, interactiveElements]);
 
+  // Track heatmap interactions
+  const trackHeatmapInteraction = async (event: React.MouseEvent, type: 'click' | 'hover') => {
+    if (!chatbotId || !containerRef.current) return;
+
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    try {
+      await supabase.from('video_heatmaps').insert({
+        chatbot_id: chatbotId,
+        conversation_id: conversationId,
+        visitor_id: visitorId,
+        video_url: url,
+        interaction_data: {
+          x,
+          y,
+          timestamp: currentTime,
+          type,
+          duration: type === 'hover' ? 1 : undefined
+        },
+        viewport_size: {
+          width: rect.width,
+          height: rect.height
+        }
+      });
+    } catch (error) {
+      console.error('Error tracking heatmap interaction:', error);
+    }
+  };
+
   const togglePlay = () => {
     if (videoRef.current) {
       if (isPlaying) {
@@ -259,7 +290,16 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
           const video = e.target as HTMLVideoElement;
           setDuration(video.duration);
         }}
-        onClick={togglePlay}
+        onClick={(e) => {
+          togglePlay();
+          trackHeatmapInteraction(e, 'click');
+        }}
+        onMouseMove={(e) => {
+          // Track hover interactions periodically
+          if (Math.random() < 0.1) { // Sample 10% of hover events
+            trackHeatmapInteraction(e, 'hover');
+          }
+        }}
       />
       
       {/* Interactive Elements */}

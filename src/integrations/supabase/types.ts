@@ -14,6 +14,75 @@ export type Database = {
   }
   public: {
     Tables: {
+      ab_tests: {
+        Row: {
+          chatbot_id: string
+          created_at: string
+          description: string | null
+          end_date: string | null
+          id: string
+          name: string
+          results: Json | null
+          start_date: string | null
+          status: string
+          success_metric: string
+          test_type: string
+          traffic_split: Json
+          updated_at: string
+          variants: Json
+          workspace_id: string
+        }
+        Insert: {
+          chatbot_id: string
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          name: string
+          results?: Json | null
+          start_date?: string | null
+          status?: string
+          success_metric: string
+          test_type: string
+          traffic_split?: Json
+          updated_at?: string
+          variants?: Json
+          workspace_id: string
+        }
+        Update: {
+          chatbot_id?: string
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          name?: string
+          results?: Json | null
+          start_date?: string | null
+          status?: string
+          success_metric?: string
+          test_type?: string
+          traffic_split?: Json
+          updated_at?: string
+          variants?: Json
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ab_tests_chatbot_id_fkey"
+            columns: ["chatbot_id"]
+            isOneToOne: false
+            referencedRelation: "chatbots"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ab_tests_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       analytics_events: {
         Row: {
           chatbot_id: string
@@ -139,30 +208,39 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          industry_tags: string[] | null
           is_active: boolean
           name: string
           preview_image: string | null
+          sample_videos: Json | null
           template_config: Json
+          video_enabled: boolean | null
         }
         Insert: {
           category: string
           created_at?: string
           description?: string | null
           id?: string
+          industry_tags?: string[] | null
           is_active?: boolean
           name: string
           preview_image?: string | null
+          sample_videos?: Json | null
           template_config: Json
+          video_enabled?: boolean | null
         }
         Update: {
           category?: string
           created_at?: string
           description?: string | null
           id?: string
+          industry_tags?: string[] | null
           is_active?: boolean
           name?: string
           preview_image?: string | null
+          sample_videos?: Json | null
           template_config?: Json
+          video_enabled?: boolean | null
         }
         Relationships: []
       }
@@ -339,6 +417,51 @@ export type Database = {
           },
         ]
       }
+      conversion_funnels: {
+        Row: {
+          chatbot_id: string
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          steps: Json
+          workspace_id: string
+        }
+        Insert: {
+          chatbot_id: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          steps: Json
+          workspace_id: string
+        }
+        Update: {
+          chatbot_id?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          steps?: Json
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversion_funnels_chatbot_id_fkey"
+            columns: ["chatbot_id"]
+            isOneToOne: false
+            referencedRelation: "chatbots"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversion_funnels_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       integrations: {
         Row: {
           config: Json
@@ -446,6 +569,41 @@ export type Database = {
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      performance_metrics: {
+        Row: {
+          chatbot_id: string
+          id: string
+          metadata: Json | null
+          metric_type: string
+          metric_value: number
+          timestamp: string
+        }
+        Insert: {
+          chatbot_id: string
+          id?: string
+          metadata?: Json | null
+          metric_type: string
+          metric_value: number
+          timestamp?: string
+        }
+        Update: {
+          chatbot_id?: string
+          id?: string
+          metadata?: Json | null
+          metric_type?: string
+          metric_value?: number
+          timestamp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "performance_metrics_chatbot_id_fkey"
+            columns: ["chatbot_id"]
+            isOneToOne: false
+            referencedRelation: "chatbots"
             referencedColumns: ["id"]
           },
         ]
@@ -602,6 +760,54 @@ export type Database = {
           },
           {
             foreignKeyName: "video_analytics_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      video_heatmaps: {
+        Row: {
+          chatbot_id: string
+          conversation_id: string | null
+          created_at: string
+          id: string
+          interaction_data: Json
+          video_url: string
+          viewport_size: Json
+          visitor_id: string | null
+        }
+        Insert: {
+          chatbot_id: string
+          conversation_id?: string | null
+          created_at?: string
+          id?: string
+          interaction_data: Json
+          video_url: string
+          viewport_size: Json
+          visitor_id?: string | null
+        }
+        Update: {
+          chatbot_id?: string
+          conversation_id?: string | null
+          created_at?: string
+          id?: string
+          interaction_data?: Json
+          video_url?: string
+          viewport_size?: Json
+          visitor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_heatmaps_chatbot_id_fkey"
+            columns: ["chatbot_id"]
+            isOneToOne: false
+            referencedRelation: "chatbots"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "video_heatmaps_conversation_id_fkey"
             columns: ["conversation_id"]
             isOneToOne: false
             referencedRelation: "conversations"
