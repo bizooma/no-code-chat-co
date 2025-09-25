@@ -33,7 +33,7 @@ const Landing = () => {
           <div className="max-w-3xl mx-auto mb-12">
             <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
               Build Chatbots
-              <span className="text-primary"> Without Code</span>
+              <span className="text-white"> Without Code</span>
             </h2>
             <p className="text-xl text-white/90 mb-8">
               Create powerful chatbots for your website in minutes. Generate leads, 
