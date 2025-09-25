@@ -119,7 +119,7 @@ export type Database = {
     }
     Functions: {
       assign_platform_owner_role: {
-        Args: { user_id: string }
+        Args: { target_user_id: string }
         Returns: undefined
       }
       create_platform_owner: {
