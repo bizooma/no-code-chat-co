@@ -37,6 +37,15 @@ serve(async (req) => {
       throw new Error('Chatbot not found');
     }
 
+    // Fetch knowledge sources
+    const { data: knowledgeSources } = await supabase
+      .from('avatar_knowledge_sources')
+      .select('content, source_name')
+      .eq('chatbot_id', chatbotId)
+      .eq('status', 'ready');
+
+    console.log('Found knowledge sources:', knowledgeSources?.length || 0);
+
     const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
     if (!OPENAI_API_KEY) {
       console.error('OPENAI_API_KEY is not configured');
@@ -44,13 +53,25 @@ serve(async (req) => {
     }
 
     // Build messages for LLM
-    const systemPrompt = chatbot.system_prompt || 'You are a helpful AI assistant. Keep your responses concise and conversational, suitable for being spoken by a video avatar.';
-    const knowledgeContext = chatbot.knowledge_base ? `\n\nKnowledge Base:\n${chatbot.knowledge_base}` : '';
+    let systemPrompt = chatbot.system_prompt || 'You are a helpful AI assistant. Keep your responses concise and conversational, suitable for being spoken by a video avatar.';
+    
+    // Add knowledge from multiple sources
+    if (knowledgeSources && knowledgeSources.length > 0) {
+      systemPrompt += '\n\nKnowledge Base:\n';
+      knowledgeSources.forEach((source: any) => {
+        systemPrompt += `\n--- ${source.source_name} ---\n${source.content}\n`;
+      });
+    }
+    
+    // Fallback to old knowledge_base field for backward compatibility
+    if (chatbot.knowledge_base && (!knowledgeSources || knowledgeSources.length === 0)) {
+      systemPrompt += `\n\nKnowledge Base:\n${chatbot.knowledge_base}`;
+    }
 
     const messages = [
       { 
         role: 'system', 
-        content: systemPrompt + knowledgeContext
+        content: systemPrompt
       },
       ...conversationHistory.map((msg: any) => ({
         role: msg.role,

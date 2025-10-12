@@ -14,6 +14,7 @@ import { useWorkspace } from '@/contexts/WorkspaceContext';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import AvatarChatbot from '@/components/avatar/AvatarChatbot';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { KnowledgeBaseManager } from '@/components/avatar/KnowledgeBaseManager';
 
 const AvatarChatbotEditor = () => {
   const navigate = useNavigate();
@@ -293,17 +294,16 @@ const AvatarChatbotEditor = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="knowledge_base">Knowledge Base (Optional)</Label>
-                <Textarea
-                  id="knowledge_base"
-                  value={formData.knowledge_base}
-                  onChange={(e) => setFormData({ ...formData, knowledge_base: e.target.value })}
-                  placeholder="Add custom knowledge or context for the AI..."
-                  rows={6}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Provide additional context or information for the AI to reference
+                <Label>Knowledge Base</Label>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Train your bot with documents, URLs, or manual text
                 </p>
+                {id && <KnowledgeBaseManager chatbotId={id} />}
+                {!id && (
+                  <p className="text-sm text-muted-foreground p-4 border rounded-lg">
+                    Save the chatbot first to add knowledge sources
+                  </p>
+                )}
               </div>
             </CardContent>
           </Card>

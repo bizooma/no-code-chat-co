@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.save-avatar-conversation]
 verify_jwt = false
+
+[functions.process-knowledge-source]
+verify_jwt = true

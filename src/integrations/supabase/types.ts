@@ -216,6 +216,53 @@ export type Database = {
           },
         ]
       }
+      avatar_knowledge_sources: {
+        Row: {
+          chatbot_id: string
+          content: string
+          created_at: string
+          file_url: string | null
+          id: string
+          metadata: Json | null
+          source_name: string
+          source_type: Database["public"]["Enums"]["knowledge_source_type"]
+          status: Database["public"]["Enums"]["knowledge_source_status"]
+          updated_at: string
+        }
+        Insert: {
+          chatbot_id: string
+          content: string
+          created_at?: string
+          file_url?: string | null
+          id?: string
+          metadata?: Json | null
+          source_name: string
+          source_type: Database["public"]["Enums"]["knowledge_source_type"]
+          status?: Database["public"]["Enums"]["knowledge_source_status"]
+          updated_at?: string
+        }
+        Update: {
+          chatbot_id?: string
+          content?: string
+          created_at?: string
+          file_url?: string | null
+          id?: string
+          metadata?: Json | null
+          source_name?: string
+          source_type?: Database["public"]["Enums"]["knowledge_source_type"]
+          status?: Database["public"]["Enums"]["knowledge_source_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "avatar_knowledge_sources_chatbot_id_fkey"
+            columns: ["chatbot_id"]
+            isOneToOne: false
+            referencedRelation: "avatar_chatbots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chatbot_messages: {
         Row: {
           buttons: Json | null
@@ -1109,6 +1156,8 @@ export type Database = {
         | "facebook_messenger"
         | "whatsapp_business"
         | "webhook"
+      knowledge_source_status: "processing" | "ready" | "error"
+      knowledge_source_type: "text" | "file" | "url"
       lead_status: "new" | "contacted" | "qualified" | "converted" | "lost"
       message_sender: "bot" | "user" | "agent"
       message_type:
@@ -1268,6 +1317,8 @@ export const Constants = {
         "whatsapp_business",
         "webhook",
       ],
+      knowledge_source_status: ["processing", "ready", "error"],
+      knowledge_source_type: ["text", "file", "url"],
       lead_status: ["new", "contacted", "qualified", "converted", "lost"],
       message_sender: ["bot", "user", "agent"],
       message_type: [
