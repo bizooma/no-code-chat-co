@@ -200,6 +200,7 @@ const AvatarChatbotEditor = () => {
         <TabsList>
           <TabsTrigger value="settings">Settings</TabsTrigger>
           {id && <TabsTrigger value="preview">Preview</TabsTrigger>}
+          {id && <TabsTrigger value="embed">Embed</TabsTrigger>}
         </TabsList>
 
         <TabsContent value="settings" className="space-y-6">
@@ -325,6 +326,78 @@ const AvatarChatbotEditor = () => {
         {id && (
           <TabsContent value="preview">
             <AvatarChatbot chatbotId={id} />
+          </TabsContent>
+        )}
+
+        {id && (
+          <TabsContent value="embed" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Embed Code</CardTitle>
+                <CardDescription>
+                  Copy this code and paste it into your website's HTML
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="relative">
+                  <pre className="bg-muted p-4 rounded-lg overflow-x-auto">
+                    <code>{`<div id="avatar-chatbot-${id}"></div>
+<script>
+  (function() {
+    var script = document.createElement('script');
+    script.src = 'https://jsyqavxvspkqitrwbeay.supabase.co/storage/v1/object/public/avatar-chatbot-widget.js';
+    script.async = true;
+    script.onload = function() {
+      window.AvatarChatbot.init({
+        chatbotId: '${id}',
+        containerId: 'avatar-chatbot-${id}'
+      });
+    };
+    document.head.appendChild(script);
+  })();
+</script>`}</code>
+                  </pre>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="absolute top-2 right-2"
+                    onClick={() => {
+                      navigator.clipboard.writeText(`<div id="avatar-chatbot-${id}"></div>
+<script>
+  (function() {
+    var script = document.createElement('script');
+    script.src = 'https://jsyqavxvspkqitrwbeay.supabase.co/storage/v1/object/public/avatar-chatbot-widget.js';
+    script.async = true;
+    script.onload = function() {
+      window.AvatarChatbot.init({
+        chatbotId: '${id}',
+        containerId: 'avatar-chatbot-${id}'
+      });
+    };
+    document.head.appendChild(script);
+  })();
+</script>`);
+                      toast({
+                        title: 'Copied!',
+                        description: 'Embed code copied to clipboard',
+                      });
+                    }}
+                  >
+                    Copy
+                  </Button>
+                </div>
+
+                <div className="space-y-2">
+                  <h3 className="font-semibold">Installation Instructions</h3>
+                  <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
+                    <li>Copy the embed code above</li>
+                    <li>Paste it into your website's HTML where you want the avatar chatbot to appear</li>
+                    <li>Save and publish your website</li>
+                    <li>The avatar chatbot will load automatically when visitors access the page</li>
+                  </ol>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         )}
       </Tabs>
