@@ -89,9 +89,22 @@ const AvatarChatbotEditor = () => {
 
     setSaving(true);
     try {
+      // Ensure workspace exists (create a default one if needed)
+      let workspaceId = currentWorkspace?.id as string | null | undefined;
+
+      if (!workspaceId) {
+        const { data: newWs, error: wsError } = await supabase
+          .from('workspaces')
+          .insert([{ name: 'My Workspace', owner_id: user.id }])
+          .select()
+          .single();
+        if (wsError) throw wsError;
+        workspaceId = newWs.id;
+      }
+
       const dataToSave = {
         ...formData,
-        workspace_id: currentWorkspace?.id || null,
+        workspace_id: workspaceId,
         user_id: user.id,
       };
 
