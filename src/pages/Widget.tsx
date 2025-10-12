@@ -19,6 +19,7 @@ import {
 import { VideoPlayer } from '@/components/video/VideoPlayer';
 import { supabase } from '@/integrations/supabase/client';
 import { useSearchParams } from 'react-router-dom';
+import AvatarChatbot from '@/components/avatar/AvatarChatbot';
 
 interface Chatbot {
   id: string;
@@ -70,7 +71,18 @@ interface ConversationMessage {
 
 const Widget = () => {
   const [searchParams] = useSearchParams();
-  const chatbotId = searchParams.get('id');
+  const chatbotId = searchParams.get('chatbotId') || searchParams.get('id');
+  const widgetType = searchParams.get('type');
+  const isEmbedded = searchParams.get('embedded') === 'true';
+  
+  // If it's an avatar chatbot, render that component
+  if (widgetType === 'avatar' && chatbotId) {
+    return (
+      <div className={isEmbedded ? 'h-full' : 'min-h-screen bg-background'}>
+        <AvatarChatbot chatbotId={chatbotId} />
+      </div>
+    );
+  }
   
   const [chatbot, setChatbot] = useState<Chatbot | null>(null);
   const [messages, setMessages] = useState<ChatbotMessage[]>([]);
