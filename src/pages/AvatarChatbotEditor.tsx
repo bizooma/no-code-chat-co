@@ -76,7 +76,7 @@ const AvatarChatbotEditor = () => {
   };
 
   const handleSave = async () => {
-    if (!user || !currentWorkspace) return;
+    if (!user) return;
 
     if (!formData.name.trim()) {
       toast({
@@ -91,7 +91,7 @@ const AvatarChatbotEditor = () => {
     try {
       const dataToSave = {
         ...formData,
-        workspace_id: currentWorkspace.id,
+        workspace_id: currentWorkspace?.id || null,
         user_id: user.id,
       };
 
