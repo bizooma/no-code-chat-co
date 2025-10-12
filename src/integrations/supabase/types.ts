@@ -128,6 +128,94 @@ export type Database = {
           },
         ]
       }
+      avatar_chatbots: {
+        Row: {
+          avatar_id: string
+          created_at: string
+          id: string
+          is_active: boolean | null
+          knowledge_base: string | null
+          llm_model: string
+          name: string
+          system_prompt: string | null
+          updated_at: string
+          user_id: string
+          voice_id: string
+          workspace_id: string
+        }
+        Insert: {
+          avatar_id: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          knowledge_base?: string | null
+          llm_model?: string
+          name: string
+          system_prompt?: string | null
+          updated_at?: string
+          user_id: string
+          voice_id: string
+          workspace_id: string
+        }
+        Update: {
+          avatar_id?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          knowledge_base?: string | null
+          llm_model?: string
+          name?: string
+          system_prompt?: string | null
+          updated_at?: string
+          user_id?: string
+          voice_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "avatar_chatbots_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      avatar_conversations: {
+        Row: {
+          chatbot_id: string
+          created_at: string
+          id: string
+          messages: Json
+          session_duration: number | null
+          visitor_id: string
+        }
+        Insert: {
+          chatbot_id: string
+          created_at?: string
+          id?: string
+          messages?: Json
+          session_duration?: number | null
+          visitor_id: string
+        }
+        Update: {
+          chatbot_id?: string
+          created_at?: string
+          id?: string
+          messages?: Json
+          session_duration?: number | null
+          visitor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "avatar_conversations_chatbot_id_fkey"
+            columns: ["chatbot_id"]
+            isOneToOne: false
+            referencedRelation: "avatar_chatbots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chatbot_messages: {
         Row: {
           buttons: Json | null
@@ -249,6 +337,7 @@ export type Database = {
           ai_enabled: boolean
           ai_model: string | null
           ai_prompt: string | null
+          chatbot_type: string | null
           created_at: string
           created_by: string
           description: string | null
@@ -267,6 +356,7 @@ export type Database = {
           ai_enabled?: boolean
           ai_model?: string | null
           ai_prompt?: string | null
+          chatbot_type?: string | null
           created_at?: string
           created_by: string
           description?: string | null
@@ -285,6 +375,7 @@ export type Database = {
           ai_enabled?: boolean
           ai_model?: string | null
           ai_prompt?: string | null
+          chatbot_type?: string | null
           created_at?: string
           created_by?: string
           description?: string | null

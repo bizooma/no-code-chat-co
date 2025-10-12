@@ -4,7 +4,7 @@ import { useWorkspace } from '@/contexts/WorkspaceContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Bot, Users, BarChart3, Bell, Settings, Target, Crown, Building2, Palette, Home } from 'lucide-react';
+import { Plus, Bot, Users, BarChart3, Bell, Settings, Target, Crown, Building2, Palette, Home, Video } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import WorkspaceSwitcher from '@/components/WorkspaceSwitcher';
 
@@ -254,13 +254,23 @@ const Dashboard = () => {
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-semibold text-foreground">Quick Actions</h3>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <Link to="/chatbots">
               <Button variant="outline" className="w-full justify-start h-auto p-4">
                 <Bot className="mr-3 h-5 w-5" />
                 <div className="text-left">
                   <div className="font-medium">Manage Bots</div>
                   <div className="text-sm text-muted-foreground">Create and edit chatbots</div>
+                </div>
+              </Button>
+            </Link>
+            <Link to="/avatar-chatbots">
+              <Button variant="outline" className="w-full justify-start h-auto p-4 border-primary/50 bg-primary/5">
+                <Video className="mr-3 h-5 w-5 text-primary" />
+                <div className="text-left">
+                  <div className="font-medium">Avatar Bots</div>
+                  <div className="text-sm text-muted-foreground">AI video avatars</div>
+                  <Badge variant="secondary" className="mt-1 text-xs">Premium</Badge>
                 </div>
               </Button>
             </Link>

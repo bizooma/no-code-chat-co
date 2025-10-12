@@ -24,6 +24,8 @@ import Pricing from "./pages/Pricing";
 import TemplateLibrary from "./pages/TemplateLibrary";
 import TemplateAnalytics from "./pages/TemplateAnalytics";
 import OnboardingWizard from "./components/templates/OnboardingWizard";
+import AvatarChatbots from "./pages/AvatarChatbots";
+import AvatarChatbotEditor from "./pages/AvatarChatbotEditor";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -209,6 +211,41 @@ const App = () => (
                   </ProtectedRoute>
                 } 
               />
+              
+              {/* Avatar Chatbots */}
+              <Route 
+                path="/avatar-chatbots" 
+                element={
+                  <ProtectedRoute>
+                    <AvatarChatbots />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/avatar-chatbots/create" 
+                element={
+                  <ProtectedRoute>
+                    <AvatarChatbotEditor />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/avatar-chatbots/:id/editor" 
+                element={
+                  <ProtectedRoute>
+                    <AvatarChatbotEditor />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/avatar-chatbots/:id/preview" 
+                element={
+                  <ProtectedRoute>
+                    <AvatarChatbotEditor />
+                  </ProtectedRoute>
+                } 
+              />
+              
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
