@@ -5,11 +5,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Bot, Zap, Code, Users, ArrowRight, CheckCircle } from 'lucide-react';
 import heroBackground from '@/assets/hero-background.jpg';
-import AvatarChatbot from '@/components/avatar/AvatarChatbot';
+import { FloatingAvatarWidget } from '@/components/avatar/FloatingAvatarWidget';
 
 const Landing = () => {
   return (
     <div className="min-h-screen bg-background">
+      {/* Floating Avatar Widget */}
+      <FloatingAvatarWidget chatbotId="39227a3c-a72f-4580-a9be-a11393cecf58" />
+      
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border bg-card backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -440,23 +443,6 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Live Demo Section */}
-      <section className="py-16 px-4">
-        <div className="container mx-auto">
-          <div className="text-center mb-12">
-            <h3 className="text-3xl font-bold text-foreground mb-4">
-              Try Our Avatar Chatbot Demo
-            </h3>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Experience the power of AI-powered video avatars. Chat with our demo bot below.
-            </p>
-          </div>
-          
-          <div className="max-w-4xl mx-auto">
-            <AvatarChatbot chatbotId="39227a3c-a72f-4580-a9be-a11393cecf58" />
-          </div>
-        </div>
-      </section>
 
       {/* CTA Section */}
       <section className="py-16 px-4 bg-primary text-primary-foreground">

@@ -12,35 +12,13 @@ serve(async (req) => {
   }
 
   try {
-    // Verify user authentication
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      throw new Error('No authorization header');
-    }
-
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      {
-        global: {
-          headers: { Authorization: authHeader },
-        },
-      }
-    );
-
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
-    
-    if (userError || !user) {
-      throw new Error('Unauthorized');
-    }
-
     const HEYGEN_API_KEY = Deno.env.get('HEYGEN_API_KEY');
     if (!HEYGEN_API_KEY) {
       console.error('HEYGEN_API_KEY is not configured');
       throw new Error('HeyGen API key is not configured');
     }
 
-    console.log('Requesting HeyGen token for user:', user.id);
+    console.log('Requesting HeyGen token for public session');
 
     // Request an ephemeral token from HeyGen
     const response = await fetch('https://api.heygen.com/v1/streaming.create_token', {
