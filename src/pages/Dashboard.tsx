@@ -4,13 +4,20 @@ import { useWorkspace } from '@/contexts/WorkspaceContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Bot, Users, BarChart3, Bell, Settings, Target, Crown, Building2, Palette, Home, Video } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Plus, Bot, Users, BarChart3, Bell, Settings, Target, Crown, Building2, Palette, Home, Video, MessageSquare } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import WorkspaceSwitcher from '@/components/WorkspaceSwitcher';
+import { useDashboardStats, useRecentChatbots, useRecentLeads } from '@/hooks/useDashboardStats';
+import { formatDistanceToNow } from 'date-fns';
 
 const Dashboard = () => {
   const { user, signOut, isPlatformOwner, subscription } = useAuth();
   const { currentWorkspace } = useWorkspace();
+
+  const { data: stats, isLoading: statsLoading } = useDashboardStats(currentWorkspace?.id);
+  const { data: recentBots, isLoading: botsLoading } = useRecentChatbots(currentWorkspace?.id, 5);
+  const { data: recentLeads, isLoading: leadsLoading } = useRecentLeads(currentWorkspace?.id, 5);
 
   const brandColor = currentWorkspace?.brand_color || '#3B82F6';
   const isWhiteLabeled = currentWorkspace?.white_label_enabled;
@@ -97,10 +104,21 @@ const Dashboard = () => {
               <Bot className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">0</div>
-              <p className="text-xs text-muted-foreground">
-                No bots created yet
-              </p>
+              {statsLoading ? (
+                <>
+                  <Skeleton className="h-8 w-16 mb-2" />
+                  <Skeleton className="h-4 w-32" />
+                </>
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">{stats?.totalBots ?? 0}</div>
+                  <p className="text-xs text-muted-foreground">
+                    {stats?.totalBots === 0 ? 'No bots created yet' : 
+                     stats?.totalBots === 1 ? '1 active bot' : 
+                     `${stats?.totalBots} active bots`}
+                  </p>
+                </>
+              )}
             </CardContent>
           </Card>
           
@@ -110,23 +128,45 @@ const Dashboard = () => {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">0</div>
-              <p className="text-xs text-muted-foreground">
-                No leads collected yet
-              </p>
+              {statsLoading ? (
+                <>
+                  <Skeleton className="h-8 w-16 mb-2" />
+                  <Skeleton className="h-4 w-32" />
+                </>
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">{stats?.totalLeads ?? 0}</div>
+                  <p className="text-xs text-muted-foreground">
+                    {stats?.totalLeads === 0 ? 'No leads collected yet' : 
+                     stats?.totalLeads === 1 ? '1 lead captured' : 
+                     `${stats?.totalLeads} leads captured`}
+                  </p>
+                </>
+              )}
             </CardContent>
           </Card>
           
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Conversations</CardTitle>
-              <BarChart3 className="h-4 w-4 text-muted-foreground" />
+              <MessageSquare className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">0</div>
-              <p className="text-xs text-muted-foreground">
-                No conversations yet
-              </p>
+              {statsLoading ? (
+                <>
+                  <Skeleton className="h-8 w-16 mb-2" />
+                  <Skeleton className="h-4 w-32" />
+                </>
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">{stats?.totalConversations ?? 0}</div>
+                  <p className="text-xs text-muted-foreground">
+                    {stats?.totalConversations === 0 ? 'No conversations yet' : 
+                     stats?.totalConversations === 1 ? '1 conversation' : 
+                     `${stats?.totalConversations} total conversations`}
+                  </p>
+                </>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -335,49 +375,196 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Empty State */}
-          <Card className="text-center py-12">
-            <CardContent>
-              <Bot className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <CardTitle className="mb-2">No chatbots yet</CardTitle>
-              <CardDescription className="mb-4">
-                Create your first chatbot to get started with lead generation and customer support.
-              </CardDescription>
-              <div className="flex gap-4 justify-center">
-                <Link to="/onboarding">
-                  <Button className="flex items-center space-x-2">
-                    <Plus className="h-4 w-4" />
-                    <span>5-Min Setup</span>
-                  </Button>
-                </Link>
-                <Link to="/templates">
-                  <Button variant="outline" className="flex items-center space-x-2">
-                    <Bot className="h-4 w-4" />
-                    <span>Browse Templates</span>
-                  </Button>
-                </Link>
+          {botsLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[...Array(3)].map((_, i) => (
+                <Card key={i}>
+                  <CardHeader>
+                    <Skeleton className="h-6 w-32 mb-2" />
+                    <Skeleton className="h-4 w-24" />
+                  </CardHeader>
+                  <CardContent>
+                    <Skeleton className="h-9 w-full" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : recentBots && recentBots.length > 0 ? (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {recentBots.map((bot) => (
+                  <Card key={bot.id} className="hover:shadow-md transition-shadow">
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <CardTitle className="text-lg flex items-center gap-2">
+                            {bot.type === 'avatar' ? (
+                              <Video className="h-4 w-4 text-primary" />
+                            ) : (
+                              <Bot className="h-4 w-4" />
+                            )}
+                            {bot.name}
+                          </CardTitle>
+                          <CardDescription className="mt-1">
+                            {bot.type === 'avatar' ? 'Avatar Bot' : 'Standard Bot'}
+                          </CardDescription>
+                        </div>
+                        <Badge variant={bot.status === 'published' || bot.status === 'active' ? 'default' : 'secondary'}>
+                          {bot.status}
+                        </Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm" className="flex-1" asChild>
+                          <Link to={bot.type === 'avatar' ? `/avatar-chatbots/${bot.id}` : `/chatbots/${bot.id}`}>
+                            <Settings className="mr-2 h-3 w-3" />
+                            Edit
+                          </Link>
+                        </Button>
+                        <Button variant="outline" size="sm" className="flex-1" asChild>
+                          <Link to="/analytics">
+                            <BarChart3 className="mr-2 h-3 w-3" />
+                            Analytics
+                          </Link>
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
-              <div className="mt-4">
+              <div className="mt-4 text-center">
                 <Link to="/chatbots" className="text-primary hover:underline text-sm">
                   View all chatbots →
                 </Link>
               </div>
-            </CardContent>
-          </Card>
+            </>
+          ) : (
+            <Card className="text-center py-12">
+              <CardContent>
+                <Bot className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <CardTitle className="mb-2">No chatbots yet</CardTitle>
+                <CardDescription className="mb-4">
+                  Create your first chatbot to get started with lead generation and customer support.
+                </CardDescription>
+                <div className="flex gap-4 justify-center">
+                  <Link to="/onboarding">
+                    <Button className="flex items-center space-x-2">
+                      <Plus className="h-4 w-4" />
+                      <span>5-Min Setup</span>
+                    </Button>
+                  </Link>
+                  <Link to="/templates">
+                    <Button variant="outline" className="flex items-center space-x-2">
+                      <Bot className="h-4 w-4" />
+                      <span>Browse Templates</span>
+                    </Button>
+                  </Link>
+                </div>
+                <div className="mt-4">
+                  <Link to="/chatbots" className="text-primary hover:underline text-sm">
+                    View all chatbots →
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Recent Leads Section */}
         <div>
-          <h3 className="text-xl font-semibold text-foreground mb-6">Recent Leads</h3>
-          <Card className="text-center py-12">
-            <CardContent>
-              <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <CardTitle className="mb-2">No leads yet</CardTitle>
-              <CardDescription>
-                Leads collected by your chatbots will appear here.
-              </CardDescription>
-            </CardContent>
-          </Card>
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-semibold text-foreground">Recent Leads</h3>
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/leads">
+                View All Leads →
+              </Link>
+            </Button>
+          </div>
+          
+          {leadsLoading ? (
+            <div className="space-y-4">
+              {[...Array(3)].map((_, i) => (
+                <Card key={i}>
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-2 flex-1">
+                        <Skeleton className="h-5 w-48" />
+                        <Skeleton className="h-4 w-64" />
+                      </div>
+                      <Skeleton className="h-6 w-16" />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : recentLeads && recentLeads.length > 0 ? (
+            <>
+              <div className="space-y-4">
+                {recentLeads.map((lead) => (
+                  <Card key={lead.id} className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <h4 className="font-semibold text-lg">
+                              {lead.name || 'Anonymous'}
+                            </h4>
+                            <Badge variant={
+                              lead.status === 'new' ? 'default' : 
+                              lead.status === 'contacted' ? 'secondary' : 
+                              'outline'
+                            }>
+                              {lead.status}
+                            </Badge>
+                          </div>
+                          <div className="space-y-1 text-sm text-muted-foreground">
+                            {lead.email && (
+                              <p className="flex items-center gap-2">
+                                <Users className="h-3 w-3" />
+                                {lead.email}
+                              </p>
+                            )}
+                            {lead.phone && <p>📞 {lead.phone}</p>}
+                            {lead.company && <p>🏢 {lead.company}</p>}
+                            {lead.chatbot_name && (
+                              <p className="flex items-center gap-2">
+                                <Bot className="h-3 w-3" />
+                                From: {lead.chatbot_name}
+                              </p>
+                            )}
+                            <p className="text-xs">
+                              {formatDistanceToNow(new Date(lead.created_at), { addSuffix: true })}
+                            </p>
+                          </div>
+                        </div>
+                        <Button variant="outline" size="sm" asChild>
+                          <Link to="/leads">
+                            View Details
+                          </Link>
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+              <div className="mt-4 text-center">
+                <Link to="/leads" className="text-primary hover:underline text-sm">
+                  View all leads →
+                </Link>
+              </div>
+            </>
+          ) : (
+            <Card className="text-center py-12">
+              <CardContent>
+                <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <CardTitle className="mb-2">No leads yet</CardTitle>
+                <CardDescription>
+                  Leads collected by your chatbots will appear here.
+                </CardDescription>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </main>
     </div>
