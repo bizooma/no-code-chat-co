@@ -1,20 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { useToast } from '@/components/ui/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Send, StopCircle, Video, MessageCircle } from 'lucide-react';
-import StreamingAvatar, {
-  AvatarQuality,
-  StreamingEvents,
-  TaskType,
-  VoiceEmotion,
-} from '@heygen/streaming-avatar';
+import { useState, useEffect, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2, Mic, PhoneOff, Video, MessageCircle } from "lucide-react";
+import { createAgentManager } from "@d-id/client-sdk";
 
 interface Message {
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string;
   timestamp: Date;
 }
@@ -25,36 +20,36 @@ interface AvatarChatbotProps {
 }
 
 const AvatarChatbot: React.FC<AvatarChatbotProps> = ({ chatbotId, onClose }) => {
-  const { toast } = useToast();
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [sessionActive, setSessionActive] = useState(false);
+  const [isSessionActive, setIsSessionActive] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [sessionData, setSessionData] = useState<any>(null);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [chatbot, setChatbot] = useState<any>(null);
   const [visitorId] = useState(() => `visitor-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`);
   
-  const avatarRef = useRef<StreamingAvatar | null>(null);
+  const agentManagerRef = useRef<any>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const sessionStartTime = useRef<number>(0);
+  const sessionStartTimeRef = useRef<number>(0);
+  
+  const { toast } = useToast();
 
   // Fetch chatbot configuration
   useEffect(() => {
     const fetchChatbot = async () => {
       const { data, error } = await supabase
-        .from('avatar_chatbots')
-        .select('*')
-        .eq('id', chatbotId)
+        .from("avatar_chatbots")
+        .select("*")
+        .eq("id", chatbotId)
         .single();
 
       if (error) {
-        console.error('Error fetching chatbot:', error);
+        console.error("Error fetching chatbot:", error);
         toast({
-          title: 'Error',
-          description: 'Failed to load chatbot configuration',
-          variant: 'destructive',
+          title: "Error",
+          description: "Failed to load chatbot configuration",
+          variant: "destructive",
         });
         return;
       }
@@ -65,157 +60,178 @@ const AvatarChatbot: React.FC<AvatarChatbotProps> = ({ chatbotId, onClose }) => 
     fetchChatbot();
   }, [chatbotId, toast]);
 
+  // Start avatar session
   const startSession = async () => {
     if (!chatbot) return;
 
     setIsLoading(true);
     try {
-      // Get HeyGen token
-      const { data: tokenData, error: tokenError } = await supabase.functions.invoke('generate-heygen-token');
+      console.log("Generating D-ID client key...");
+      
+      // Get client key from edge function
+      const { data: keyData, error: keyError } = await supabase.functions.invoke(
+        "generate-did-client-key",
+        {
+          body: { 
+            allowedDomains: [window.location.origin, 'http://localhost:8080', 'https://*.lovable.app']
+          }
+        }
+      );
 
-      if (tokenError || !tokenData?.token) {
-        throw new Error('Failed to get HeyGen token');
+      if (keyError || !keyData?.clientKey) {
+        throw new Error("Failed to generate D-ID client key");
       }
 
-      // Initialize avatar
-      const avatar = new StreamingAvatar({
-        token: tokenData.token,
-      });
+      console.log("D-ID client key generated successfully");
 
-      avatarRef.current = avatar;
-
-      // Set up event listeners
-      avatar.on(StreamingEvents.AVATAR_START_TALKING, () => {
-        console.log('Avatar started talking');
-        setIsSpeaking(true);
-      });
-
-      avatar.on(StreamingEvents.AVATAR_STOP_TALKING, () => {
-        console.log('Avatar stopped talking');
-        setIsSpeaking(false);
-      });
-
-      avatar.on(StreamingEvents.STREAM_READY, (event) => {
-        console.log('Stream ready:', event);
-        if (event.detail && videoRef.current) {
-          videoRef.current.srcObject = event.detail;
-          videoRef.current.play();
-        }
-      });
-
-      avatar.on(StreamingEvents.STREAM_DISCONNECTED, () => {
-        console.log('Stream disconnected');
-        endSession();
-      });
-
-      // Start avatar session
-      const session = await avatar.createStartAvatar({
-        avatarName: chatbot.avatar_id,
-        quality: AvatarQuality.High,
-        voice: {
-          voiceId: chatbot.voice_id,
+      // Initialize D-ID Agent Manager
+      const agentManager = await createAgentManager(chatbot.avatar_id, {
+        mode: 'functional' as any,
+        auth: {
+          type: 'key',
+          clientKey: keyData.clientKey
+        } as any,
+        callbacks: {
+          onSrcObjectReady: (value: MediaStream) => {
+            console.log("Video stream ready");
+            if (videoRef.current) {
+              videoRef.current.srcObject = value;
+            }
+          },
+          onVideoStateChange: (state: string) => {
+            console.log("Video state:", state);
+            setIsSpeaking(state === "playing");
+          },
+          onConnectionStateChange: (state: string) => {
+            console.log("Connection state:", state);
+            if (state === "connected") {
+              setIsSessionActive(true);
+              sessionStartTimeRef.current = Date.now();
+            } else if (state === "disconnected") {
+              setIsSessionActive(false);
+            }
+          },
+          onNewMessage: (messages: any[], type: string) => {
+            console.log("New message:", type, messages);
+            if (type === "answer" && messages.length > 0) {
+              const lastMessage = messages[messages.length - 1];
+              if (lastMessage.role === "assistant") {
+                setMessages((prev) => [
+                  ...prev,
+                  {
+                    role: "assistant",
+                    content: lastMessage.content,
+                    timestamp: new Date(),
+                  },
+                ]);
+              }
+            }
+          },
+          onError: (error: any, errorData: any) => {
+            console.error("D-ID error:", error, errorData);
+            toast({
+              title: "Avatar Error",
+              description: error?.message || "An error occurred with the avatar",
+              variant: "destructive",
+            });
+          },
+        },
+        streamOptions: {
+          compatibilityMode: "auto",
+          streamWarmup: false,
         },
       });
 
-      setSessionData(session);
-      setSessionActive(true);
-      sessionStartTime.current = Date.now();
+      agentManagerRef.current = agentManager;
+
+      // Connect to agent
+      console.log("Connecting to D-ID agent...");
+      await agentManager.connect();
+
+      console.log("D-ID session started successfully");
 
       toast({
-        title: 'Connected',
-        description: 'Avatar session started successfully',
+        title: "Session Started",
+        description: "Avatar is ready to chat!",
       });
-    } catch (error) {
-      console.error('Error starting session:', error);
+    } catch (error: any) {
+      console.error("Error starting session:", error);
       toast({
-        title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to start avatar session',
-        variant: 'destructive',
+        title: "Error",
+        description: error.message || "Failed to start avatar session",
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
     }
   };
 
+  // End avatar session
   const endSession = async () => {
-    if (avatarRef.current) {
-      await avatarRef.current.stopAvatar();
-      avatarRef.current = null;
-    }
+    if (!agentManagerRef.current) return;
 
-    // Save conversation
-    if (messages.length > 0) {
-      const sessionDuration = Math.floor((Date.now() - sessionStartTime.current) / 1000);
+    try {
+      await agentManagerRef.current.disconnect();
       
-      await supabase.functions.invoke('save-avatar-conversation', {
-        body: {
-          conversationId,
-          chatbotId,
-          visitorId,
-          messages,
-          sessionDuration,
-        },
+      // Save conversation to database
+      if (messages.length > 0) {
+        const sessionDuration = Math.floor(
+          (Date.now() - sessionStartTimeRef.current) / 1000
+        );
+
+        await supabase.functions.invoke('save-avatar-conversation', {
+          body: {
+            conversationId,
+            chatbotId,
+            visitorId,
+            messages,
+            sessionDuration,
+          },
+        });
+      }
+
+      setIsSessionActive(false);
+      agentManagerRef.current = null;
+
+      toast({
+        title: "Session Ended",
+        description: "Avatar session has been closed",
+      });
+    } catch (error: any) {
+      console.error("Error ending session:", error);
+      toast({
+        title: "Error",
+        description: "Failed to end session properly",
+        variant: "destructive",
       });
     }
-
-    setSessionActive(false);
-    setSessionData(null);
-    setIsSpeaking(false);
-
-    toast({
-      title: 'Session Ended',
-      description: 'Avatar session has been closed',
-    });
   };
 
+  // Send message
   const sendMessage = async () => {
-    if (!input.trim() || !sessionActive || isLoading) return;
+    if (!input.trim() || !agentManagerRef.current || !isSessionActive) return;
 
     const userMessage: Message = {
-      role: 'user',
+      role: "user",
       content: input.trim(),
       timestamp: new Date(),
     };
 
     setMessages((prev) => [...prev, userMessage]);
-    setInput('');
+    setInput("");
     setIsLoading(true);
 
     try {
-      // Get AI response
-      const { data: aiData, error: aiError } = await supabase.functions.invoke('process-avatar-message', {
-        body: {
-          message: userMessage.content,
-          chatbotId,
-          conversationHistory: messages,
-        },
-      });
+      // Send message to D-ID agent (it will use its LLM to respond)
+      await agentManagerRef.current.chat(userMessage.content);
 
-      if (aiError || !aiData?.response) {
-        throw new Error('Failed to get AI response');
-      }
-
-      const assistantMessage: Message = {
-        role: 'assistant',
-        content: aiData.response,
-        timestamp: new Date(),
-      };
-
-      setMessages((prev) => [...prev, assistantMessage]);
-
-      // Make avatar speak the response
-      if (avatarRef.current && sessionData) {
-        await avatarRef.current.speak({
-          text: aiData.response,
-          taskType: TaskType.REPEAT,
-        });
-      }
-    } catch (error) {
-      console.error('Error sending message:', error);
+      console.log("Message sent to D-ID agent");
+    } catch (error: any) {
+      console.error("Error sending message:", error);
       toast({
-        title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to process message',
-        variant: 'destructive',
+        title: "Error",
+        description: error.message || "Failed to send message",
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -223,7 +239,7 @@ const AvatarChatbot: React.FC<AvatarChatbotProps> = ({ chatbotId, onClose }) => 
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
     }
@@ -236,9 +252,13 @@ const AvatarChatbot: React.FC<AvatarChatbotProps> = ({ chatbotId, onClose }) => 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Video className="h-5 w-5 text-primary" />
-            <h2 className="text-xl font-semibold">
-              {chatbot?.name || 'Avatar Chatbot'}
-            </h2>
+            <h2 className="text-xl font-semibold">{chatbot?.name || "Avatar Chatbot"}</h2>
+            {isSpeaking && (
+              <span className="flex items-center gap-1 text-sm text-primary">
+                <Mic className="w-4 h-4 animate-pulse" />
+                Speaking...
+              </span>
+            )}
           </div>
           {onClose && (
             <Button variant="ghost" size="sm" onClick={onClose}>
@@ -255,7 +275,8 @@ const AvatarChatbot: React.FC<AvatarChatbotProps> = ({ chatbotId, onClose }) => 
             playsInline
             className="w-full h-full object-cover"
           />
-          {!sessionActive && (
+          
+          {!isSessionActive && (
             <div className="absolute inset-0 flex items-center justify-center bg-background/80">
               <div className="text-center space-y-4">
                 <Video className="h-16 w-16 mx-auto text-muted-foreground" />
@@ -263,7 +284,8 @@ const AvatarChatbot: React.FC<AvatarChatbotProps> = ({ chatbotId, onClose }) => 
               </div>
             </div>
           )}
-          {isSpeaking && sessionActive && (
+
+          {isSpeaking && isSessionActive && (
             <div className="absolute bottom-4 left-4">
               <div className="flex items-center gap-2 bg-primary/90 text-primary-foreground px-3 py-1 rounded-full text-sm">
                 <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
@@ -275,7 +297,7 @@ const AvatarChatbot: React.FC<AvatarChatbotProps> = ({ chatbotId, onClose }) => 
 
         {/* Session Controls */}
         <div className="flex justify-center gap-2">
-          {!sessionActive ? (
+          {!isSessionActive ? (
             <Button
               onClick={startSession}
               disabled={isLoading || !chatbot}
@@ -299,14 +321,14 @@ const AvatarChatbot: React.FC<AvatarChatbotProps> = ({ chatbotId, onClose }) => 
               variant="destructive"
               size="lg"
             >
-              <StopCircle className="mr-2 h-4 w-4" />
+              <PhoneOff className="mr-2 h-4 w-4" />
               End Session
             </Button>
           )}
         </div>
 
         {/* Chat History */}
-        {sessionActive && (
+        {isSessionActive && (
           <>
             <div className="border-t pt-4">
               <div className="flex items-center gap-2 mb-2">
@@ -323,13 +345,13 @@ const AvatarChatbot: React.FC<AvatarChatbotProps> = ({ chatbotId, onClose }) => 
                     {messages.map((msg, index) => (
                       <div
                         key={index}
-                        className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                        className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                       >
                         <div
                           className={`max-w-[80%] rounded-lg px-4 py-2 ${
-                            msg.role === 'user'
-                              ? 'bg-primary text-primary-foreground'
-                              : 'bg-muted'
+                            msg.role === "user"
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-muted"
                           }`}
                         >
                           <p className="text-sm">{msg.content}</p>
@@ -351,17 +373,17 @@ const AvatarChatbot: React.FC<AvatarChatbotProps> = ({ chatbotId, onClose }) => 
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Type your message..."
-                disabled={isLoading || !sessionActive}
+                disabled={isLoading || !isSessionActive}
                 className="flex-1"
               />
               <Button
                 onClick={sendMessage}
-                disabled={isLoading || !input.trim() || !sessionActive}
+                disabled={isLoading || !input.trim() || !isSessionActive}
               >
                 {isLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  <Send className="h-4 w-4" />
+                  "Send"
                 )}
               </Button>
             </div>
