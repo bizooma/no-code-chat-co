@@ -138,6 +138,7 @@ export type Database = {
           knowledge_base: string | null
           llm_model: string
           name: string
+          presenter_id: string
           system_prompt: string | null
           updated_at: string
           user_id: string
@@ -153,6 +154,7 @@ export type Database = {
           knowledge_base?: string | null
           llm_model?: string
           name: string
+          presenter_id?: string
           system_prompt?: string | null
           updated_at?: string
           user_id: string
@@ -168,6 +170,7 @@ export type Database = {
           knowledge_base?: string | null
           llm_model?: string
           name?: string
+          presenter_id?: string
           system_prompt?: string | null
           updated_at?: string
           user_id?: string

@@ -56,7 +56,7 @@ const AvatarChatbotEditor = () => {
       
       setFormData({
         name: data.name,
-        presenter_id: data.presenter_id || 'anna_public_3_20240108',
+        presenter_id: (data as any).presenter_id || 'anna_public_3_20240108',
         voice_id: data.voice_id,
         llm_model: data.llm_model,
         system_prompt: data.system_prompt || '',
