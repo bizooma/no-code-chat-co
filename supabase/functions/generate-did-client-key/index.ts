@@ -21,11 +21,14 @@ serve(async (req) => {
 
     console.log('Requesting D-ID client key for domains:', allowedDomains);
 
+    // D-ID API key should be in format "username:password" and needs base64 encoding
+    const encodedKey = btoa(D_ID_API_KEY);
+    
     // Create client key from D-ID API
     const response = await fetch('https://api.d-id.com/agents/client-keys', {
       method: 'POST',
       headers: {
-        'Authorization': `Basic ${D_ID_API_KEY}`,
+        'Authorization': `Basic ${encodedKey}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
