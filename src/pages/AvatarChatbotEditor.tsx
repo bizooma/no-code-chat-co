@@ -325,7 +325,75 @@ const AvatarChatbotEditor = () => {
         </TabsContent>
 
         {id && (
-          <TabsContent value="preview" className="min-h-[600px] relative bg-muted/50">
+          <TabsContent value="preview" className="min-h-[600px] relative overflow-hidden">
+            {/* Mock Website Layout */}
+            <div className="absolute inset-0 bg-background">
+              {/* Mock Header */}
+              <div className="border-b bg-card px-6 py-4">
+                <div className="flex items-center justify-between max-w-7xl mx-auto">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-primary rounded" />
+                    <span className="font-semibold text-lg">Your Website</span>
+                  </div>
+                  <div className="flex gap-6 text-sm text-muted-foreground">
+                    <span>Home</span>
+                    <span>About</span>
+                    <span>Services</span>
+                    <span>Contact</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mock Hero Section */}
+              <div className="px-6 py-16 bg-gradient-to-br from-primary/10 to-primary/5">
+                <div className="max-w-7xl mx-auto">
+                  <h1 className="text-4xl md:text-5xl font-bold mb-4">
+                    Welcome to Our Website
+                  </h1>
+                  <p className="text-xl text-muted-foreground max-w-2xl mb-8">
+                    This is a preview of how your AI chatbot will appear on your website. 
+                    The floating button in the bottom-right corner is your live chatbot.
+                  </p>
+                  <div className="flex gap-4">
+                    <div className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium">
+                      Get Started
+                    </div>
+                    <div className="px-6 py-3 border rounded-lg font-medium">
+                      Learn More
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mock Content Section */}
+              <div className="px-6 py-12">
+                <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="p-6 bg-card border rounded-lg">
+                    <div className="w-12 h-12 bg-primary/10 rounded-lg mb-4" />
+                    <h3 className="font-semibold mb-2">Feature One</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Your chatbot is always available to help visitors.
+                    </p>
+                  </div>
+                  <div className="p-6 bg-card border rounded-lg">
+                    <div className="w-12 h-12 bg-primary/10 rounded-lg mb-4" />
+                    <h3 className="font-semibold mb-2">Feature Two</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Instant responses to common questions.
+                    </p>
+                  </div>
+                  <div className="p-6 bg-card border rounded-lg">
+                    <div className="w-12 h-12 bg-primary/10 rounded-lg mb-4" />
+                    <h3 className="font-semibold mb-2">Feature Three</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Collect leads while you sleep.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Floating Avatar Widget */}
             <FloatingAvatarWidget chatbotId={id} />
           </TabsContent>
         )}
