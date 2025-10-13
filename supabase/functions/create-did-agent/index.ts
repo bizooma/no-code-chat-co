@@ -17,7 +17,7 @@ serve(async (req) => {
       throw new Error('D_ID_API_KEY not configured');
     }
 
-    const { chatbotId, name, avatarId, voiceId, llmModel, systemPrompt, knowledgeBase } = await req.json();
+    const { chatbotId, name, presenterId, voiceId, llmModel, systemPrompt, knowledgeBase } = await req.json();
 
     if (!chatbotId) {
       throw new Error('chatbotId is required');
@@ -29,7 +29,7 @@ serve(async (req) => {
     const agentPayload: any = {
       presenter: {
         type: 'talk',
-        presenter_id: avatarId,
+        presenter_id: presenterId,
         voice: {
           type: 'text',
           provider: {

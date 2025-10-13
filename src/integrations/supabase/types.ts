@@ -130,7 +130,6 @@ export type Database = {
       }
       avatar_chatbots: {
         Row: {
-          avatar_id: string
           created_at: string
           did_agent_id: string | null
           did_client_key: string | null
@@ -146,7 +145,6 @@ export type Database = {
           workspace_id: string
         }
         Insert: {
-          avatar_id: string
           created_at?: string
           did_agent_id?: string | null
           did_client_key?: string | null
@@ -162,7 +160,6 @@ export type Database = {
           workspace_id: string
         }
         Update: {
-          avatar_id?: string
           created_at?: string
           did_agent_id?: string | null
           did_client_key?: string | null

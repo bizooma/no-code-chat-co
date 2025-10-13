@@ -27,7 +27,7 @@ const AvatarChatbotEditor = () => {
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
-    avatar_id: 'anna_public_3_20240108',
+    presenter_id: 'anna_public_3_20240108',
     voice_id: 'af9a42ce26594cbcae8c01b33b1f473b', // Default English voice
     llm_model: 'gpt-4o-mini',
     system_prompt: 'You are a helpful AI assistant. Keep your responses concise and conversational, suitable for being spoken by a video avatar.',
@@ -56,7 +56,7 @@ const AvatarChatbotEditor = () => {
       
       setFormData({
         name: data.name,
-        avatar_id: data.avatar_id,
+        presenter_id: data.presenter_id || 'anna_public_3_20240108',
         voice_id: data.voice_id,
         llm_model: data.llm_model,
         system_prompt: data.system_prompt || '',
@@ -141,7 +141,7 @@ const AvatarChatbotEditor = () => {
           body: {
             chatbotId,
             name: formData.name,
-            avatarId: formData.avatar_id,
+            presenterId: formData.presenter_id,
             voiceId: formData.voice_id,
             llmModel: formData.llm_model,
             systemPrompt: formData.system_prompt,
@@ -268,15 +268,15 @@ const AvatarChatbotEditor = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="avatar_id">Avatar ID</Label>
+                <Label htmlFor="presenter_id">Presenter ID</Label>
                 <Input
-                  id="avatar_id"
-                  value={formData.avatar_id}
-                  onChange={(e) => setFormData({ ...formData, avatar_id: e.target.value })}
+                  id="presenter_id"
+                  value={formData.presenter_id}
+                  onChange={(e) => setFormData({ ...formData, presenter_id: e.target.value })}
                   placeholder="anna_public_3_20240108"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Enter a valid HeyGen avatar ID
+                  Enter a valid D-ID presenter ID (e.g., amy-Aq6OmGZnMt)
                 </p>
               </div>
 
@@ -286,10 +286,10 @@ const AvatarChatbotEditor = () => {
                   id="voice_id"
                   value={formData.voice_id}
                   onChange={(e) => setFormData({ ...formData, voice_id: e.target.value })}
-                  placeholder="af9a42ce26594cbcae8c01b33b1f473b"
+                  placeholder="9BWtsMINqrJLrRacOk9x"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Enter a valid HeyGen voice ID
+                  Enter a valid ElevenLabs voice ID (e.g., 9BWtsMINqrJLrRacOk9x for Aria)
                 </p>
               </div>
             </CardContent>
