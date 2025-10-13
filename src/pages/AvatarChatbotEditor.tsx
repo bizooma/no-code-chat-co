@@ -13,6 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useWorkspace } from '@/contexts/WorkspaceContext';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import AvatarChatbot from '@/components/avatar/AvatarChatbot';
+import { FloatingAvatarWidget } from '@/components/avatar/FloatingAvatarWidget';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { KnowledgeBaseManager } from '@/components/avatar/KnowledgeBaseManager';
 
@@ -324,8 +325,8 @@ const AvatarChatbotEditor = () => {
         </TabsContent>
 
         {id && (
-          <TabsContent value="preview">
-            <AvatarChatbot chatbotId={id} />
+          <TabsContent value="preview" className="min-h-[600px] relative bg-muted/50">
+            <FloatingAvatarWidget chatbotId={id} />
           </TabsContent>
         )}
 
