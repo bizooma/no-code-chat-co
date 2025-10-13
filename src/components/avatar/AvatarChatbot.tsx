@@ -66,30 +66,19 @@ const AvatarChatbot: React.FC<AvatarChatbotProps> = ({ chatbotId, onClose }) => 
 
     setIsLoading(true);
     try {
-      console.log("Generating D-ID client key...");
+      console.log("Initializing D-ID agent with static client key...");
       
-      // Get client key from edge function
-      const { data: keyData, error: keyError } = await supabase.functions.invoke(
-        "generate-did-client-key",
-        {
-          body: { 
-            allowedDomains: [window.location.origin, 'http://localhost:8080', 'https://*.lovable.app']
-          }
-        }
-      );
+      // Use the static client key provided by D-ID
+      const clientKey = "Z29vZ2xlLW9hdXRoMnwxMDc0NjQ2Njc4OTg3MTA5ODM4ODA6b0ZNWUp4Xy1oV01PYzJtVFFQYkhP";
 
-      if (keyError || !keyData?.clientKey) {
-        throw new Error("Failed to generate D-ID client key");
-      }
-
-      console.log("D-ID client key generated successfully");
+      console.log("Client key ready");
 
       // Initialize D-ID Agent Manager
       const agentManager = await createAgentManager(chatbot.avatar_id, {
         mode: 'functional' as any,
         auth: {
           type: 'key',
-          clientKey: keyData.clientKey
+          clientKey: clientKey
         } as any,
         callbacks: {
           onSrcObjectReady: (value: MediaStream) => {
