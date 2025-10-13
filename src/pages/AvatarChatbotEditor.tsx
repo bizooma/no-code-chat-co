@@ -109,6 +109,8 @@ const AvatarChatbotEditor = () => {
         user_id: user.id,
       };
 
+      let chatbotId = id;
+
       if (id) {
         // Update existing
         const { error } = await supabase
@@ -117,11 +119,6 @@ const AvatarChatbotEditor = () => {
           .eq('id', id);
 
         if (error) throw error;
-
-        toast({
-          title: 'Success',
-          description: 'Avatar chatbot updated successfully',
-        });
       } else {
         // Create new
         const { data, error } = await supabase
@@ -131,13 +128,41 @@ const AvatarChatbotEditor = () => {
           .single();
 
         if (error) throw error;
+        chatbotId = data.id;
+        
+        navigate(`/avatar-chatbots/${data.id}/editor`);
+      }
 
+      // Create or update D-ID agent
+      console.log('Creating D-ID agent for chatbot:', chatbotId);
+      const { data: agentData, error: agentError } = await supabase.functions.invoke(
+        'create-did-agent',
+        {
+          body: {
+            chatbotId,
+            name: formData.name,
+            avatarId: formData.avatar_id,
+            voiceId: formData.voice_id,
+            llmModel: formData.llm_model,
+            systemPrompt: formData.system_prompt,
+            knowledgeBase: formData.knowledge_base
+          }
+        }
+      );
+
+      if (agentError) {
+        console.error('Failed to create D-ID agent:', agentError);
+        toast({
+          title: 'Warning',
+          description: 'Chatbot saved but D-ID agent creation failed. Please try saving again.',
+          variant: 'destructive',
+        });
+      } else {
+        console.log('D-ID agent created successfully:', agentData);
         toast({
           title: 'Success',
-          description: 'Avatar chatbot created successfully',
+          description: 'Avatar chatbot and D-ID agent saved successfully',
         });
-
-        navigate(`/avatar-chatbots/${data.id}/editor`);
       }
     } catch (error) {
       console.error('Error saving chatbot:', error);

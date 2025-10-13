@@ -15,6 +15,9 @@ verify_jwt = true
 [functions.generate-did-client-key]
 verify_jwt = false
 
+[functions.create-did-agent]
+verify_jwt = true
+
 [functions.process-avatar-message]
 verify_jwt = false
 

@@ -132,6 +132,8 @@ export type Database = {
         Row: {
           avatar_id: string
           created_at: string
+          did_agent_id: string | null
+          did_client_key: string | null
           id: string
           is_active: boolean | null
           knowledge_base: string | null
@@ -146,6 +148,8 @@ export type Database = {
         Insert: {
           avatar_id: string
           created_at?: string
+          did_agent_id?: string | null
+          did_client_key?: string | null
           id?: string
           is_active?: boolean | null
           knowledge_base?: string | null
@@ -160,6 +164,8 @@ export type Database = {
         Update: {
           avatar_id?: string
           created_at?: string
+          did_agent_id?: string | null
+          did_client_key?: string | null
           id?: string
           is_active?: boolean | null
           knowledge_base?: string | null

@@ -62,23 +62,47 @@ const AvatarChatbot: React.FC<AvatarChatbotProps> = ({ chatbotId, onClose }) => 
 
   // Start avatar session
   const startSession = async () => {
-    if (!chatbot) return;
+    if (!chatbot) {
+      toast({
+        title: "Error",
+        description: "Chatbot configuration not found",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setIsLoading(true);
     try {
-      console.log("Initializing D-ID agent with static client key...");
-      
-      // Use the static client key provided by D-ID
-      const clientKey = "Z29vZ2xlLW9hdXRoMnwxMDc0NjQ2Njc4OTg3MTA5ODM4ODA6b0ZNWUp4Xy1oV01PYzJtVFFQYkhP";
+      // Fetch D-ID agent credentials from database
+      const { data: chatbotData, error: fetchError } = await supabase
+        .from('avatar_chatbots')
+        .select('did_agent_id, did_client_key')
+        .eq('id', chatbotId)
+        .single();
 
-      console.log("Client key ready");
+      if (fetchError) {
+        console.error("Error fetching D-ID credentials:", fetchError);
+        throw new Error("Failed to fetch D-ID agent credentials");
+      }
 
-      // Initialize D-ID Agent Manager
-      const agentManager = await createAgentManager(chatbot.avatar_id, {
+      if (!chatbotData?.did_agent_id || !chatbotData?.did_client_key) {
+        toast({
+          title: "Configuration Required",
+          description: "Please save the chatbot configuration first to create the D-ID agent",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      console.log("Initializing D-ID agent:", chatbotData.did_agent_id);
+
+      // Initialize D-ID Agent Manager with stored credentials
+      const agentManager = await createAgentManager(chatbotData.did_agent_id, {
         mode: 'functional' as any,
         auth: {
           type: 'key',
-          clientKey: clientKey
+          clientKey: chatbotData.did_client_key
         } as any,
         callbacks: {
           onSrcObjectReady: (value: MediaStream) => {
