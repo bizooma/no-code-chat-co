@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { VideoFlowBuilder } from '@/components/chatbot/VideoFlowBuilder';
+import { VideoFlowBuilder, VideoFlowBuilderRef } from '@/components/chatbot/VideoFlowBuilder';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Eye, Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -11,6 +11,7 @@ export default function VideoFlowEditor() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const videoFlowBuilderRef = useRef<VideoFlowBuilderRef>(null);
   const [chatbot, setChatbot] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [initialNodes, setInitialNodes] = useState<Node[]>([]);
@@ -124,7 +125,28 @@ export default function VideoFlowEditor() {
         description: error.message,
         variant: 'destructive',
       });
+      throw error; // Re-throw to handle in publish
     }
+  };
+
+  const handlePublish = async () => {
+    if (!videoFlowBuilderRef.current) return;
+
+    try {
+      // Save the flow first
+      await videoFlowBuilderRef.current.save();
+      
+      // Navigate to embed demo page
+      navigate(`/embed-demo?id=${id}`);
+    } catch (error: any) {
+      // Error already handled in handleSave
+      console.error('Error publishing:', error);
+    }
+  };
+
+  const handlePreview = () => {
+    // Navigate to widget preview page
+    navigate(`/widget?id=${id}`);
   };
 
   if (loading) {
@@ -149,11 +171,11 @@ export default function VideoFlowEditor() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline">
+          <Button variant="outline" onClick={handlePreview}>
             <Eye className="h-4 w-4 mr-2" />
             Preview
           </Button>
-          <Button>
+          <Button onClick={handlePublish}>
             <Save className="h-4 w-4 mr-2" />
             Publish
           </Button>
@@ -163,6 +185,7 @@ export default function VideoFlowEditor() {
       {/* Flow Builder */}
       <div className="flex-1">
         <VideoFlowBuilder
+          ref={videoFlowBuilderRef}
           chatbotId={id!}
           workspaceId={chatbot?.workspace_id}
           onSave={handleSave}

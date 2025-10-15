@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useImperativeHandle, forwardRef } from 'react';
 import ReactFlow, {
   Node,
   Edge,
@@ -214,7 +214,13 @@ interface VideoFlowBuilderProps {
   initialEdges?: Edge[];
 }
 
-export const VideoFlowBuilder = ({ chatbotId, workspaceId, onSave, initialNodes = [], initialEdges = [] }: VideoFlowBuilderProps) => {
+export interface VideoFlowBuilderRef {
+  save: () => Promise<void>;
+  getCurrentFlow: () => { nodes: Node[]; edges: Edge[] };
+}
+
+export const VideoFlowBuilder = forwardRef<VideoFlowBuilderRef, VideoFlowBuilderProps>(
+  ({ chatbotId, workspaceId, onSave, initialNodes = [], initialEdges = [] }, ref) => {
   const [nodes, setNodes] = useState<Node[]>(initialNodes.length > 0 ? initialNodes : [
     {
       id: 'start',
@@ -244,6 +250,17 @@ export const VideoFlowBuilder = ({ chatbotId, workspaceId, onSave, initialNodes 
   const onNodeClick = useCallback((_: React.MouseEvent, node: Node) => {
     setSelectedNode(node);
   }, []);
+
+  // Expose save method to parent component via ref
+  useImperativeHandle(ref, () => ({
+    save: async () => {
+      await onSave(nodes, edges);
+    },
+    getCurrentFlow: () => ({
+      nodes,
+      edges,
+    }),
+  }), [nodes, edges, onSave]);
 
   const addNode = (type: string) => {
     const defaultTitles: Record<string, string> = {
@@ -511,4 +528,6 @@ export const VideoFlowBuilder = ({ chatbotId, workspaceId, onSave, initialNodes 
       )}
     </div>
   );
-};
+});
+
+VideoFlowBuilder.displayName = 'VideoFlowBuilder';
