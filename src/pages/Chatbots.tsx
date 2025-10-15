@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Bot, Settings, Copy, Play, Pause, Trash2, MoreHorizontal, Video, MessageSquare, Film } from 'lucide-react';
+import { Plus, Bot, Settings, Copy, Play, Pause, Trash2, MoreHorizontal, Video, MessageSquare, Film, GitBranch, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -224,15 +224,15 @@ const Chatbots = () => {
             </TabsTrigger>
             <TabsTrigger value="standard">
               <MessageSquare className="h-4 w-4 mr-2" />
-              Standard ({botCounts.standard})
+              ChatFlow ({botCounts.standard})
             </TabsTrigger>
             <TabsTrigger value="video">
-              <Video className="h-4 w-4 mr-2" />
-              Video Bots ({botCounts.video})
+              <GitBranch className="h-4 w-4 mr-2" />
+              VideoFlow ({botCounts.video})
             </TabsTrigger>
             <TabsTrigger value="avatar">
-              <Video className="h-4 w-4 mr-2" />
-              Avatar Bots ({botCounts.avatar})
+              <Sparkles className="h-4 w-4 mr-2" />
+              AvatarFlow ({botCounts.avatar})
             </TabsTrigger>
           </TabsList>
         </Tabs>
@@ -285,9 +285,9 @@ const Chatbots = () => {
                         className="w-full h-full object-cover"
                       />
                       <div className="absolute top-2 right-2">
-                        <Badge className="bg-primary/90 backdrop-blur">
-                          <Video className="h-3 w-3 mr-1" />
-                          Video Bot
+                        <Badge className="bg-purple-600/90 backdrop-blur text-white">
+                          <GitBranch className="h-3 w-3 mr-1" />
+                          VideoFlow
                         </Badge>
                       </div>
                     </div>
@@ -298,11 +298,17 @@ const Chatbots = () => {
                       <div className="flex-1 min-w-0">
                         <CardTitle className="text-lg truncate flex items-center gap-2">
                           {botType === 'video' ? (
-                            <Video className="h-4 w-4 text-secondary" />
+                            <div className="h-8 w-8 rounded-lg bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center flex-shrink-0">
+                              <GitBranch className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                            </div>
                           ) : botType === 'avatar' ? (
-                            <Video className="h-4 w-4 text-primary" />
+                            <div className="h-8 w-8 rounded-lg bg-green-100 dark:bg-green-900/50 flex items-center justify-center flex-shrink-0">
+                              <Sparkles className="h-4 w-4 text-green-600 dark:text-green-400" />
+                            </div>
                           ) : (
-                            <Bot className="h-4 w-4" />
+                            <div className="h-8 w-8 rounded-lg bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center flex-shrink-0">
+                              <MessageSquare className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                            </div>
                           )}
                           {bot.name}
                         </CardTitle>
@@ -313,14 +319,21 @@ const Chatbots = () => {
                         )}
                         <div className="flex gap-2 mt-2">
                           {botType === 'video' && (
-                            <Badge variant="secondary" className="text-xs bg-primary/10 text-primary">
-                              <Film className="h-3 w-3 mr-1" />
-                              Interactive Video
+                            <Badge variant="secondary" className="text-xs bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400">
+                              <GitBranch className="h-3 w-3 mr-1" />
+                              VideoFlow Bot
                             </Badge>
                           )}
                           {botType === 'avatar' && (
-                            <Badge variant="secondary" className="text-xs">
-                              AI Avatar
+                            <Badge variant="secondary" className="text-xs bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400">
+                              <Sparkles className="h-3 w-3 mr-1" />
+                              AvatarFlow Bot
+                            </Badge>
+                          )}
+                          {botType === 'standard' && (
+                            <Badge variant="secondary" className="text-xs bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
+                              <MessageSquare className="h-3 w-3 mr-1" />
+                              ChatFlow Bot
                             </Badge>
                           )}
                         </div>

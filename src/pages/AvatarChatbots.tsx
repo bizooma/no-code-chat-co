@@ -7,7 +7,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useWorkspace } from '@/contexts/WorkspaceContext';
-import { Plus, Video, Edit, Trash2, Play } from 'lucide-react';
+import { Plus, Video, Edit, Trash2, Play, Sparkles } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -92,14 +92,19 @@ const AvatarChatbots = () => {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Avatar Chatbots</h1>
+          <h1 className="text-3xl font-bold flex items-center gap-3">
+            <div className="h-10 w-10 rounded-lg bg-green-100 dark:bg-green-900/50 flex items-center justify-center">
+              <Sparkles className="h-6 w-6 text-green-600 dark:text-green-400" />
+            </div>
+            AvatarFlow Bots
+          </h1>
           <p className="text-muted-foreground mt-1">
-            Manage your AI-powered video avatar chatbots
+            Manage your AI-powered video avatar chatbots with realistic conversations
           </p>
         </div>
-        <Button onClick={() => navigate('/avatar-chatbots/create')}>
+        <Button onClick={() => navigate('/avatar-chatbots/create')} className="bg-green-600 hover:bg-green-700">
           <Plus className="mr-2 h-4 w-4" />
-          Create Avatar Chatbot
+          Create AvatarFlow Bot
         </Button>
       </div>
 
@@ -108,19 +113,21 @@ const AvatarChatbots = () => {
           <p className="text-muted-foreground">Loading avatar chatbots...</p>
         </div>
       ) : chatbots.length === 0 ? (
-        <Card>
+        <Card className="border-green-200 dark:border-green-900">
           <CardContent className="py-12">
             <div className="text-center space-y-4">
-              <Video className="h-16 w-16 mx-auto text-muted-foreground" />
+              <div className="h-16 w-16 rounded-lg bg-green-100 dark:bg-green-900/50 flex items-center justify-center mx-auto">
+                <Sparkles className="h-8 w-8 text-green-600 dark:text-green-400" />
+              </div>
               <div>
-                <h3 className="text-lg font-semibold">No Avatar Chatbots Yet</h3>
+                <h3 className="text-lg font-semibold">No AvatarFlow Bots Yet</h3>
                 <p className="text-muted-foreground mt-1">
-                  Create your first avatar chatbot to get started with AI-powered video conversations
+                  Create your first AvatarFlow bot to engage visitors with realistic AI-powered video conversations
                 </p>
               </div>
-              <Button onClick={() => navigate('/avatar-chatbots/create')}>
+              <Button onClick={() => navigate('/avatar-chatbots/create')} className="bg-green-600 hover:bg-green-700">
                 <Plus className="mr-2 h-4 w-4" />
-                Create Your First Avatar Chatbot
+                Create Your First AvatarFlow Bot
               </Button>
             </div>
           </CardContent>

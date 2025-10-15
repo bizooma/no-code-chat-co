@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Plus, Bot, Users, BarChart3, Bell, Settings, Target, Crown, Building2, Palette, Home, Video, MessageSquare } from 'lucide-react';
+import { Plus, Bot, Users, BarChart3, Bell, Settings, Target, Crown, Building2, Palette, Home, Video, MessageSquare, GitBranch, Sparkles, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import WorkspaceSwitcher from '@/components/WorkspaceSwitcher';
 import { useDashboardStats, useRecentChatbots, useRecentLeads } from '@/hooks/useDashboardStats';
@@ -114,21 +114,21 @@ const Dashboard = () => {
                   <div className="text-2xl font-bold">{stats?.totalBots ?? 0}</div>
                   <div className="flex flex-wrap gap-1 mt-2">
                     {stats?.standardBots ? (
-                      <Badge variant="secondary" className="text-xs">
+                      <Badge variant="secondary" className="text-xs bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
                         <MessageSquare className="h-3 w-3 mr-1" />
-                        {stats.standardBots} Standard
+                        {stats.standardBots} ChatFlow
                       </Badge>
                     ) : null}
                     {stats?.videoBots ? (
-                      <Badge variant="secondary" className="text-xs bg-primary/10 text-primary">
-                        <Video className="h-3 w-3 mr-1" />
-                        {stats.videoBots} Video
+                      <Badge variant="secondary" className="text-xs bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400">
+                        <GitBranch className="h-3 w-3 mr-1" />
+                        {stats.videoBots} VideoFlow
                       </Badge>
                     ) : null}
                     {stats?.avatarBots ? (
-                      <Badge variant="secondary" className="text-xs">
-                        <Video className="h-3 w-3 mr-1" />
-                        {stats.avatarBots} Avatar
+                      <Badge variant="secondary" className="text-xs bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400">
+                        <Sparkles className="h-3 w-3 mr-1" />
+                        {stats.avatarBots} AvatarFlow
                       </Badge>
                     ) : null}
                   </div>
@@ -304,90 +304,212 @@ const Dashboard = () => {
           </div>
         )}
 
-        {/* Quick Actions Section */}
+        {/* Create Your Bot Section */}
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-semibold text-foreground">Quick Actions</h3>
+          <div className="mb-6">
+            <h3 className="text-2xl font-bold text-foreground mb-2">Create Your Bot</h3>
+            <p className="text-muted-foreground">Choose the perfect bot type for your business needs</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* ChatFlow Card */}
+            <Card className="hover:shadow-lg transition-all duration-300 hover:scale-[1.02] border-blue-200 dark:border-blue-900 bg-gradient-to-br from-blue-50/50 to-white dark:from-blue-950/20 dark:to-background">
+              <CardHeader>
+                <div className="h-12 w-12 rounded-lg bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center mb-4">
+                  <MessageSquare className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                </div>
+                <CardTitle className="text-xl flex items-center gap-2">
+                  ChatFlow
+                  <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300">
+                    Text-Based
+                  </Badge>
+                </CardTitle>
+                <CardDescription className="text-base">
+                  Perfect for FAQ, lead capture, and customer support
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-start gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-blue-600 mt-1.5" />
+                    <span className="text-muted-foreground">Quick setup with templates</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-blue-600 mt-1.5" />
+                    <span className="text-muted-foreground">Customizable conversation flows</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-blue-600 mt-1.5" />
+                    <span className="text-muted-foreground">Lead collection forms</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-blue-600 mt-1.5" />
+                    <span className="text-muted-foreground">Multi-channel deployment</span>
+                  </div>
+                </div>
+                
+                <div className="pt-4 border-t">
+                  <p className="text-xs font-medium text-muted-foreground mb-2">BEST FOR</p>
+                  <p className="text-sm">Customer support, Lead generation, Product info</p>
+                </div>
+                
+                <Link to="/chatbots/create" className="block">
+                  <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                    Create ChatFlow Bot
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            {/* VideoFlow Card */}
+            <Card className="hover:shadow-lg transition-all duration-300 hover:scale-[1.02] border-purple-200 dark:border-purple-900 bg-gradient-to-br from-purple-50/50 to-white dark:from-purple-950/20 dark:to-background">
+              <CardHeader>
+                <div className="h-12 w-12 rounded-lg bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center mb-4">
+                  <GitBranch className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+                </div>
+                <CardTitle className="text-xl flex items-center gap-2">
+                  VideoFlow
+                  <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300">
+                    Interactive
+                  </Badge>
+                </CardTitle>
+                <CardDescription className="text-base">
+                  Engage visitors with branching video experiences
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-start gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-purple-600 mt-1.5" />
+                    <span className="text-muted-foreground">Visual flow builder</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-purple-600 mt-1.5" />
+                    <span className="text-muted-foreground">Conditional video paths</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-purple-600 mt-1.5" />
+                    <span className="text-muted-foreground">Interactive decision points</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-purple-600 mt-1.5" />
+                    <span className="text-muted-foreground">Advanced analytics & heatmaps</span>
+                  </div>
+                </div>
+                
+                <div className="pt-4 border-t">
+                  <p className="text-xs font-medium text-muted-foreground mb-2">BEST FOR</p>
+                  <p className="text-sm">Product demos, Training, Interactive tours</p>
+                </div>
+                
+                <Link to="/templates" className="block">
+                  <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white">
+                    Create VideoFlow Bot
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            {/* AvatarFlow Card */}
+            <Card className="hover:shadow-lg transition-all duration-300 hover:scale-[1.02] border-green-200 dark:border-green-900 bg-gradient-to-br from-green-50/50 to-white dark:from-green-950/20 dark:to-background">
+              <CardHeader>
+                <div className="h-12 w-12 rounded-lg bg-green-100 dark:bg-green-900/50 flex items-center justify-center mb-4">
+                  <Sparkles className="h-6 w-6 text-green-600 dark:text-green-400" />
+                </div>
+                <CardTitle className="text-xl flex items-center gap-2">
+                  AvatarFlow
+                  <Badge variant="secondary" className="text-xs bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300">
+                    AI Avatar
+                  </Badge>
+                </CardTitle>
+                <CardDescription className="text-base">
+                  Realistic AI avatars powered by HeyGen/D-ID
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-start gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-green-600 mt-1.5" />
+                    <span className="text-muted-foreground">Natural conversations with AI</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-green-600 mt-1.5" />
+                    <span className="text-muted-foreground">Lifelike video avatars</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-green-600 mt-1.5" />
+                    <span className="text-muted-foreground">Knowledge base integration</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-green-600 mt-1.5" />
+                    <span className="text-muted-foreground">Real-time responses</span>
+                  </div>
+                </div>
+                
+                <div className="pt-4 border-t">
+                  <p className="text-xs font-medium text-muted-foreground mb-2">BEST FOR</p>
+                  <p className="text-sm">Sales pitches, Consultations, Virtual assistants</p>
+                </div>
+                
+                <Link to="/avatar-chatbots/create" className="block">
+                  <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
+                    Create AvatarFlow Bot
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Quick Actions - Simplified */}
+        <div className="mb-8">
+          <h3 className="text-xl font-semibold text-foreground mb-4">Quick Actions</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
             <Link to="/chatbots">
-              <Button variant="outline" className="w-full justify-start h-auto p-4">
-                <Bot className="mr-3 h-5 w-5" />
-                <div className="text-left">
-                  <div className="font-medium">Manage Bots</div>
-                  <div className="text-sm text-muted-foreground">Create and edit chatbots</div>
-                </div>
-              </Button>
-            </Link>
-            <Link to="/avatar-chatbots">
-              <Button variant="outline" className="w-full justify-start h-auto p-4 border-primary/50 bg-primary/5">
-                <Video className="mr-3 h-5 w-5 text-primary" />
-                <div className="text-left">
-                  <div className="font-medium">Avatar Bots</div>
-                  <div className="text-sm text-muted-foreground">AI video avatars</div>
-                  <Badge variant="secondary" className="mt-1 text-xs">Premium</Badge>
-                </div>
+              <Button variant="outline" className="w-full h-auto p-4 flex flex-col items-center gap-2">
+                <Bot className="h-5 w-5" />
+                <span className="text-sm font-medium">Manage Bots</span>
               </Button>
             </Link>
             <Link to="/analytics">
-              <Button variant="outline" className="w-full justify-start h-auto p-4">
-                <BarChart3 className="mr-3 h-5 w-5" />
-                <div className="text-left">
-                  <div className="font-medium">Analytics</div>
-                  <div className="text-sm text-muted-foreground">View performance metrics</div>
-                </div>
+              <Button variant="outline" className="w-full h-auto p-4 flex flex-col items-center gap-2">
+                <BarChart3 className="h-5 w-5" />
+                <span className="text-sm font-medium">Analytics</span>
               </Button>
             </Link>
             <Link to="/leads">
-              <Button variant="outline" className="w-full justify-start h-auto p-4">
-                <Users className="mr-3 h-5 w-5" />
-                <div className="text-left">
-                  <div className="font-medium">Leads</div>
-                  <div className="text-sm text-muted-foreground">Manage captured leads</div>
-                </div>
+              <Button variant="outline" className="w-full h-auto p-4 flex flex-col items-center gap-2">
+                <Users className="h-5 w-5" />
+                <span className="text-sm font-medium">Leads</span>
               </Button>
             </Link>
-            <Link to="/portal">
-              <Button variant="outline" className="w-full justify-start h-auto p-4">
-                <Building2 className="mr-3 h-5 w-5" />
-                <div className="text-left">
-                  <div className="font-medium">Client Portal</div>
-                  <div className="text-sm text-muted-foreground">View as client</div>
-                </div>
+            <Link to="/lead-integrations">
+              <Button variant="outline" className="w-full h-auto p-4 flex flex-col items-center gap-2">
+                <Target className="h-5 w-5" />
+                <span className="text-sm font-medium">Integrations</span>
               </Button>
             </Link>
             <Link to="/pricing">
-              <Button variant="outline" className="w-full justify-start h-auto p-4">
-                <Crown className="mr-3 h-5 w-5" />
-                <div className="text-left">
-                  <div className="font-medium">
-                    {subscription?.subscribed ? 'Manage Plan' : 'Upgrade Plan'}
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {subscription?.subscribed ? 'View billing and usage' : 'Unlock premium features'}
-                  </div>
-                </div>
+              <Button variant="outline" className="w-full h-auto p-4 flex flex-col items-center gap-2">
+                <Crown className="h-5 w-5" />
+                <span className="text-sm font-medium">
+                  {subscription?.subscribed ? 'Manage Plan' : 'Upgrade'}
+                </span>
               </Button>
             </Link>
           </div>
         </div>
           <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-semibold text-foreground">My Chatbots</h3>
-            <div className="flex items-center gap-4">
-              <Button variant="outline" asChild>
-                <Link to="/templates">
-                  <Bot className="mr-2 h-4 w-4" />
-                  Browse Templates
-                </Link>
-              </Button>
-              <Button asChild>
-                <Link to="/onboarding">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Quick Setup
-                </Link>
-              </Button>
-            </div>
+            <h3 className="text-xl font-semibold text-foreground">My Bots</h3>
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/chatbots">
+                View All Bots →
+              </Link>
+            </Button>
           </div>
 
           {botsLoading ? (
@@ -414,19 +536,43 @@ const Dashboard = () => {
                         <div className="flex-1">
                           <CardTitle className="text-lg flex items-center gap-2">
                             {bot.type === 'avatar' ? (
-                              <Video className="h-4 w-4 text-primary" />
+                              <>
+                                <div className="h-8 w-8 rounded-lg bg-green-100 dark:bg-green-900/50 flex items-center justify-center">
+                                  <Sparkles className="h-4 w-4 text-green-600 dark:text-green-400" />
+                                </div>
+                                {bot.name}
+                              </>
                             ) : bot.type === 'video' ? (
-                              <Video className="h-4 w-4 text-secondary" />
+                              <>
+                                <div className="h-8 w-8 rounded-lg bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center">
+                                  <GitBranch className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                                </div>
+                                {bot.name}
+                              </>
                             ) : (
-                              <Bot className="h-4 w-4" />
+                              <>
+                                <div className="h-8 w-8 rounded-lg bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
+                                  <MessageSquare className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                                </div>
+                                {bot.name}
+                              </>
                             )}
-                            {bot.name}
                           </CardTitle>
-                          <CardDescription className="mt-1 flex items-center gap-2">
-                            {bot.type === 'avatar' ? 'Avatar Bot' : bot.type === 'video' ? 'Video Bot' : 'Standard Bot'}
-                            {bot.type === 'video' && (
-                              <Badge variant="secondary" className="text-xs bg-primary/10 text-primary">
-                                Interactive Video
+                          <CardDescription className="mt-2 flex items-center gap-2">
+                            {bot.type === 'avatar' ? (
+                              <Badge variant="secondary" className="text-xs bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400">
+                                <Sparkles className="h-3 w-3 mr-1" />
+                                AvatarFlow Bot
+                              </Badge>
+                            ) : bot.type === 'video' ? (
+                              <Badge variant="secondary" className="text-xs bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400">
+                                <GitBranch className="h-3 w-3 mr-1" />
+                                VideoFlow Bot
+                              </Badge>
+                            ) : (
+                              <Badge variant="secondary" className="text-xs bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
+                                <MessageSquare className="h-3 w-3 mr-1" />
+                                ChatFlow Bot
                               </Badge>
                             )}
                           </CardDescription>
@@ -465,27 +611,31 @@ const Dashboard = () => {
             <Card className="text-center py-12">
               <CardContent>
                 <Bot className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <CardTitle className="mb-2">No chatbots yet</CardTitle>
-                <CardDescription className="mb-4">
-                  Create your first chatbot to get started with lead generation and customer support.
+                <CardTitle className="mb-2">No bots yet</CardTitle>
+                <CardDescription className="mb-6">
+                  Choose from our 3 bot types to get started with lead generation and customer support
                 </CardDescription>
-                <div className="flex gap-4 justify-center">
-                  <Link to="/onboarding">
-                    <Button className="flex items-center space-x-2">
-                      <Plus className="h-4 w-4" />
-                      <span>5-Min Setup</span>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
+                  <Link to="/chatbots/create">
+                    <Button variant="outline" className="w-full h-auto p-4 flex flex-col items-center gap-2 hover:bg-blue-50 dark:hover:bg-blue-950/20 hover:border-blue-300">
+                      <MessageSquare className="h-6 w-6 text-blue-600" />
+                      <span className="font-semibold">ChatFlow</span>
+                      <span className="text-xs text-muted-foreground">Text-based chatbot</span>
                     </Button>
                   </Link>
                   <Link to="/templates">
-                    <Button variant="outline" className="flex items-center space-x-2">
-                      <Bot className="h-4 w-4" />
-                      <span>Browse Templates</span>
+                    <Button variant="outline" className="w-full h-auto p-4 flex flex-col items-center gap-2 hover:bg-purple-50 dark:hover:bg-purple-950/20 hover:border-purple-300">
+                      <GitBranch className="h-6 w-6 text-purple-600" />
+                      <span className="font-semibold">VideoFlow</span>
+                      <span className="text-xs text-muted-foreground">Interactive video</span>
                     </Button>
                   </Link>
-                </div>
-                <div className="mt-4">
-                  <Link to="/chatbots" className="text-primary hover:underline text-sm">
-                    View all chatbots →
+                  <Link to="/avatar-chatbots/create">
+                    <Button variant="outline" className="w-full h-auto p-4 flex flex-col items-center gap-2 hover:bg-green-50 dark:hover:bg-green-950/20 hover:border-green-300">
+                      <Sparkles className="h-6 w-6 text-green-600" />
+                      <span className="font-semibold">AvatarFlow</span>
+                      <span className="text-xs text-muted-foreground">AI video avatar</span>
+                    </Button>
                   </Link>
                 </div>
               </CardContent>
