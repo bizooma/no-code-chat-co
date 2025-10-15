@@ -19,7 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Video, MessageSquare, FormInput, CheckCircle, Plus } from 'lucide-react';
+import { Video, MessageSquare, FormInput, CheckCircle, Plus, UserPlus } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface VideoNodeData {
@@ -32,12 +32,19 @@ interface VideoNodeData {
     text: string;
     next_node_id: string | null;
   }>;
+  lead_fields?: Array<{
+    id: string;
+    label: string;
+    field_type: 'text' | 'email' | 'phone' | 'textarea';
+    required: boolean;
+  }>;
 }
 
 const nodeTypes = {
   video_question: VideoQuestionNode,
   multiple_choice: MultipleChoiceNode,
   text_response: TextResponseNode,
+  lead_capture: LeadCaptureNode,
   end: EndNode,
 };
 
@@ -93,6 +100,26 @@ function TextResponseNode({ data, selected }: { data: VideoNodeData; selected: b
         <FormInput className="h-4 w-4 text-primary" />
         <h3 className="font-semibold text-sm">{data.title || 'Text Response'}</h3>
       </div>
+    </Card>
+  );
+}
+
+function LeadCaptureNode({ data, selected }: { data: VideoNodeData; selected: boolean }) {
+  return (
+    <Card className={`min-w-[200px] p-4 ${selected ? 'ring-2 ring-primary' : ''}`}>
+      <div className="flex items-center gap-2 mb-2">
+        <UserPlus className="h-4 w-4 text-primary" />
+        <h3 className="font-semibold text-sm">{data.title || 'Lead Capture'}</h3>
+      </div>
+      {data.lead_fields && data.lead_fields.length > 0 && (
+        <div className="space-y-1">
+          {data.lead_fields.map((field) => (
+            <div key={field.id} className="text-xs bg-secondary px-2 py-1 rounded">
+              {field.label} ({field.field_type})
+            </div>
+          ))}
+        </div>
+      )}
     </Card>
   );
 }
@@ -153,7 +180,11 @@ export const VideoFlowBuilder = ({ chatbotId, onSave, initialNodes = [], initial
       position: { x: Math.random() * 300 + 100, y: Math.random() * 300 + 100 },
       data: { 
         title: type === 'end' ? 'End' : 'New Node',
-        responses: type !== 'end' && type !== 'text_response' ? [] : undefined,
+        responses: type !== 'end' && type !== 'text_response' && type !== 'lead_capture' ? [] : undefined,
+        lead_fields: type === 'lead_capture' ? [
+          { id: 'field-name', label: 'Name', field_type: 'text', required: true },
+          { id: 'field-email', label: 'Email', field_type: 'email', required: true },
+        ] : undefined,
       },
     };
     setNodes((nds) => [...nds, newNode]);
@@ -234,6 +265,14 @@ export const VideoFlowBuilder = ({ chatbotId, onSave, initialNodes = [], initial
           <Button
             variant="outline"
             className="w-full justify-start"
+            onClick={() => addNode('lead_capture')}
+          >
+            <UserPlus className="h-4 w-4 mr-2" />
+            Lead Capture
+          </Button>
+          <Button
+            variant="outline"
+            className="w-full justify-start"
             onClick={() => addNode('end')}
           >
             <CheckCircle className="h-4 w-4 mr-2" />
@@ -297,7 +336,54 @@ export const VideoFlowBuilder = ({ chatbotId, onSave, initialNodes = [], initial
                 </>
               )}
 
-              {selectedNode.type !== 'end' && selectedNode.type !== 'text_response' && (
+              {selectedNode.type === 'lead_capture' && (
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <Label>Form Fields</Label>
+                    <Button size="sm" variant="outline" onClick={() => {
+                      const newField = {
+                        id: `field-${Date.now()}`,
+                        label: 'New Field',
+                        field_type: 'text' as const,
+                        required: false,
+                      };
+                      const currentFields = (selectedNode.data.lead_fields || []) as any[];
+                      updateNodeData('lead_fields', [...currentFields, newField]);
+                    }}>
+                      <Plus className="h-3 w-3" />
+                    </Button>
+                  </div>
+                  <div className="space-y-2">
+                    {((selectedNode.data.lead_fields || []) as any[]).map((field) => (
+                      <Card key={field.id} className="p-2 space-y-2">
+                        <Input
+                          value={field.label}
+                          onChange={(e) => {
+                            const currentFields = (selectedNode.data.lead_fields || []) as any[];
+                            const updatedFields = currentFields.map((f) =>
+                              f.id === field.id ? { ...f, label: e.target.value } : f
+                            );
+                            updateNodeData('lead_fields', updatedFields);
+                          }}
+                          placeholder="Field Label"
+                        />
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => {
+                            const currentFields = (selectedNode.data.lead_fields || []) as any[];
+                            updateNodeData('lead_fields', currentFields.filter((f) => f.id !== field.id));
+                          }}
+                        >
+                          Delete
+                        </Button>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {selectedNode.type !== 'end' && selectedNode.type !== 'text_response' && selectedNode.type !== 'lead_capture' && (
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <Label>Responses</Label>
