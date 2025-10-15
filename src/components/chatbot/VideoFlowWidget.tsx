@@ -8,8 +8,7 @@ import { VideoPlayer } from '@/components/video/VideoPlayer';
 
 enum WidgetState {
   MINIMIZED = 'minimized',
-  VIDEO_PLAYING = 'playing',
-  AWAITING_RESPONSE = 'waiting',
+  PLAYING = 'playing',
   COLLECTING_LEAD = 'lead',
   COMPLETED = 'completed',
 }
@@ -38,7 +37,7 @@ export const VideoFlowWidget = ({ chatbotId, position = 'bottom-right' }: VideoF
   const currentNode = getCurrentNode();
 
   const handleOpen = () => {
-    setWidgetState(WidgetState.VIDEO_PLAYING);
+    setWidgetState(WidgetState.PLAYING);
   };
 
   const handleMinimize = () => {
@@ -51,7 +50,7 @@ export const VideoFlowWidget = ({ chatbotId, position = 'bottom-right' }: VideoF
 
   const handleResponseClick = async (responseId: string) => {
     await moveToNextNode(responseId);
-    setWidgetState(WidgetState.VIDEO_PLAYING);
+    // Stay in PLAYING state to show next video with its buttons
   };
 
   const handleLeadSubmit = async () => {
@@ -99,36 +98,38 @@ export const VideoFlowWidget = ({ chatbotId, position = 'bottom-right' }: VideoF
             <div className="text-center py-8">Loading...</div>
           )}
 
-          {!loading && widgetState === WidgetState.VIDEO_PLAYING && currentNode && (
-            <div>
+          {!loading && widgetState === WidgetState.PLAYING && currentNode && (
+            <div className="relative">
               {currentNode.video_url && (
-                <VideoPlayer
-                  type={currentNode.video_url.includes('youtube') ? 'youtube' : 'uploaded'}
-                  url={currentNode.video_url}
-                  autoplay
-                  controls
-                  onVideoEnd={() => setWidgetState(WidgetState.AWAITING_RESPONSE)}
-                />
+                <div className="relative">
+                  <VideoPlayer
+                    type={currentNode.video_url.includes('youtube') ? 'youtube' : 'uploaded'}
+                    url={currentNode.video_url}
+                    autoplay
+                    controls
+                  />
+                  
+                  {/* Overlay Buttons - Shown during video playback */}
+                  {currentNode.responses && currentNode.responses.length > 0 && (
+                    <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 via-black/60 to-transparent">
+                      <div className="space-y-2">
+                        {currentNode.responses.map((response) => (
+                          <Button
+                            key={response.id}
+                            className="w-full bg-white/95 hover:bg-white text-black font-medium shadow-lg backdrop-blur-sm"
+                            onClick={() => handleResponseClick(response.id)}
+                          >
+                            {response.text}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               )}
               {currentNode.description && (
                 <p className="mt-4 text-sm text-muted-foreground">{currentNode.description}</p>
               )}
-            </div>
-          )}
-
-          {widgetState === WidgetState.AWAITING_RESPONSE && currentNode?.responses && (
-            <div className="space-y-2 mt-4">
-              <p className="text-sm font-medium mb-3">Choose an option:</p>
-              {currentNode.responses.map((response) => (
-                <Button
-                  key={response.id}
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => handleResponseClick(response.id)}
-                >
-                  {response.text}
-                </Button>
-              ))}
             </div>
           )}
 
