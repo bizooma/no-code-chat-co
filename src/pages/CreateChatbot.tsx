@@ -45,6 +45,7 @@ const CreateChatbot = () => {
     ai_enabled: false,
     ai_model: 'gpt-3.5-turbo',
     template_id: '',
+    chatbot_type: 'standard' as 'standard' | 'video_bot',
     widget_config: {
       color: '#3B82F6',
       position: 'bottom-right'
@@ -91,7 +92,7 @@ const CreateChatbot = () => {
   };
 
   const handleNext = () => {
-    if (currentStep < 4) {
+    if (currentStep < 5) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -134,6 +135,7 @@ const CreateChatbot = () => {
           ai_enabled: formData.ai_enabled,
           ai_model: formData.ai_enabled ? formData.ai_model : null,
           widget_config: formData.widget_config,
+          chatbot_type: formData.chatbot_type,
           status: 'draft'
         })
         .select()
@@ -171,6 +173,50 @@ const CreateChatbot = () => {
   const renderStep = () => {
     switch (currentStep) {
       case 1:
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle>Choose Bot Type</CardTitle>
+              <CardDescription>
+                Select the type of chatbot you want to create
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Card
+                  className={`cursor-pointer transition-all hover:ring-2 hover:ring-primary ${
+                    formData.chatbot_type === 'standard' ? 'ring-2 ring-primary' : ''
+                  }`}
+                  onClick={() => setFormData(prev => ({ ...prev, chatbot_type: 'standard' }))}
+                >
+                  <CardContent className="p-6">
+                    <MessageSquare className="h-12 w-12 text-primary mb-4" />
+                    <h3 className="font-semibold text-lg mb-2">Standard Bot</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Text-based chatbot with AI capabilities and flow builder
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card
+                  className={`cursor-pointer transition-all hover:ring-2 hover:ring-primary ${
+                    formData.chatbot_type === 'video_bot' ? 'ring-2 ring-primary' : ''
+                  }`}
+                  onClick={() => setFormData(prev => ({ ...prev, chatbot_type: 'video_bot' }))}
+                >
+                  <CardContent className="p-6">
+                    <Bot className="h-12 w-12 text-primary mb-4" />
+                    <h3 className="font-semibold text-lg mb-2">Video Bot</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Interactive video bot with conditional logic and branching
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+            </CardContent>
+          </Card>
+        );
+
+      case 2:
         return (
           <Card>
             <CardHeader>
@@ -226,7 +272,7 @@ const CreateChatbot = () => {
           </Card>
         );
 
-      case 2:
+      case 3:
         return (
           <Card>
             <CardHeader>
@@ -288,7 +334,7 @@ const CreateChatbot = () => {
           </Card>
         );
 
-      case 3:
+      case 4:
         return (
           <Card>
             <CardHeader>
@@ -342,7 +388,7 @@ const CreateChatbot = () => {
           </Card>
         );
 
-      case 4:
+      case 5:
         return (
           <Card>
             <CardHeader>
@@ -395,7 +441,7 @@ const CreateChatbot = () => {
             <h1 className="text-2xl font-bold text-foreground">Create New Chatbot</h1>
           </div>
           <div className="flex items-center space-x-2">
-            {[1, 2, 3, 4].map((step) => (
+            {[1, 2, 3, 4, 5].map((step) => (
               <Badge 
                 key={step}
                 variant={step === currentStep ? 'default' : step < currentStep ? 'secondary' : 'outline'}
@@ -424,7 +470,7 @@ const CreateChatbot = () => {
               Back
             </Button>
             
-            {currentStep === 4 ? (
+            {currentStep === 5 ? (
               <Button onClick={handleCreate} disabled={loading}>
                 {loading ? 'Creating...' : 'Create Chatbot'}
               </Button>

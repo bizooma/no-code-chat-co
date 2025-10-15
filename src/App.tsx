@@ -27,6 +27,7 @@ import OnboardingWizard from "./components/templates/OnboardingWizard";
 import AvatarChatbots from "./pages/AvatarChatbots";
 import AvatarChatbotEditor from "./pages/AvatarChatbotEditor";
 import NotFound from "./pages/NotFound";
+import VideoFlowEditor from "./pages/VideoFlowEditor";
 
 const queryClient = new QueryClient();
 
@@ -143,6 +144,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <ChatbotEditor />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/chatbots/:id/video-editor" 
+                element={
+                  <ProtectedRoute>
+                    <VideoFlowEditor />
                   </ProtectedRoute>
                 } 
               />

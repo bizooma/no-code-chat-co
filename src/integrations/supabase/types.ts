@@ -282,6 +282,8 @@ export type Database = {
           message_text: string
           message_type: Database["public"]["Enums"]["message_type"]
           next_message_key: string | null
+          node_connections: Json | null
+          node_position: Json | null
           updated_at: string
           video_autoplay: boolean | null
           video_chapters: Json | null
@@ -303,6 +305,8 @@ export type Database = {
           message_text: string
           message_type?: Database["public"]["Enums"]["message_type"]
           next_message_key?: string | null
+          node_connections?: Json | null
+          node_position?: Json | null
           updated_at?: string
           video_autoplay?: boolean | null
           video_chapters?: Json | null
@@ -324,6 +328,8 @@ export type Database = {
           message_text?: string
           message_type?: Database["public"]["Enums"]["message_type"]
           next_message_key?: string | null
+          node_connections?: Json | null
+          node_position?: Json | null
           updated_at?: string
           video_autoplay?: boolean | null
           video_chapters?: Json | null

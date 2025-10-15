@@ -44,6 +44,7 @@ interface Chatbot {
   ai_enabled: boolean;
   ai_model: string | null;
   ai_prompt: string | null;
+  chatbot_type?: string;
   created_at: string;
   updated_at: string;
 }
@@ -76,6 +77,13 @@ const ChatbotEditor = () => {
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('flow');
   const [previewOpen, setPreviewOpen] = useState(false);
+
+  // Redirect to VideoFlowEditor if this is a video bot
+  useEffect(() => {
+    if (chatbot?.chatbot_type === 'video_bot') {
+      navigate(`/chatbots/${id}/video-editor`);
+    }
+  }, [chatbot, id, navigate]);
 
   useEffect(() => {
     if (id) {
