@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Bot, Zap, Code, Users, ArrowRight, CheckCircle } from 'lucide-react';
+import { Bot, Zap, Code, Users, ArrowRight, CheckCircle, MessageSquare, Video, Sparkles, PlayCircle, Brain, Gauge } from 'lucide-react';
 import heroBackground from '@/assets/hero-background.jpg';
 import { FloatingAvatarWidget } from '@/components/avatar/FloatingAvatarWidget';
 
@@ -66,51 +66,243 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-16 px-4 bg-muted/50">
+      {/* Bot Types Section */}
+      <section className="py-20 px-4 bg-muted/50">
         <div className="container mx-auto">
-          <div className="text-center mb-12">
-            <h3 className="text-3xl font-bold text-foreground mb-4">
-              Why Choose SupportBots.dev?
+          <div className="text-center mb-16">
+            <h3 className="text-4xl font-bold text-foreground mb-4">
+              Three Powerful Bot Types, One Platform
             </h3>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Everything you need to create, deploy, and manage chatbots that convert visitors into customers.
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              Choose the perfect chatbot for your business needs. From simple conversations to AI-powered video avatars.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+            {/* Standard Chatbot */}
+            <Card className="hover:shadow-xl transition-all duration-300 border-2">
               <CardHeader>
-                <Code className="h-12 w-12 text-primary mb-4" />
-                <CardTitle>No Code Required</CardTitle>
-                <CardDescription>
-                  Build sophisticated chatbots with our visual drag-and-drop interface. 
-                  No programming skills needed.
+                <div className="flex items-center justify-between mb-4">
+                  <MessageSquare className="h-12 w-12 text-primary" />
+                  <span className="text-xs font-semibold px-3 py-1 bg-primary/10 text-primary rounded-full">
+                    CLASSIC
+                  </span>
+                </div>
+                <CardTitle className="text-2xl mb-2">Standard Chatbot</CardTitle>
+                <CardDescription className="text-base">
+                  Traditional text-based conversational bot with smart flows
                 </CardDescription>
               </CardHeader>
+              <CardContent>
+                <div className="mb-6">
+                  <h4 className="font-semibold text-sm text-foreground mb-3">How It Works:</h4>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Build conversation flows with our drag-and-drop builder. Visitors interact through text messages and button responses. Perfect for FAQs, lead qualification, and customer support.
+                  </p>
+                </div>
+
+                <div className="mb-6">
+                  <h4 className="font-semibold text-sm text-foreground mb-3">Key Features:</h4>
+                  <div className="space-y-2">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                      <span className="text-sm">Visual flow builder</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                      <span className="text-sm">Conditional logic & branching</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                      <span className="text-sm">Form fields & data collection</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                      <span className="text-sm">CRM integrations ready</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                      <span className="text-sm">Real-time analytics</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t">
+                  <h4 className="font-semibold text-sm text-foreground mb-2">Best For:</h4>
+                  <p className="text-sm text-muted-foreground">
+                    E-commerce stores, SaaS companies, service businesses needing automated support and lead capture
+                  </p>
+                </div>
+              </CardContent>
             </Card>
 
-            <Card>
+            {/* Video Chatbot */}
+            <Card className="hover:shadow-xl transition-all duration-300 border-2 border-primary relative">
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                <span className="bg-primary text-primary-foreground px-4 py-1 rounded-full text-xs font-bold shadow-lg">
+                  ⚡ NEW
+                </span>
+              </div>
               <CardHeader>
-                <Zap className="h-12 w-12 text-primary mb-4" />
-                <CardTitle>Deploy in Minutes</CardTitle>
-                <CardDescription>
-                  Get your chatbot live on your website with just a simple copy-paste 
-                  of our JavaScript snippet.
+                <div className="flex items-center justify-between mb-4">
+                  <Video className="h-12 w-12 text-secondary" />
+                  <span className="text-xs font-semibold px-3 py-1 bg-secondary/10 text-secondary rounded-full">
+                    INTERACTIVE
+                  </span>
+                </div>
+                <CardTitle className="text-2xl mb-2">Video Chatbot</CardTitle>
+                <CardDescription className="text-base">
+                  Interactive video flows that guide visitors with recorded videos
                 </CardDescription>
               </CardHeader>
+              <CardContent>
+                <div className="mb-6">
+                  <h4 className="font-semibold text-sm text-foreground mb-3">How It Works:</h4>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Create personalized video journeys where each node plays a video. Visitors watch and respond with button clicks. Upload your own videos or use YouTube links. Perfect for product demos and storytelling.
+                  </p>
+                </div>
+
+                <div className="mb-6">
+                  <h4 className="font-semibold text-sm text-foreground mb-3">Key Features:</h4>
+                  <div className="space-y-2">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-secondary mt-0.5 flex-shrink-0" />
+                      <span className="text-sm">Upload or YouTube videos</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-secondary mt-0.5 flex-shrink-0" />
+                      <span className="text-sm">Branching video paths</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-secondary mt-0.5 flex-shrink-0" />
+                      <span className="text-sm">Video analytics & heatmaps</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-secondary mt-0.5 flex-shrink-0" />
+                      <span className="text-sm">Lead capture forms</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-secondary mt-0.5 flex-shrink-0" />
+                      <span className="text-sm">A/B testing for videos</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t">
+                  <h4 className="font-semibold text-sm text-foreground mb-2">Best For:</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Product launches, onboarding flows, educational content, sales presentations, real estate tours
+                  </p>
+                </div>
+              </CardContent>
             </Card>
 
-            <Card>
+            {/* Avatar Chatbot */}
+            <Card className="hover:shadow-xl transition-all duration-300 border-2">
               <CardHeader>
-                <Users className="h-12 w-12 text-primary mb-4" />
-                <CardTitle>Collect Leads</CardTitle>
-                <CardDescription>
-                  Automatically capture visitor information and turn conversations 
-                  into qualified leads for your business.
+                <div className="flex items-center justify-between mb-4">
+                  <Sparkles className="h-12 w-12 text-primary" />
+                  <span className="text-xs font-semibold px-3 py-1 bg-primary/10 text-primary rounded-full">
+                    AI POWERED
+                  </span>
+                </div>
+                <CardTitle className="text-2xl mb-2">AI Avatar Chatbot</CardTitle>
+                <CardDescription className="text-base">
+                  Lifelike AI video avatar with voice and natural conversations
                 </CardDescription>
               </CardHeader>
+              <CardContent>
+                <div className="mb-6">
+                  <h4 className="font-semibold text-sm text-foreground mb-3">How It Works:</h4>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    An AI-powered digital human that speaks to visitors in real-time. Uses GPT for natural language understanding and D-ID for realistic avatar animation. Visitors talk or type, the avatar responds with voice and video.
+                  </p>
+                </div>
+
+                <div className="mb-6">
+                  <h4 className="font-semibold text-sm text-foreground mb-3">Key Features:</h4>
+                  <div className="space-y-2">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                      <span className="text-sm">Lifelike video avatars</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                      <span className="text-sm">Natural voice responses</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                      <span className="text-sm">Custom knowledge base</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                      <span className="text-sm">Multiple avatar presenters</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                      <span className="text-sm">Contextual conversations</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t">
+                  <h4 className="font-semibold text-sm text-foreground mb-2">Best For:</h4>
+                  <p className="text-sm text-muted-foreground">
+                    High-end brands, consulting services, premium education, virtual receptionists, personalized sales
+                  </p>
+                </div>
+              </CardContent>
             </Card>
+          </div>
+
+          {/* Comparison Table */}
+          <div className="bg-card rounded-lg p-8 mt-12 border">
+            <h4 className="text-2xl font-bold text-center mb-8">Quick Comparison</h4>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-3 px-4 font-semibold">Feature</th>
+                    <th className="text-center py-3 px-4 font-semibold">Standard</th>
+                    <th className="text-center py-3 px-4 font-semibold">Video</th>
+                    <th className="text-center py-3 px-4 font-semibold">AI Avatar</th>
+                  </tr>
+                </thead>
+                <tbody className="text-sm">
+                  <tr className="border-b">
+                    <td className="py-3 px-4">Setup Time</td>
+                    <td className="text-center py-3 px-4">5 mins</td>
+                    <td className="text-center py-3 px-4">15 mins</td>
+                    <td className="text-center py-3 px-4">10 mins</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="py-3 px-4">Content Type</td>
+                    <td className="text-center py-3 px-4">Text</td>
+                    <td className="text-center py-3 px-4">Pre-recorded Video</td>
+                    <td className="text-center py-3 px-4">AI-Generated Video</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="py-3 px-4">Interaction Style</td>
+                    <td className="text-center py-3 px-4">Button Clicks</td>
+                    <td className="text-center py-3 px-4">Button Clicks</td>
+                    <td className="text-center py-3 px-4">Natural Language</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="py-3 px-4">Best Engagement</td>
+                    <td className="text-center py-3 px-4">Good</td>
+                    <td className="text-center py-3 px-4">Excellent</td>
+                    <td className="text-center py-3 px-4">Outstanding</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 px-4">Pricing</td>
+                    <td className="text-center py-3 px-4 font-semibold text-primary">Included</td>
+                    <td className="text-center py-3 px-4 font-semibold text-primary">Pro+</td>
+                    <td className="text-center py-3 px-4 font-semibold text-primary">Enterprise</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </section>
@@ -176,107 +368,145 @@ const Landing = () => {
       </section>
 
       {/* Pricing Section */}
-      <section className="py-16 px-4">
+      <section className="py-20 px-4 bg-gradient-to-b from-background to-muted/30">
         <div className="container mx-auto">
           <div className="text-center mb-12">
-            <h3 className="text-3xl font-bold text-foreground mb-4">
-              Choose Your Plan
+            <h3 className="text-4xl font-bold text-foreground mb-4">
+              Simple, Transparent Pricing
             </h3>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Select the perfect plan for your business needs. Upgrade or downgrade at any time.
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Choose the plan that fits your business. All plans include Standard Chatbots. Upgrade for advanced features.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {/* Individual Plan */}
-            <Card className="relative">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-12">
+            {/* Starter Plan */}
+            <Card className="relative hover:shadow-xl transition-shadow">
               <CardHeader>
-                <CardTitle className="text-2xl">Individual</CardTitle>
-                <CardDescription>Perfect for solo entrepreneurs and small projects</CardDescription>
+                <CardTitle className="text-2xl">Starter</CardTitle>
+                <CardDescription>Perfect for small businesses getting started</CardDescription>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold text-foreground">$9</span>
+                  <span className="text-4xl font-bold text-foreground">$19</span>
                   <span className="text-muted-foreground">/month</span>
                 </div>
               </CardHeader>
               <CardContent>
+                <div className="mb-6">
+                  <div className="bg-primary/5 rounded-lg p-3 mb-4">
+                    <div className="flex items-center gap-2 mb-1">
+                      <MessageSquare className="h-5 w-5 text-primary" />
+                      <span className="font-semibold text-sm">Standard Chatbots</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Text-based conversational bots</p>
+                  </div>
+                </div>
+                
                 <div className="space-y-3 mb-6">
                   <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-primary" />
-                    <span className="text-sm">Up to 3 chatbots</span>
+                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
+                    <span className="text-sm">Up to 5 chatbots</span>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-primary" />
-                    <span className="text-sm">1,000 conversations/month</span>
+                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
+                    <span className="text-sm">2,500 conversations/month</span>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-primary" />
+                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
+                    <span className="text-sm">Visual flow builder</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
+                    <span className="text-sm">Lead capture & forms</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
                     <span className="text-sm">Basic analytics</span>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-primary" />
+                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
                     <span className="text-sm">Email support</span>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-primary" />
-                    <span className="text-sm">Template library access</span>
+                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
+                    <span className="text-sm">Template library</span>
                   </div>
                 </div>
                 <Link to="/auth">
                   <Button className="w-full" variant="outline">
-                    Get Started
+                    Start Free Trial
                   </Button>
                 </Link>
               </CardContent>
             </Card>
 
             {/* Pro Plan */}
-            <Card className="relative border-primary">
+            <Card className="relative border-2 border-primary shadow-lg hover:shadow-2xl transition-shadow">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <span className="bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-medium">
-                  Most Popular
+                <span className="bg-primary text-primary-foreground px-6 py-1.5 rounded-full text-sm font-bold shadow-lg">
+                  MOST POPULAR
                 </span>
               </div>
               <CardHeader>
-                <CardTitle className="text-2xl">Pro</CardTitle>
-                <CardDescription>Ideal for growing businesses and teams</CardDescription>
+                <CardTitle className="text-2xl">Professional</CardTitle>
+                <CardDescription>For growing businesses with video needs</CardDescription>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold text-foreground">$29</span>
+                  <span className="text-4xl font-bold text-foreground">$49</span>
                   <span className="text-muted-foreground">/month</span>
                 </div>
               </CardHeader>
               <CardContent>
+                <div className="mb-6 space-y-2">
+                  <div className="bg-primary/5 rounded-lg p-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <MessageSquare className="h-5 w-5 text-primary" />
+                      <span className="font-semibold text-sm">Standard Chatbots</span>
+                    </div>
+                  </div>
+                  <div className="bg-secondary/10 rounded-lg p-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Video className="h-5 w-5 text-secondary" />
+                      <span className="font-semibold text-sm">Video Chatbots</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Interactive video flows</p>
+                  </div>
+                </div>
+                
                 <div className="space-y-3 mb-6">
                   <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-primary" />
-                    <span className="text-sm">Up to 10 chatbots</span>
+                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
+                    <span className="text-sm font-medium">Everything in Starter, plus:</span>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-primary" />
+                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
+                    <span className="text-sm">Up to 15 chatbots</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
                     <span className="text-sm">10,000 conversations/month</span>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-primary" />
-                    <span className="text-sm">Advanced analytics & reporting</span>
+                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
+                    <span className="text-sm">Video upload & hosting</span>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-primary" />
+                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
+                    <span className="text-sm">Video analytics & heatmaps</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
+                    <span className="text-sm">A/B testing</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
                     <span className="text-sm">Priority support</span>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-primary" />
-                    <span className="text-sm">Video chatbot features</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-primary" />
-                    <span className="text-sm">Lead integrations</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-primary" />
+                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
                     <span className="text-sm">Custom branding</span>
                   </div>
                 </div>
                 <Link to="/auth">
-                  <Button className="w-full">
+                  <Button className="w-full" size="lg">
                     Start Pro Trial
                   </Button>
                 </Link>
@@ -284,44 +514,70 @@ const Landing = () => {
             </Card>
 
             {/* Enterprise Plan */}
-            <Card className="relative">
+            <Card className="relative hover:shadow-xl transition-shadow">
               <CardHeader>
                 <CardTitle className="text-2xl">Enterprise</CardTitle>
-                <CardDescription>For large organizations with custom needs</CardDescription>
+                <CardDescription>Complete solution with AI avatars</CardDescription>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold text-foreground">$99</span>
+                  <span className="text-4xl font-bold text-foreground">$149</span>
                   <span className="text-muted-foreground">/month</span>
                 </div>
               </CardHeader>
               <CardContent>
+                <div className="mb-6 space-y-2">
+                  <div className="bg-primary/5 rounded-lg p-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <MessageSquare className="h-5 w-5 text-primary" />
+                      <span className="font-semibold text-sm">Standard Chatbots</span>
+                    </div>
+                  </div>
+                  <div className="bg-secondary/10 rounded-lg p-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Video className="h-5 w-5 text-secondary" />
+                      <span className="font-semibold text-sm">Video Chatbots</span>
+                    </div>
+                  </div>
+                  <div className="bg-primary/10 rounded-lg p-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Sparkles className="h-5 w-5 text-primary" />
+                      <span className="font-semibold text-sm">AI Avatar Chatbots</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Lifelike AI video avatars</p>
+                  </div>
+                </div>
+                
                 <div className="space-y-3 mb-6">
                   <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-primary" />
+                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
+                    <span className="text-sm font-medium">Everything in Pro, plus:</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
                     <span className="text-sm">Unlimited chatbots</span>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-primary" />
-                    <span className="text-sm">100,000 conversations/month</span>
+                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
+                    <span className="text-sm">50,000 conversations/month</span>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-primary" />
-                    <span className="text-sm">Custom analytics dashboard</span>
+                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
+                    <span className="text-sm">AI avatar creation</span>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-primary" />
-                    <span className="text-sm">24/7 dedicated support</span>
+                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
+                    <span className="text-sm">Custom knowledge base</span>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-primary" />
+                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
                     <span className="text-sm">White-label solution</span>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-primary" />
-                    <span className="text-sm">API access</span>
+                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
+                    <span className="text-sm">24/7 dedicated support</span>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-primary" />
-                    <span className="text-sm">Custom integrations</span>
+                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
+                    <span className="text-sm">API access & webhooks</span>
                   </div>
                 </div>
                 <Link to="/auth">
@@ -331,6 +587,59 @@ const Landing = () => {
                 </Link>
               </CardContent>
             </Card>
+          </div>
+
+          {/* Feature Availability Table */}
+          <div className="max-w-6xl mx-auto bg-card rounded-xl p-8 shadow-lg border">
+            <h4 className="text-2xl font-bold text-center mb-8">Bot Type Availability</h4>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
+              <div className="font-semibold text-left">Bot Type</div>
+              <div className="font-semibold">Starter</div>
+              <div className="font-semibold">Professional</div>
+              <div className="font-semibold">Enterprise</div>
+              
+              <div className="text-left flex items-center gap-2 pt-4 border-t">
+                <MessageSquare className="h-5 w-5 text-primary" />
+                <span>Standard Chatbot</span>
+              </div>
+              <div className="pt-4 border-t">
+                <CheckCircle className="h-6 w-6 text-primary mx-auto" />
+              </div>
+              <div className="pt-4 border-t">
+                <CheckCircle className="h-6 w-6 text-primary mx-auto" />
+              </div>
+              <div className="pt-4 border-t">
+                <CheckCircle className="h-6 w-6 text-primary mx-auto" />
+              </div>
+              
+              <div className="text-left flex items-center gap-2 pt-4">
+                <Video className="h-5 w-5 text-secondary" />
+                <span>Video Chatbot</span>
+              </div>
+              <div className="pt-4">
+                <span className="text-muted-foreground">—</span>
+              </div>
+              <div className="pt-4">
+                <CheckCircle className="h-6 w-6 text-primary mx-auto" />
+              </div>
+              <div className="pt-4">
+                <CheckCircle className="h-6 w-6 text-primary mx-auto" />
+              </div>
+              
+              <div className="text-left flex items-center gap-2 pt-4">
+                <Sparkles className="h-5 w-5 text-primary" />
+                <span>AI Avatar Chatbot</span>
+              </div>
+              <div className="pt-4">
+                <span className="text-muted-foreground">—</span>
+              </div>
+              <div className="pt-4">
+                <span className="text-muted-foreground">—</span>
+              </div>
+              <div className="pt-4">
+                <CheckCircle className="h-6 w-6 text-primary mx-auto" />
+              </div>
+            </div>
           </div>
         </div>
       </section>
