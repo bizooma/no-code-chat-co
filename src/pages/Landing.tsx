@@ -46,7 +46,8 @@ const Landing = () => {
               <span className="text-white"> Without Code</span>
             </h2>
             <p className="text-xl text-white/90 mb-8">
-              Create powerful chatbots for your website in minutes. Generate leads, 
+              Create powerful chatbots for your website in minutes. Build traditional text bots, 
+              mobile-optimized video flows, or AI-powered avatars. Generate leads, 
               provide support, and engage customers with our visual bot builder.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -152,14 +153,14 @@ const Landing = () => {
                 </div>
                 <CardTitle className="text-2xl mb-2">Video Chatbot</CardTitle>
                 <CardDescription className="text-base">
-                  Interactive video flows that guide visitors with recorded videos
+                  Interactive portrait video flows optimized for mobile engagement
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="mb-6">
                   <h4 className="font-semibold text-sm text-foreground mb-3">How It Works:</h4>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Create personalized video journeys where each node plays a video. Visitors watch and respond with button clicks. Upload your own videos or use YouTube links. Perfect for product demos and storytelling.
+                    Create engaging video journeys with portrait videos optimized for mobile. Visitors watch your videos and respond with interactive buttons that overlay during playback. Upload vertical videos (TikTok/Reels style) for maximum engagement. Perfect for product demos, onboarding, and storytelling.
                   </p>
                 </div>
 
@@ -168,23 +169,27 @@ const Landing = () => {
                   <div className="space-y-2">
                     <div className="flex items-start gap-2">
                       <CheckCircle className="h-4 w-4 text-secondary mt-0.5 flex-shrink-0" />
-                      <span className="text-sm">Upload or YouTube videos</span>
+                      <span className="text-sm">Portrait video uploads (9:16 format)</span>
                     </div>
                     <div className="flex items-start gap-2">
                       <CheckCircle className="h-4 w-4 text-secondary mt-0.5 flex-shrink-0" />
-                      <span className="text-sm">Branching video paths</span>
+                      <span className="text-sm">Interactive buttons during playback</span>
                     </div>
                     <div className="flex items-start gap-2">
                       <CheckCircle className="h-4 w-4 text-secondary mt-0.5 flex-shrink-0" />
-                      <span className="text-sm">Video analytics & heatmaps</span>
+                      <span className="text-sm">Mobile-optimized vertical layout</span>
                     </div>
                     <div className="flex items-start gap-2">
                       <CheckCircle className="h-4 w-4 text-secondary mt-0.5 flex-shrink-0" />
-                      <span className="text-sm">Lead capture forms</span>
+                      <span className="text-sm">Branching video paths & flows</span>
                     </div>
                     <div className="flex items-start gap-2">
                       <CheckCircle className="h-4 w-4 text-secondary mt-0.5 flex-shrink-0" />
-                      <span className="text-sm">A/B testing for videos</span>
+                      <span className="text-sm">Video analytics & engagement tracking</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-secondary mt-0.5 flex-shrink-0" />
+                      <span className="text-sm">Lead capture forms with video</span>
                     </div>
                   </div>
                 </div>
@@ -192,7 +197,7 @@ const Landing = () => {
                 <div className="pt-4 border-t">
                   <h4 className="font-semibold text-sm text-foreground mb-2">Best For:</h4>
                   <p className="text-sm text-muted-foreground">
-                    Product launches, onboarding flows, educational content, sales presentations, real estate tours
+                    Product launches, onboarding flows, educational content, sales presentations, real estate tours, mobile app promotions, social media campaigns
                   </p>
                 </div>
               </CardContent>
@@ -279,14 +284,26 @@ const Landing = () => {
                   <tr className="border-b">
                     <td className="py-3 px-4">Content Type</td>
                     <td className="text-center py-3 px-4">Text</td>
-                    <td className="text-center py-3 px-4">Pre-recorded Video</td>
+                    <td className="text-center py-3 px-4">Portrait Videos (Mobile-First)</td>
                     <td className="text-center py-3 px-4">AI-Generated Video</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="py-3 px-4">Video Format</td>
+                    <td className="text-center py-3 px-4">N/A</td>
+                    <td className="text-center py-3 px-4">9:16 Portrait</td>
+                    <td className="text-center py-3 px-4">N/A</td>
                   </tr>
                   <tr className="border-b">
                     <td className="py-3 px-4">Interaction Style</td>
                     <td className="text-center py-3 px-4">Button Clicks</td>
-                    <td className="text-center py-3 px-4">Button Clicks</td>
+                    <td className="text-center py-3 px-4">Overlay Buttons During Video</td>
                     <td className="text-center py-3 px-4">Natural Language</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="py-3 px-4">Mobile Optimized</td>
+                    <td className="text-center py-3 px-4">Yes</td>
+                    <td className="text-center py-3 px-4">Excellent</td>
+                    <td className="text-center py-3 px-4">Yes</td>
                   </tr>
                   <tr className="border-b">
                     <td className="py-3 px-4">Best Engagement</td>
