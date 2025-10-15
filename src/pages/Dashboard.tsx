@@ -112,11 +112,26 @@ const Dashboard = () => {
               ) : (
                 <>
                   <div className="text-2xl font-bold">{stats?.totalBots ?? 0}</div>
-                  <p className="text-xs text-muted-foreground">
-                    {stats?.totalBots === 0 ? 'No bots created yet' : 
-                     stats?.totalBots === 1 ? '1 active bot' : 
-                     `${stats?.totalBots} active bots`}
-                  </p>
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {stats?.standardBots ? (
+                      <Badge variant="secondary" className="text-xs">
+                        <MessageSquare className="h-3 w-3 mr-1" />
+                        {stats.standardBots} Standard
+                      </Badge>
+                    ) : null}
+                    {stats?.videoBots ? (
+                      <Badge variant="secondary" className="text-xs bg-primary/10 text-primary">
+                        <Video className="h-3 w-3 mr-1" />
+                        {stats.videoBots} Video
+                      </Badge>
+                    ) : null}
+                    {stats?.avatarBots ? (
+                      <Badge variant="secondary" className="text-xs">
+                        <Video className="h-3 w-3 mr-1" />
+                        {stats.avatarBots} Avatar
+                      </Badge>
+                    ) : null}
+                  </div>
                 </>
               )}
             </CardContent>
@@ -400,13 +415,20 @@ const Dashboard = () => {
                           <CardTitle className="text-lg flex items-center gap-2">
                             {bot.type === 'avatar' ? (
                               <Video className="h-4 w-4 text-primary" />
+                            ) : bot.type === 'video' ? (
+                              <Video className="h-4 w-4 text-secondary" />
                             ) : (
                               <Bot className="h-4 w-4" />
                             )}
                             {bot.name}
                           </CardTitle>
-                          <CardDescription className="mt-1">
-                            {bot.type === 'avatar' ? 'Avatar Bot' : 'Standard Bot'}
+                          <CardDescription className="mt-1 flex items-center gap-2">
+                            {bot.type === 'avatar' ? 'Avatar Bot' : bot.type === 'video' ? 'Video Bot' : 'Standard Bot'}
+                            {bot.type === 'video' && (
+                              <Badge variant="secondary" className="text-xs bg-primary/10 text-primary">
+                                Interactive Video
+                              </Badge>
+                            )}
                           </CardDescription>
                         </div>
                         <Badge variant={bot.status === 'published' || bot.status === 'active' ? 'default' : 'secondary'}>

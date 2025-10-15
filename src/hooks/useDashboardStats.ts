@@ -3,6 +3,9 @@ import { supabase } from '@/integrations/supabase/client';
 
 interface DashboardStats {
   totalBots: number;
+  standardBots: number;
+  avatarBots: number;
+  videoBots: number;
   totalLeads: number;
   totalConversations: number;
 }
@@ -10,9 +13,10 @@ interface DashboardStats {
 interface ChatbotItem {
   id: string;
   name: string;
-  type: 'standard' | 'avatar';
+  type: 'standard' | 'avatar' | 'video';
   status: string;
   created_at: string;
+  video_config?: any;
 }
 
 interface LeadItem {
@@ -32,14 +36,21 @@ export const useDashboardStats = (workspaceId: string | undefined) => {
     queryKey: ['dashboard-stats', workspaceId],
     queryFn: async (): Promise<DashboardStats> => {
       if (!workspaceId) {
-        return { totalBots: 0, totalLeads: 0, totalConversations: 0 };
+        return { 
+          totalBots: 0, 
+          standardBots: 0,
+          avatarBots: 0,
+          videoBots: 0,
+          totalLeads: 0, 
+          totalConversations: 0 
+        };
       }
 
-      // Fetch total chatbots (standard + avatar)
-      const [chatbotsResult, avatarBotsResult] = await Promise.all([
+      // Fetch total chatbots with breakdown
+      const [chatbotsData, avatarBotsResult] = await Promise.all([
         supabase
           .from('chatbots')
-          .select('id', { count: 'exact', head: true })
+          .select('chatbot_type')
           .eq('workspace_id', workspaceId),
         supabase
           .from('avatar_chatbots')
@@ -47,7 +58,10 @@ export const useDashboardStats = (workspaceId: string | undefined) => {
           .eq('workspace_id', workspaceId),
       ]);
 
-      const totalBots = (chatbotsResult.count || 0) + (avatarBotsResult.count || 0);
+      const standardBotsCount = chatbotsData.data?.filter(b => !b.chatbot_type || b.chatbot_type === 'standard').length || 0;
+      const videoBotsCount = chatbotsData.data?.filter(b => b.chatbot_type === 'video_bot').length || 0;
+      const avatarBotsCount = avatarBotsResult.count || 0;
+      const totalBots = standardBotsCount + videoBotsCount + avatarBotsCount;
 
       // Fetch total leads
       const { count: totalLeads } = await supabase
@@ -56,18 +70,18 @@ export const useDashboardStats = (workspaceId: string | undefined) => {
         .eq('workspace_id', workspaceId);
 
       // Fetch bot IDs first, then count conversations
-      const { data: standardBots } = await supabase
+      const { data: standardBotsData } = await supabase
         .from('chatbots')
         .select('id')
         .eq('workspace_id', workspaceId);
 
-      const { data: avatarBots } = await supabase
+      const { data: avatarBotsData } = await supabase
         .from('avatar_chatbots')
         .select('id')
         .eq('workspace_id', workspaceId);
 
-      const standardBotIds = standardBots?.map(b => b.id) || [];
-      const avatarBotIds = avatarBots?.map(b => b.id) || [];
+      const standardBotIds = standardBotsData?.map(b => b.id) || [];
+      const avatarBotIds = avatarBotsData?.map(b => b.id) || [];
 
       let standardConvoCount = 0;
       let avatarConvoCount = 0;
@@ -92,6 +106,9 @@ export const useDashboardStats = (workspaceId: string | undefined) => {
 
       return {
         totalBots,
+        standardBots: standardBotsCount,
+        avatarBots: avatarBotsCount,
+        videoBots: videoBotsCount,
         totalLeads: totalLeads || 0,
         totalConversations,
       };
@@ -110,7 +127,7 @@ export const useRecentChatbots = (workspaceId: string | undefined, limit: number
       const [standardBots, avatarBots] = await Promise.all([
         supabase
           .from('chatbots')
-          .select('id, name, status, created_at')
+          .select('id, name, status, created_at, chatbot_type, video_config')
           .eq('workspace_id', workspaceId)
           .order('created_at', { ascending: false })
           .limit(limit),
@@ -125,9 +142,10 @@ export const useRecentChatbots = (workspaceId: string | undefined, limit: number
       const standardItems: ChatbotItem[] = (standardBots.data || []).map(bot => ({
         id: bot.id,
         name: bot.name,
-        type: 'standard' as const,
+        type: bot.chatbot_type === 'video_bot' ? 'video' as const : 'standard' as const,
         status: bot.status,
         created_at: bot.created_at,
+        video_config: bot.video_config,
       }));
 
       const avatarItems: ChatbotItem[] = (avatarBots.data || []).map(bot => ({

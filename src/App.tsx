@@ -21,7 +21,7 @@ import Analytics from "./pages/Analytics";
 import Leads from "./pages/Leads";
 import LeadIntegrations from "./pages/LeadIntegrations";
 import Pricing from "./pages/Pricing";
-import TemplateLibrary from "./pages/TemplateLibrary";
+import VideoTemplateLibrary from "./pages/VideoTemplateLibrary";
 import TemplateAnalytics from "./pages/TemplateAnalytics";
 import OnboardingWizard from "./components/templates/OnboardingWizard";
 import AvatarChatbots from "./pages/AvatarChatbots";
@@ -159,7 +159,7 @@ const App = () => (
                 path="/templates" 
                 element={
                   <ProtectedRoute>
-                    <TemplateLibrary />
+                    <VideoTemplateLibrary />
                   </ProtectedRoute>
                 } 
               />

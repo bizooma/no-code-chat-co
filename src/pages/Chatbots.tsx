@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useWorkspace } from '@/contexts/WorkspaceContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Bot, Settings, Copy, Play, Pause, Trash2, MoreHorizontal } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Plus, Bot, Settings, Copy, Play, Pause, Trash2, MoreHorizontal, Video, MessageSquare, Film } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -34,23 +36,30 @@ interface Chatbot {
   created_at: string;
   updated_at: string;
   workspace_id: string;
+  chatbot_type: string | null;
+  video_config: any;
 }
 
 const Chatbots = () => {
   const { user } = useAuth();
+  const { currentWorkspace } = useWorkspace();
   const { toast } = useToast();
   const [chatbots, setChatbots] = useState<Chatbot[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filterType, setFilterType] = useState<'all' | 'standard' | 'video' | 'avatar'>('all');
 
   useEffect(() => {
     fetchChatbots();
-  }, []);
+  }, [currentWorkspace]);
 
   const fetchChatbots = async () => {
+    if (!currentWorkspace?.id) return;
+    
     try {
       const { data, error } = await supabase
         .from('chatbots')
         .select('*')
+        .eq('workspace_id', currentWorkspace.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -145,6 +154,31 @@ const Chatbots = () => {
     }
   };
 
+  const getBotType = (bot: Chatbot): 'standard' | 'video' | 'avatar' => {
+    if (bot.chatbot_type === 'video_bot') return 'video';
+    if (bot.chatbot_type === 'avatar_bot') return 'avatar';
+    return 'standard';
+  };
+
+  const getVideoThumbnail = (bot: Chatbot): string | null => {
+    if (bot.chatbot_type === 'video_bot' && bot.video_config?.preview_thumbnail) {
+      return bot.video_config.preview_thumbnail;
+    }
+    return null;
+  };
+
+  const filteredBots = chatbots.filter(bot => {
+    if (filterType === 'all') return true;
+    return getBotType(bot) === filterType;
+  });
+
+  const botCounts = {
+    all: chatbots.length,
+    standard: chatbots.filter(b => getBotType(b) === 'standard').length,
+    video: chatbots.filter(b => getBotType(b) === 'video').length,
+    avatar: chatbots.filter(b => getBotType(b) === 'avatar').length,
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -164,133 +198,221 @@ const Chatbots = () => {
             </Link>
             <h1 className="text-2xl font-bold text-foreground">My Chatbots</h1>
           </div>
-          <Link to="/chatbots/create">
-            <Button className="flex items-center space-x-2">
-              <Plus className="h-4 w-4" />
-              <span>Create New Bot</span>
-            </Button>
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link to="/templates">
+              <Button variant="outline">
+                <Film className="mr-2 h-4 w-4" />
+                Video Templates
+              </Button>
+            </Link>
+            <Link to="/chatbots/create">
+              <Button className="flex items-center space-x-2">
+                <Plus className="h-4 w-4" />
+                <span>Create New Bot</span>
+              </Button>
+            </Link>
+          </div>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
-        {chatbots.length === 0 ? (
+        <Tabs value={filterType} onValueChange={(v) => setFilterType(v as any)} className="mb-6">
+          <TabsList>
+            <TabsTrigger value="all">
+              All ({botCounts.all})
+            </TabsTrigger>
+            <TabsTrigger value="standard">
+              <MessageSquare className="h-4 w-4 mr-2" />
+              Standard ({botCounts.standard})
+            </TabsTrigger>
+            <TabsTrigger value="video">
+              <Video className="h-4 w-4 mr-2" />
+              Video Bots ({botCounts.video})
+            </TabsTrigger>
+            <TabsTrigger value="avatar">
+              <Video className="h-4 w-4 mr-2" />
+              Avatar Bots ({botCounts.avatar})
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+
+        {filteredBots.length === 0 ? (
           // Empty State
           <Card className="text-center py-12">
             <CardContent>
               <Bot className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <CardTitle className="mb-2">No chatbots yet</CardTitle>
+              <CardTitle className="mb-2">
+                {filterType === 'all' ? 'No chatbots yet' : `No ${filterType} bots yet`}
+              </CardTitle>
               <CardDescription className="mb-4">
-                Create your first chatbot to get started with lead generation and customer support.
+                {filterType === 'video' 
+                  ? 'Create an interactive video bot to engage your visitors with guided video flows.'
+                  : 'Create your first chatbot to get started with lead generation and customer support.'}
               </CardDescription>
-              <Link to="/chatbots/create">
-                <Button className="flex items-center space-x-2 mx-auto">
-                  <Plus className="h-4 w-4" />
-                  <span>Create Your First Bot</span>
-                </Button>
-              </Link>
+              <div className="flex gap-2 justify-center">
+                {filterType === 'video' && (
+                  <Link to="/templates">
+                    <Button variant="outline" className="flex items-center space-x-2">
+                      <Film className="h-4 w-4" />
+                      <span>Browse Video Templates</span>
+                    </Button>
+                  </Link>
+                )}
+                <Link to="/chatbots/create">
+                  <Button className="flex items-center space-x-2">
+                    <Plus className="h-4 w-4" />
+                    <span>Create Your First Bot</span>
+                  </Button>
+                </Link>
+              </div>
             </CardContent>
           </Card>
         ) : (
           // Chatbots Grid
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {chatbots.map((bot) => (
-              <Card key={bot.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1 min-w-0">
-                      <CardTitle className="text-lg truncate">{bot.name}</CardTitle>
-                      {bot.description && (
-                        <CardDescription className="mt-1 line-clamp-2">
-                          {bot.description}
-                        </CardDescription>
-                      )}
+            {filteredBots.map((bot) => {
+              const botType = getBotType(bot);
+              const thumbnail = getVideoThumbnail(bot);
+              
+              return (
+                <Card key={bot.id} className="hover:shadow-lg transition-shadow overflow-hidden">
+                  {thumbnail && (
+                    <div className="relative w-full h-40 bg-muted">
+                      <img 
+                        src={thumbnail} 
+                        alt={bot.name}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute top-2 right-2">
+                        <Badge className="bg-primary/90 backdrop-blur">
+                          <Video className="h-3 w-3 mr-1" />
+                          Video Bot
+                        </Badge>
+                      </div>
                     </div>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="bg-popover border border-border z-50">
-                        <DropdownMenuItem onClick={() => copyEmbedCode(bot.id)}>
-                          <Copy className="mr-2 h-4 w-4" />
-                          Copy Embed Code
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleStatusToggle(bot.id, bot.status)}>
-                          {bot.status === 'active' ? (
-                            <>
-                              <Pause className="mr-2 h-4 w-4" />
-                              Deactivate
-                            </>
-                          ) : (
-                            <>
-                              <Play className="mr-2 h-4 w-4" />
-                              Activate
-                            </>
-                          )}
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <DropdownMenuItem 
-                              className="text-destructive focus:text-destructive"
-                              onSelect={(e) => e.preventDefault()}
-                            >
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              Delete
-                            </DropdownMenuItem>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Delete Chatbot</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Are you sure you want to delete "{bot.name}"? This action cannot be undone.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => handleDelete(bot.id)}
-                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                              >
-                                Delete
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="flex items-center justify-between mb-4">
-                    <Badge className={getStatusColor(bot.status)}>
-                      {bot.status.charAt(0).toUpperCase() + bot.status.slice(1)}
-                    </Badge>
-                    <span className="text-sm text-muted-foreground">
-                      {new Date(bot.created_at).toLocaleDateString()}
-                    </span>
-                  </div>
+                  )}
                   
-                  <div className="flex space-x-2">
-                    <Link to={`/chatbots/${bot.id}/editor`} className="flex-1">
-                      <Button variant="outline" size="sm" className="w-full">
-                        <Settings className="mr-2 h-4 w-4" />
-                        Edit
-                      </Button>
-                    </Link>
-                    <Link to={`/chatbots/${bot.id}/analytics`} className="flex-1">
-                      <Button variant="outline" size="sm" className="w-full">
-                        <Bot className="mr-2 h-4 w-4" />
-                        Analytics
-                      </Button>
-                    </Link>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1 min-w-0">
+                        <CardTitle className="text-lg truncate flex items-center gap-2">
+                          {botType === 'video' ? (
+                            <Video className="h-4 w-4 text-secondary" />
+                          ) : botType === 'avatar' ? (
+                            <Video className="h-4 w-4 text-primary" />
+                          ) : (
+                            <Bot className="h-4 w-4" />
+                          )}
+                          {bot.name}
+                        </CardTitle>
+                        {bot.description && (
+                          <CardDescription className="mt-1 line-clamp-2">
+                            {bot.description}
+                          </CardDescription>
+                        )}
+                        <div className="flex gap-2 mt-2">
+                          {botType === 'video' && (
+                            <Badge variant="secondary" className="text-xs bg-primary/10 text-primary">
+                              <Film className="h-3 w-3 mr-1" />
+                              Interactive Video
+                            </Badge>
+                          )}
+                          {botType === 'avatar' && (
+                            <Badge variant="secondary" className="text-xs">
+                              AI Avatar
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="bg-popover border border-border z-50">
+                          <DropdownMenuItem onClick={() => copyEmbedCode(bot.id)}>
+                            <Copy className="mr-2 h-4 w-4" />
+                            Copy Embed Code
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleStatusToggle(bot.id, bot.status)}>
+                            {bot.status === 'active' ? (
+                              <>
+                                <Pause className="mr-2 h-4 w-4" />
+                                Deactivate
+                              </>
+                            ) : (
+                              <>
+                                <Play className="mr-2 h-4 w-4" />
+                                Activate
+                              </>
+                            )}
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <DropdownMenuItem 
+                                className="text-destructive focus:text-destructive"
+                                onSelect={(e) => e.preventDefault()}
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Delete
+                              </DropdownMenuItem>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Delete Chatbot</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to delete "{bot.name}"? This action cannot be undone.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => handleDelete(bot.id)}
+                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                >
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="flex items-center justify-between mb-4">
+                      <Badge className={getStatusColor(bot.status)}>
+                        {bot.status.charAt(0).toUpperCase() + bot.status.slice(1)}
+                      </Badge>
+                      <span className="text-sm text-muted-foreground">
+                        {new Date(bot.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                    
+                    <div className="flex space-x-2">
+                      <Link 
+                        to={botType === 'video' ? `/chatbots/${bot.id}/video-editor` : `/chatbots/${bot.id}/editor`} 
+                        className="flex-1"
+                      >
+                        <Button variant="outline" size="sm" className="w-full">
+                          <Settings className="mr-2 h-4 w-4" />
+                          Edit
+                        </Button>
+                      </Link>
+                      <Link to={`/analytics?chatbot_id=${bot.id}`} className="flex-1">
+                        <Button variant="outline" size="sm" className="w-full">
+                          <Bot className="mr-2 h-4 w-4" />
+                          Analytics
+                        </Button>
+                      </Link>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         )}
       </main>
