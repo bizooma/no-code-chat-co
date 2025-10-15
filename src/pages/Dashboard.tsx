@@ -187,7 +187,7 @@ const Dashboard = () => {
         </div>
 
         {/* Subscription Status */}
-        {!subscription?.subscribed && (
+        {!subscription?.subscribed && !isPlatformOwner && (
           <Card className="mb-8 bg-gradient-to-r from-primary/10 to-secondary/10 border-primary/20">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
