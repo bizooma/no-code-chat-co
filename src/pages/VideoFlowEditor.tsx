@@ -164,6 +164,7 @@ export default function VideoFlowEditor() {
       <div className="flex-1">
         <VideoFlowBuilder
           chatbotId={id!}
+          workspaceId={chatbot?.workspace_id}
           onSave={handleSave}
           initialNodes={initialNodes}
           initialEdges={initialEdges}

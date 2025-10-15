@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Progress } from '@/components/ui/progress';
-import { Upload, Video, Youtube, X, Play } from 'lucide-react';
+import { Upload, Video, Youtube, X, Play, FolderOpen } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -15,9 +15,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface VideoUploadProps {
   chatbotId: string;
+  workspaceId?: string;
+  nodeId?: string;
   onVideoUpload?: (videoData: VideoData) => void;
   currentVideo?: VideoData | null;
 }
@@ -34,6 +44,8 @@ interface VideoData {
 
 export const VideoUpload: React.FC<VideoUploadProps> = ({
   chatbotId,
+  workspaceId,
+  nodeId,
   onVideoUpload,
   currentVideo
 }) => {
@@ -41,6 +53,9 @@ export const VideoUpload: React.FC<VideoUploadProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [showLibrary, setShowLibrary] = useState(false);
+  const [libraryVideos, setLibraryVideos] = useState<any[]>([]);
   const [videoData, setVideoData] = useState<VideoData>(currentVideo || {
     type: 'youtube',
     url: '',
@@ -106,12 +121,19 @@ export const VideoUpload: React.FC<VideoUploadProps> = ({
     setUploadProgress(0);
 
     try {
+      // Create organized path: workspace_id/chatbot_id/node_id_timestamp.ext
       const fileExt = file.name.split('.').pop();
-      const fileName = `${chatbotId}/${Date.now()}.${fileExt}`;
+      const timestamp = Date.now();
+      const fileName = workspaceId 
+        ? `${workspaceId}/${chatbotId}/${nodeId || 'video'}_${timestamp}.${fileExt}`
+        : `${chatbotId}/${nodeId || 'video'}_${timestamp}.${fileExt}`;
 
       const { data, error } = await supabase.storage
         .from('chatbot-videos')
-        .upload(fileName, file);
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
 
       if (error) throw error;
 
@@ -119,12 +141,16 @@ export const VideoUpload: React.FC<VideoUploadProps> = ({
         .from('chatbot-videos')
         .getPublicUrl(fileName);
 
+      // Get video duration
+      const duration = await getVideoDuration(file);
+
       const updatedVideoData: VideoData = {
         type: 'uploaded',
         url: publicUrl.publicUrl,
         autoplay: videoData.autoplay,
         controls: videoData.controls,
-        title: file.name
+        title: file.name,
+        duration
       };
 
       setVideoData(updatedVideoData);
@@ -145,6 +171,83 @@ export const VideoUpload: React.FC<VideoUploadProps> = ({
       setIsUploading(false);
       setUploadProgress(0);
     }
+  };
+
+  const getVideoDuration = (file: File): Promise<number> => {
+    return new Promise((resolve) => {
+      const video = document.createElement('video');
+      video.preload = 'metadata';
+      video.onloadedmetadata = () => {
+        window.URL.revokeObjectURL(video.src);
+        resolve(Math.round(video.duration));
+      };
+      video.src = URL.createObjectURL(file);
+    });
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      handleFileUpload(files[0]);
+    }
+  };
+
+  const loadVideoLibrary = async () => {
+    try {
+      const folderPath = workspaceId ? `${workspaceId}/${chatbotId}` : chatbotId;
+      const { data, error } = await supabase.storage
+        .from('chatbot-videos')
+        .list(folderPath);
+
+      if (error) throw error;
+
+      const videosWithUrls = data?.map(file => {
+        const { data: publicUrl } = supabase.storage
+          .from('chatbot-videos')
+          .getPublicUrl(`${folderPath}/${file.name}`);
+        
+        return {
+          name: file.name,
+          url: publicUrl.publicUrl,
+          createdAt: file.created_at
+        };
+      }) || [];
+
+      setLibraryVideos(videosWithUrls);
+      setShowLibrary(true);
+    } catch (error) {
+      console.error('Error loading video library:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load video library",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const selectFromLibrary = (videoUrl: string, videoName: string) => {
+    const updatedVideoData: VideoData = {
+      type: 'uploaded',
+      url: videoUrl,
+      autoplay: videoData.autoplay,
+      controls: videoData.controls,
+      title: videoName
+    };
+    setVideoData(updatedVideoData);
+    onVideoUpload?.(updatedVideoData);
+    setShowLibrary(false);
   };
 
   const handleControlChange = (field: keyof VideoData, value: any) => {
@@ -223,8 +326,27 @@ export const VideoUpload: React.FC<VideoUploadProps> = ({
         ) : (
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>Upload Video File</Label>
-              <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
+              <div className="flex items-center justify-between">
+                <Label>Upload Video File</Label>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={loadVideoLibrary}
+                >
+                  <FolderOpen className="h-4 w-4 mr-2" />
+                  Library
+                </Button>
+              </div>
+              <div 
+                className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+                  isDragging 
+                    ? 'border-primary bg-primary/10' 
+                    : 'border-muted-foreground/25'
+                }`}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+              >
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -313,6 +435,47 @@ export const VideoUpload: React.FC<VideoUploadProps> = ({
           </div>
         )}
       </CardContent>
+
+      {/* Video Library Dialog */}
+      <Dialog open={showLibrary} onOpenChange={setShowLibrary}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Video Library</DialogTitle>
+            <DialogDescription>
+              Select a previously uploaded video
+            </DialogDescription>
+          </DialogHeader>
+          <ScrollArea className="h-96">
+            {libraryVideos.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <Video className="h-12 w-12 mx-auto mb-4" />
+                <p>No videos in library</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-4 p-4">
+                {libraryVideos.map((video) => (
+                  <Card 
+                    key={video.url} 
+                    className="cursor-pointer hover:ring-2 hover:ring-primary transition-all"
+                    onClick={() => selectFromLibrary(video.url, video.name)}
+                  >
+                    <CardContent className="p-4">
+                      <video 
+                        src={video.url} 
+                        className="w-full aspect-video bg-muted rounded-md mb-2"
+                      />
+                      <p className="text-sm font-medium truncate">{video.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(video.createdAt).toLocaleDateString()}
+                      </p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };

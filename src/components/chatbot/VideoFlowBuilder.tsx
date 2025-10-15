@@ -21,6 +21,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Video, MessageSquare, FormInput, CheckCircle, Plus, UserPlus } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { VideoUpload } from '@/components/video/VideoUpload';
 
 interface VideoNodeData {
   title: string;
@@ -137,12 +138,13 @@ function EndNode({ data, selected }: { data: VideoNodeData; selected: boolean })
 
 interface VideoFlowBuilderProps {
   chatbotId: string;
+  workspaceId?: string;
   onSave: (nodes: Node[], edges: Edge[]) => void;
   initialNodes?: Node[];
   initialEdges?: Edge[];
 }
 
-export const VideoFlowBuilder = ({ chatbotId, onSave, initialNodes = [], initialEdges = [] }: VideoFlowBuilderProps) => {
+export const VideoFlowBuilder = ({ chatbotId, workspaceId, onSave, initialNodes = [], initialEdges = [] }: VideoFlowBuilderProps) => {
   const [nodes, setNodes] = useState<Node[]>(initialNodes.length > 0 ? initialNodes : [
     {
       id: 'start',
@@ -318,14 +320,24 @@ export const VideoFlowBuilder = ({ chatbotId, onSave, initialNodes = [], initial
 
               {(selectedNode.type === 'video_question') && (
                 <>
-                  <div>
-                    <Label>Video URL</Label>
-                    <Input
-                      value={selectedNode.data.video_url || ''}
-                      onChange={(e) => updateNodeData('video_url', e.target.value)}
-                      placeholder="https://... or youtube.com/..."
-                    />
-                  </div>
+                  <VideoUpload
+                    chatbotId={chatbotId}
+                    workspaceId={workspaceId}
+                    nodeId={selectedNode.id}
+                    currentVideo={selectedNode.data.video_url ? {
+                      type: selectedNode.data.video_url.includes('youtube') ? 'youtube' : 'uploaded',
+                      url: selectedNode.data.video_url,
+                      autoplay: false,
+                      controls: true,
+                      thumbnail: selectedNode.data.video_thumbnail
+                    } : null}
+                    onVideoUpload={(videoData) => {
+                      updateNodeData('video_url', videoData.url);
+                      if (videoData.thumbnail) {
+                        updateNodeData('video_thumbnail', videoData.thumbnail);
+                      }
+                    }}
+                  />
                   <div>
                     <Label>Description</Label>
                     <Textarea
