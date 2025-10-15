@@ -75,30 +75,30 @@ const Landing = () => {
               Three Powerful Bot Types, One Platform
             </h3>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              Choose the perfect chatbot for your business needs. From simple conversations to AI-powered video avatars.
+              Choose the perfect bot type for your business needs. From simple conversations to AI-powered video avatars.
             </p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-            {/* Standard Chatbot */}
+            {/* ChatFlow */}
             <Card className="hover:shadow-xl transition-all duration-300 border-2">
               <CardHeader>
                 <div className="flex items-center justify-between mb-4">
                   <MessageSquare className="h-12 w-12 text-primary" />
                   <span className="text-xs font-semibold px-3 py-1 bg-primary/10 text-primary rounded-full">
-                    CLASSIC
+                    TEXT-BASED
                   </span>
                 </div>
-                <CardTitle className="text-2xl mb-2">Standard Chatbot</CardTitle>
+                <CardTitle className="text-2xl mb-2">ChatFlow</CardTitle>
                 <CardDescription className="text-base">
-                  Traditional text-based conversational bot with smart flows
+                  Perfect for FAQ, lead capture, and customer support
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="mb-6">
                   <h4 className="font-semibold text-sm text-foreground mb-3">How It Works:</h4>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Build conversation flows with our drag-and-drop builder. Visitors interact through text messages and button responses. Perfect for FAQs, lead qualification, and customer support.
+                    Build conversation flows with our drag-and-drop builder. Visitors interact through text messages and button responses. Perfect for automating customer support and qualifying leads.
                   </p>
                 </div>
 
@@ -107,23 +107,19 @@ const Landing = () => {
                   <div className="space-y-2">
                     <div className="flex items-start gap-2">
                       <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                      <span className="text-sm">Visual flow builder</span>
+                      <span className="text-sm">Quick setup with templates</span>
                     </div>
                     <div className="flex items-start gap-2">
                       <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                      <span className="text-sm">Conditional logic & branching</span>
+                      <span className="text-sm">Customizable conversation flows</span>
                     </div>
                     <div className="flex items-start gap-2">
                       <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                      <span className="text-sm">Form fields & data collection</span>
+                      <span className="text-sm">Lead collection forms</span>
                     </div>
                     <div className="flex items-start gap-2">
                       <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                      <span className="text-sm">CRM integrations ready</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                      <span className="text-sm">Real-time analytics</span>
+                      <span className="text-sm">Multi-channel deployment</span>
                     </div>
                   </div>
                 </div>
@@ -131,13 +127,13 @@ const Landing = () => {
                 <div className="pt-4 border-t">
                   <h4 className="font-semibold text-sm text-foreground mb-2">Best For:</h4>
                   <p className="text-sm text-muted-foreground">
-                    E-commerce stores, SaaS companies, service businesses needing automated support and lead capture
+                    Customer support, Lead generation, Product info
                   </p>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Video Chatbot */}
+            {/* VideoFlow */}
             <Card className="hover:shadow-xl transition-all duration-300 border-2 border-primary relative">
               <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                 <span className="bg-primary text-primary-foreground px-4 py-1 rounded-full text-xs font-bold shadow-lg">
@@ -151,16 +147,16 @@ const Landing = () => {
                     INTERACTIVE
                   </span>
                 </div>
-                <CardTitle className="text-2xl mb-2">Video Chatbot</CardTitle>
+                <CardTitle className="text-2xl mb-2">VideoFlow</CardTitle>
                 <CardDescription className="text-base">
-                  Interactive portrait video flows optimized for mobile engagement
+                  Engage visitors with branching video experiences
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="mb-6">
                   <h4 className="font-semibold text-sm text-foreground mb-3">How It Works:</h4>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Create engaging video journeys with portrait videos optimized for mobile. Visitors watch your videos and respond with interactive buttons that overlay during playback. Upload vertical videos (TikTok/Reels style) for maximum engagement. Perfect for product demos, onboarding, and storytelling.
+                    Create engaging video journeys with portrait videos optimized for mobile. Visitors watch your videos and respond with interactive buttons that overlay during playback. Upload vertical videos (TikTok/Reels style) for maximum engagement.
                   </p>
                 </div>
 
@@ -169,27 +165,19 @@ const Landing = () => {
                   <div className="space-y-2">
                     <div className="flex items-start gap-2">
                       <CheckCircle className="h-4 w-4 text-secondary mt-0.5 flex-shrink-0" />
-                      <span className="text-sm">Portrait video uploads (9:16 format)</span>
+                      <span className="text-sm">Visual flow builder</span>
                     </div>
                     <div className="flex items-start gap-2">
                       <CheckCircle className="h-4 w-4 text-secondary mt-0.5 flex-shrink-0" />
-                      <span className="text-sm">Interactive buttons during playback</span>
+                      <span className="text-sm">Conditional video paths</span>
                     </div>
                     <div className="flex items-start gap-2">
                       <CheckCircle className="h-4 w-4 text-secondary mt-0.5 flex-shrink-0" />
-                      <span className="text-sm">Mobile-optimized vertical layout</span>
+                      <span className="text-sm">Interactive decision points</span>
                     </div>
                     <div className="flex items-start gap-2">
                       <CheckCircle className="h-4 w-4 text-secondary mt-0.5 flex-shrink-0" />
-                      <span className="text-sm">Branching video paths & flows</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-secondary mt-0.5 flex-shrink-0" />
-                      <span className="text-sm">Video analytics & engagement tracking</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-secondary mt-0.5 flex-shrink-0" />
-                      <span className="text-sm">Lead capture forms with video</span>
+                      <span className="text-sm">Advanced analytics & heatmaps</span>
                     </div>
                   </div>
                 </div>
@@ -197,56 +185,52 @@ const Landing = () => {
                 <div className="pt-4 border-t">
                   <h4 className="font-semibold text-sm text-foreground mb-2">Best For:</h4>
                   <p className="text-sm text-muted-foreground">
-                    Product launches, onboarding flows, educational content, sales presentations, real estate tours, mobile app promotions, social media campaigns
+                    Product demos, Training, Interactive tours
                   </p>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Avatar Chatbot */}
+            {/* AvatarFlow */}
             <Card className="hover:shadow-xl transition-all duration-300 border-2">
               <CardHeader>
                 <div className="flex items-center justify-between mb-4">
                   <Sparkles className="h-12 w-12 text-primary" />
                   <span className="text-xs font-semibold px-3 py-1 bg-primary/10 text-primary rounded-full">
-                    AI POWERED
+                    AI AVATAR
                   </span>
                 </div>
-                <CardTitle className="text-2xl mb-2">AI Avatar Chatbot</CardTitle>
+                <CardTitle className="text-2xl mb-2">AvatarFlow</CardTitle>
                 <CardDescription className="text-base">
-                  Lifelike AI video avatar with voice and natural conversations
+                  Realistic AI avatars powered by HeyGen/D-ID
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="mb-6">
                   <h4 className="font-semibold text-sm text-foreground mb-3">How It Works:</h4>
                   <p className="text-sm text-muted-foreground mb-4">
-                    An AI-powered digital human that speaks to visitors in real-time. Uses GPT for natural language understanding and D-ID for realistic avatar animation. Visitors talk or type, the avatar responds with voice and video.
+                    An AI-powered digital human that speaks to visitors in real-time. Uses GPT for natural language understanding and D-ID/HeyGen for realistic avatar animation. Visitors talk or type, the avatar responds with voice and video.
                   </p>
                 </div>
 
                 <div className="mb-6">
                   <h4 className="font-semibold text-sm text-foreground mb-3">Key Features:</h4>
                   <div className="space-y-2">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                      <span className="text-sm">Natural conversations with AI</span>
+                    </div>
                     <div className="flex items-start gap-2">
                       <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                       <span className="text-sm">Lifelike video avatars</span>
                     </div>
                     <div className="flex items-start gap-2">
                       <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                      <span className="text-sm">Natural voice responses</span>
+                      <span className="text-sm">Knowledge base integration</span>
                     </div>
                     <div className="flex items-start gap-2">
                       <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                      <span className="text-sm">Custom knowledge base</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                      <span className="text-sm">Multiple avatar presenters</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                      <span className="text-sm">Contextual conversations</span>
+                      <span className="text-sm">Real-time responses</span>
                     </div>
                   </div>
                 </div>
@@ -254,7 +238,7 @@ const Landing = () => {
                 <div className="pt-4 border-t">
                   <h4 className="font-semibold text-sm text-foreground mb-2">Best For:</h4>
                   <p className="text-sm text-muted-foreground">
-                    High-end brands, consulting services, premium education, virtual receptionists, personalized sales
+                    Sales pitches, Consultations, Virtual assistants
                   </p>
                 </div>
               </CardContent>
@@ -269,9 +253,9 @@ const Landing = () => {
                 <thead>
                   <tr className="border-b">
                     <th className="text-left py-3 px-4 font-semibold">Feature</th>
-                    <th className="text-center py-3 px-4 font-semibold">Standard</th>
-                    <th className="text-center py-3 px-4 font-semibold">Video</th>
-                    <th className="text-center py-3 px-4 font-semibold">AI Avatar</th>
+                    <th className="text-center py-3 px-4 font-semibold">ChatFlow</th>
+                    <th className="text-center py-3 px-4 font-semibold">VideoFlow</th>
+                    <th className="text-center py-3 px-4 font-semibold">AvatarFlow</th>
                   </tr>
                 </thead>
                 <tbody className="text-sm">
@@ -392,7 +376,7 @@ const Landing = () => {
               Simple, Transparent Pricing
             </h3>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Choose the plan that fits your business. All plans include Standard Chatbots. Upgrade for advanced features.
+              Choose the plan that fits your business. All plans include ChatFlow bots. Upgrade for advanced features.
             </p>
           </div>
 
@@ -412,7 +396,7 @@ const Landing = () => {
                   <div className="bg-primary/5 rounded-lg p-3 mb-4">
                     <div className="flex items-center gap-2 mb-1">
                       <MessageSquare className="h-5 w-5 text-primary" />
-                      <span className="font-semibold text-sm">Standard Chatbots</span>
+                      <span className="font-semibold text-sm">ChatFlow</span>
                     </div>
                     <p className="text-xs text-muted-foreground">Text-based conversational bots</p>
                   </div>
@@ -476,13 +460,13 @@ const Landing = () => {
                   <div className="bg-primary/5 rounded-lg p-3">
                     <div className="flex items-center gap-2 mb-1">
                       <MessageSquare className="h-5 w-5 text-primary" />
-                      <span className="font-semibold text-sm">Standard Chatbots</span>
+                      <span className="font-semibold text-sm">ChatFlow</span>
                     </div>
                   </div>
                   <div className="bg-secondary/10 rounded-lg p-3">
                     <div className="flex items-center gap-2 mb-1">
                       <Video className="h-5 w-5 text-secondary" />
-                      <span className="font-semibold text-sm">Video Chatbots</span>
+                      <span className="font-semibold text-sm">VideoFlow</span>
                     </div>
                     <p className="text-xs text-muted-foreground">Interactive video flows</p>
                   </div>
@@ -545,19 +529,19 @@ const Landing = () => {
                   <div className="bg-primary/5 rounded-lg p-3">
                     <div className="flex items-center gap-2 mb-1">
                       <MessageSquare className="h-5 w-5 text-primary" />
-                      <span className="font-semibold text-sm">Standard Chatbots</span>
+                      <span className="font-semibold text-sm">ChatFlow</span>
                     </div>
                   </div>
                   <div className="bg-secondary/10 rounded-lg p-3">
                     <div className="flex items-center gap-2 mb-1">
                       <Video className="h-5 w-5 text-secondary" />
-                      <span className="font-semibold text-sm">Video Chatbots</span>
+                      <span className="font-semibold text-sm">VideoFlow</span>
                     </div>
                   </div>
                   <div className="bg-primary/10 rounded-lg p-3">
                     <div className="flex items-center gap-2 mb-1">
                       <Sparkles className="h-5 w-5 text-primary" />
-                      <span className="font-semibold text-sm">AI Avatar Chatbots</span>
+                      <span className="font-semibold text-sm">AvatarFlow</span>
                     </div>
                     <p className="text-xs text-muted-foreground">Lifelike AI video avatars</p>
                   </div>
@@ -617,7 +601,7 @@ const Landing = () => {
               
               <div className="text-left flex items-center gap-2 pt-4 border-t">
                 <MessageSquare className="h-5 w-5 text-primary" />
-                <span>Standard Chatbot</span>
+                <span>ChatFlow</span>
               </div>
               <div className="pt-4 border-t">
                 <CheckCircle className="h-6 w-6 text-primary mx-auto" />
@@ -631,7 +615,7 @@ const Landing = () => {
               
               <div className="text-left flex items-center gap-2 pt-4">
                 <Video className="h-5 w-5 text-secondary" />
-                <span>Video Chatbot</span>
+                <span>VideoFlow</span>
               </div>
               <div className="pt-4">
                 <span className="text-muted-foreground">—</span>
@@ -645,7 +629,7 @@ const Landing = () => {
               
               <div className="text-left flex items-center gap-2 pt-4">
                 <Sparkles className="h-5 w-5 text-primary" />
-                <span>AI Avatar Chatbot</span>
+                <span>AvatarFlow</span>
               </div>
               <div className="pt-4">
                 <span className="text-muted-foreground">—</span>
