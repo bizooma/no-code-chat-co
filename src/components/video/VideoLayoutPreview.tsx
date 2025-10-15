@@ -150,8 +150,8 @@ export const VideoLayoutPreview: React.FC<VideoLayoutPreviewProps> = ({
           <div className="space-y-4">
             <div className="p-4 bg-muted/50 rounded-lg">
               <VideoPlayer
-                type="youtube"
-                url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                type="uploaded"
+                url="/placeholder.svg"
                 layout={selectedLayout as any}
                 controls={true}
                 className="shadow-video"

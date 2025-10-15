@@ -206,11 +206,11 @@ export const ChatPreview: React.FC<ChatPreviewProps> = ({
          message.videoUrl && (
           <div className="mt-2">
             <VideoPlayer
-              type={message.messageType === 'youtube_video' ? 'youtube' : 
-                    message.messageType === 'uploaded_video' ? 'uploaded' : 'video_intro'}
+              type={message.messageType === 'video_intro' ? 'video_intro' : 'uploaded'}
               url={message.videoUrl}
               autoplay={message.videoAutoplay}
               controls={message.videoControls}
+              layout="portrait"
               className="max-w-sm"
               onVideoEnd={() => {
                 // Continue to next message or chat flow after video ends

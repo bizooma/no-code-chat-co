@@ -56,8 +56,18 @@ function VideoQuestionNode({ data, selected }: { data: VideoNodeData; selected: 
         <Video className="h-4 w-4 text-primary" />
         <h3 className="font-semibold text-sm">{data.title || 'Video + Question'}</h3>
       </div>
-      {data.video_url && (
-        <div className="w-full h-32 bg-muted rounded flex items-center justify-center mb-2">
+      {data.video_url ? (
+        <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded overflow-hidden mb-2">
+          {data.video_thumbnail ? (
+            <img src={data.video_thumbnail} alt="Video" className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <Video className="h-8 w-8 text-muted-foreground" />
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded flex items-center justify-center mb-2">
           <Video className="h-8 w-8 text-muted-foreground" />
         </div>
       )}
@@ -81,8 +91,18 @@ function MultipleChoiceNode({ data, selected }: { data: VideoNodeData; selected:
         <MessageSquare className="h-4 w-4 text-primary" />
         <h3 className="font-semibold text-sm">{data.title || 'Video + Buttons'}</h3>
       </div>
-      {data.video_url && (
-        <div className="w-full h-32 bg-muted rounded flex items-center justify-center mb-2">
+      {data.video_url ? (
+        <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded overflow-hidden mb-2">
+          {data.video_thumbnail ? (
+            <img src={data.video_thumbnail} alt="Video" className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <Video className="h-8 w-8 text-muted-foreground" />
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded flex items-center justify-center mb-2">
           <Video className="h-8 w-8 text-muted-foreground" />
         </div>
       )}
@@ -106,8 +126,18 @@ function TextResponseNode({ data, selected }: { data: VideoNodeData; selected: b
         <FormInput className="h-4 w-4 text-primary" />
         <h3 className="font-semibold text-sm">{data.title || 'Video + Text Input'}</h3>
       </div>
-      {data.video_url && (
-        <div className="w-full h-32 bg-muted rounded flex items-center justify-center">
+      {data.video_url ? (
+        <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded overflow-hidden">
+          {data.video_thumbnail ? (
+            <img src={data.video_thumbnail} alt="Video" className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <Video className="h-8 w-8 text-muted-foreground" />
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded flex items-center justify-center">
           <Video className="h-8 w-8 text-muted-foreground" />
         </div>
       )}
@@ -122,8 +152,18 @@ function LeadCaptureNode({ data, selected }: { data: VideoNodeData; selected: bo
         <UserPlus className="h-4 w-4 text-primary" />
         <h3 className="font-semibold text-sm">{data.title || 'Video + Lead Form'}</h3>
       </div>
-      {data.video_url && (
-        <div className="w-full h-32 bg-muted rounded flex items-center justify-center mb-2">
+      {data.video_url ? (
+        <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded overflow-hidden mb-2">
+          {data.video_thumbnail ? (
+            <img src={data.video_thumbnail} alt="Video" className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <Video className="h-8 w-8 text-muted-foreground" />
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded flex items-center justify-center mb-2">
           <Video className="h-8 w-8 text-muted-foreground" />
         </div>
       )}
@@ -147,8 +187,18 @@ function EndNode({ data, selected }: { data: VideoNodeData; selected: boolean })
         <CheckCircle className="h-4 w-4 text-primary" />
         <h3 className="font-semibold text-sm">{data.title || 'End'}</h3>
       </div>
-      {data.video_url && (
-        <div className="w-full h-32 bg-muted rounded flex items-center justify-center">
+      {data.video_url ? (
+        <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded overflow-hidden">
+          {data.video_thumbnail ? (
+            <img src={data.video_thumbnail} alt="Video" className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <Video className="h-8 w-8 text-muted-foreground" />
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded flex items-center justify-center">
           <Video className="h-8 w-8 text-muted-foreground" />
         </div>
       )}
@@ -355,7 +405,7 @@ export const VideoFlowBuilder = ({ chatbotId, workspaceId, onSave, initialNodes 
                   workspaceId={workspaceId}
                   nodeId={selectedNode.id}
                   currentVideo={selectedNode.data.video_url ? {
-                    type: selectedNode.data.video_url.includes('youtube') ? 'youtube' : 'uploaded',
+                    type: 'uploaded',
                     url: selectedNode.data.video_url,
                     autoplay: false,
                     controls: true,

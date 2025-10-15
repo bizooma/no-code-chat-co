@@ -18,7 +18,7 @@ interface InteractiveElement {
 }
 
 interface VideoPlayerProps {
-  type: 'youtube' | 'uploaded' | 'video_intro';
+  type: 'uploaded' | 'video_intro';
   url: string;
   autoplay?: boolean;
   controls?: boolean;
@@ -38,7 +38,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   url,
   autoplay = false,
   controls = true,
-  layout = 'standard',
+  layout = 'portrait',
   className,
   onVideoEnd,
   muted = false,
@@ -207,33 +207,12 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     }
   };
 
-  const extractYouTubeId = (url: string): string | null => {
-    const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
-    const match = url.match(regex);
-    return match ? match[1] : null;
-  };
-
-  const getYouTubeEmbedUrl = (url: string): string => {
-    const videoId = extractYouTubeId(url);
-    if (!videoId) return url;
-    
-    const params = new URLSearchParams({
-      autoplay: autoplay ? '1' : '0',
-      controls: controls ? '1' : '0',
-      mute: muted ? '1' : '0',
-      rel: '0',
-      modestbranding: '1'
-    });
-    
-    return `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
-  };
-
   // Layout-specific classes
   const getLayoutClasses = () => {
     const baseClasses = "relative bg-black rounded-lg overflow-hidden group";
     switch (layout) {
       case 'portrait':
-        return cn(baseClasses, "aspect-[9/16] max-w-sm mx-auto", className);
+        return cn(baseClasses, "aspect-[9/16] max-w-[384px] mx-auto", className);
       case 'landscape':
         return cn(baseClasses, "aspect-[21/9] w-full", className);
       case 'split':
@@ -241,32 +220,9 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
       case 'overlay':
         return cn(baseClasses, "aspect-video", className);
       default:
-        return cn(baseClasses, "aspect-video", className);
+        return cn(baseClasses, "aspect-[9/16] max-w-[384px] mx-auto", className);
     }
   };
-
-  if (type === 'youtube') {
-    return (
-      <div 
-        ref={containerRef}
-        className={getLayoutClasses()}
-      >
-        <iframe
-          src={getYouTubeEmbedUrl(url)}
-          className="w-full h-full"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          title="YouTube video"
-          onLoad={() => {
-            if (autoplay) {
-              setSessionStartTime(new Date());
-              trackVideoEvent('video_started', { autoplay: true });
-            }
-          }}
-        />
-      </div>
-    );
-  }
 
   return (
     <div 

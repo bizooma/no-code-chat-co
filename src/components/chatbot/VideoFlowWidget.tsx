@@ -103,8 +103,9 @@ export const VideoFlowWidget = ({ chatbotId, position = 'bottom-right' }: VideoF
               {currentNode.video_url && (
                 <div className="relative">
                   <VideoPlayer
-                    type={currentNode.video_url.includes('youtube') ? 'youtube' : 'uploaded'}
+                    type="uploaded"
                     url={currentNode.video_url}
+                    layout="portrait"
                     autoplay
                     controls
                   />

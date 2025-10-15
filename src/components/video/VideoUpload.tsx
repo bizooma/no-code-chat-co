@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Progress } from '@/components/ui/progress';
-import { Upload, Video, Youtube, X, Play, FolderOpen } from 'lucide-react';
+import { Upload, Video, X, Play, FolderOpen } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -33,7 +33,7 @@ interface VideoUploadProps {
 }
 
 interface VideoData {
-  type: 'youtube' | 'uploaded';
+  type: 'uploaded';
   url: string;
   thumbnail?: string;
   duration?: number;
@@ -57,40 +57,12 @@ export const VideoUpload: React.FC<VideoUploadProps> = ({
   const [showLibrary, setShowLibrary] = useState(false);
   const [libraryVideos, setLibraryVideos] = useState<any[]>([]);
   const [videoData, setVideoData] = useState<VideoData>(currentVideo || {
-    type: 'youtube',
+    type: 'uploaded',
     url: '',
     autoplay: false,
     controls: true
   });
 
-  const validateYouTubeUrl = (url: string): boolean => {
-    const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+/;
-    return youtubeRegex.test(url);
-  };
-
-  const extractYouTubeId = (url: string): string | null => {
-    const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
-    const match = url.match(regex);
-    return match ? match[1] : null;
-  };
-
-  const getYouTubeThumbnail = (videoId: string): string => {
-    return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-  };
-
-  const handleYouTubeUrlChange = (url: string) => {
-    const updatedVideoData = { ...videoData, url };
-    
-    if (validateYouTubeUrl(url)) {
-      const videoId = extractYouTubeId(url);
-      if (videoId) {
-        updatedVideoData.thumbnail = getYouTubeThumbnail(videoId);
-      }
-    }
-    
-    setVideoData(updatedVideoData);
-    onVideoUpload?.(updatedVideoData);
-  };
 
   const handleFileUpload = async (file: File) => {
     if (!file) return;
@@ -261,70 +233,11 @@ export const VideoUpload: React.FC<VideoUploadProps> = ({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Video className="h-5 w-5" />
-          Video Configuration
+          Upload Video
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label>Video Type</Label>
-          <Select 
-            value={videoData.type} 
-            onValueChange={(value: 'youtube' | 'uploaded') => handleControlChange('type', value)}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="youtube">
-                <div className="flex items-center gap-2">
-                  <Youtube className="h-4 w-4" />
-                  YouTube Video
-                </div>
-              </SelectItem>
-              <SelectItem value="uploaded">
-                <div className="flex items-center gap-2">
-                  <Upload className="h-4 w-4" />
-                  Upload Video
-                </div>
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {videoData.type === 'youtube' ? (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="youtube-url">YouTube URL</Label>
-              <Input
-                id="youtube-url"
-                type="url"
-                placeholder="https://www.youtube.com/watch?v=..."
-                value={videoData.url}
-                onChange={(e) => handleYouTubeUrlChange(e.target.value)}
-              />
-              {videoData.url && !validateYouTubeUrl(videoData.url) && (
-                <p className="text-sm text-destructive">Please enter a valid YouTube URL</p>
-              )}
-            </div>
-            
-            {videoData.thumbnail && (
-              <div className="space-y-2">
-                <Label>Preview</Label>
-                <div className="relative aspect-video max-w-sm bg-muted rounded-md overflow-hidden">
-                  <img 
-                    src={videoData.thumbnail} 
-                    alt="Video thumbnail"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Play className="h-12 w-12 text-white bg-black/50 rounded-full p-2" />
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="space-y-4">
+        <div className="space-y-4">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label>Upload Video File</Label>
@@ -355,8 +268,11 @@ export const VideoUpload: React.FC<VideoUploadProps> = ({
                   className="hidden"
                 />
                 <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                <p className="text-sm text-muted-foreground mb-2">
-                  Drag and drop your video file here, or click to browse
+                <p className="text-sm font-medium text-muted-foreground mb-2">
+                  Upload your portrait video (9:16 aspect ratio)
+                </p>
+                <p className="text-xs text-muted-foreground mb-2">
+                  Recommended: 1080x1920 pixels for best quality
                 </p>
                 <Button 
                   variant="outline" 
@@ -386,13 +302,12 @@ export const VideoUpload: React.FC<VideoUploadProps> = ({
                 <Label>Preview</Label>
                 <video 
                   src={videoData.url} 
-                  className="w-full max-w-sm aspect-video bg-muted rounded-md"
+                  className="w-full max-w-[240px] aspect-[9/16] bg-muted rounded-md mx-auto"
                   controls
                 />
               </div>
             )}
-          </div>
-        )}
+        </div>
 
         <div className="space-y-4 border-t pt-4">
           <h4 className="font-medium">Playback Settings</h4>
@@ -428,7 +343,7 @@ export const VideoUpload: React.FC<VideoUploadProps> = ({
           <div className="bg-muted p-3 rounded-md">
             <p className="text-sm font-medium mb-1">Current Configuration:</p>
             <p className="text-sm text-muted-foreground">
-              Type: {videoData.type === 'youtube' ? 'YouTube' : 'Uploaded'} | 
+              Video Uploaded | 
               Autoplay: {videoData.autoplay ? 'On' : 'Off'} | 
               Controls: {videoData.controls ? 'On' : 'Off'}
             </p>
@@ -462,7 +377,7 @@ export const VideoUpload: React.FC<VideoUploadProps> = ({
                     <CardContent className="p-4">
                       <video 
                         src={video.url} 
-                        className="w-full aspect-video bg-muted rounded-md mb-2"
+                        className="w-full aspect-[9/16] bg-muted rounded-md mb-2"
                       />
                       <p className="text-sm font-medium truncate">{video.name}</p>
                       <p className="text-xs text-muted-foreground">

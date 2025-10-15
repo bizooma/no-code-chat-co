@@ -60,7 +60,7 @@ interface ConversationMessage {
   formFields?: string[];
   hasVideo?: boolean;
   videoProps?: {
-    type: 'youtube' | 'uploaded' | 'video_intro';
+    type: 'uploaded' | 'video_intro';
     url: string;
     autoplay?: boolean;
     controls?: boolean;
@@ -274,7 +274,7 @@ const Widget = () => {
       formFields: message.collect_lead_info && message.conditions?.lead_fields ? message.conditions.lead_fields : undefined,
       hasVideo,
       videoProps: hasVideo ? {
-        type: message.video_type as 'youtube' | 'uploaded' | 'video_intro',
+        type: message.video_type === 'video_intro' ? 'video_intro' : 'uploaded',
         url: message.video_url!,
         autoplay: message.video_autoplay,
         controls: message.video_controls,
