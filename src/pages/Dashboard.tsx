@@ -585,7 +585,11 @@ const Dashboard = () => {
                     <CardContent>
                       <div className="flex gap-2">
                         <Button variant="outline" size="sm" className="flex-1" asChild>
-                          <Link to={bot.type === 'avatar' ? `/avatar-chatbots/${bot.id}` : `/chatbots/${bot.id}`}>
+                          <Link to={
+                            bot.type === 'avatar' ? `/avatar-chatbots/${bot.id}/editor` : 
+                            bot.type === 'video' ? `/chatbots/${bot.id}/video-editor` : 
+                            `/chatbots/${bot.id}/editor`
+                          }>
                             <Settings className="mr-2 h-3 w-3" />
                             Edit
                           </Link>
