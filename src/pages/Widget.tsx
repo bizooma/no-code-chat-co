@@ -20,6 +20,7 @@ import { VideoPlayer } from '@/components/video/VideoPlayer';
 import { supabase } from '@/integrations/supabase/client';
 import { useSearchParams } from 'react-router-dom';
 import AvatarChatbot from '@/components/avatar/AvatarChatbot';
+import { VideoFlowWidget } from '@/components/chatbot/VideoFlowWidget';
 
 interface Chatbot {
   id: string;
@@ -74,6 +75,15 @@ const Widget = () => {
   const chatbotId = searchParams.get('chatbotId') || searchParams.get('id');
   const widgetType = searchParams.get('type');
   const isEmbedded = searchParams.get('embedded') === 'true';
+  
+  // If it's a video bot, render VideoFlowWidget
+  if (widgetType === 'video' && chatbotId) {
+    return (
+      <div className={isEmbedded ? 'h-full' : 'min-h-screen'}>
+        <VideoFlowWidget chatbotId={chatbotId} />
+      </div>
+    );
+  }
   
   // If it's an avatar chatbot, render that component
   if (widgetType === 'avatar' && chatbotId) {
