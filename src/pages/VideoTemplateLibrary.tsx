@@ -142,12 +142,25 @@ const VideoTemplateLibrary = () => {
     setCreatingTemplate(template.id);
 
     try {
+      // Validate user authentication first
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+      if (authError || !user) {
+        toast({
+          title: 'Authentication Error',
+          description: 'You must be logged in to create a bot',
+          variant: 'destructive',
+        });
+        setCreatingTemplate(null);
+        return;
+      }
+
       // Create chatbot from template
       const { data: chatbot, error: botError } = await supabase
         .from('chatbots')
         .insert({
           workspace_id: currentWorkspace.id,
-          created_by: (await supabase.auth.getUser()).data.user?.id,
+          created_by: user.id,
           name: template.name,
           description: template.description,
           chatbot_type: 'video_bot',
@@ -160,7 +173,15 @@ const VideoTemplateLibrary = () => {
         .select()
         .single();
 
-      if (botError) throw botError;
+      if (botError) {
+        console.error('Supabase error creating chatbot:', {
+          message: botError.message,
+          details: botError.details,
+          hint: botError.hint,
+          code: botError.code,
+        });
+        throw botError;
+      }
 
       // Create flow nodes
       const messages = template.flow_structure.nodes.map((node, index) => ({
@@ -193,9 +214,21 @@ const VideoTemplateLibrary = () => {
       navigate(`/chatbots/${chatbot.id}/video-editor`);
     } catch (error: any) {
       console.error('Error creating template:', error);
+      
+      let errorMessage = 'Failed to create bot from template';
+      
+      // Provide more specific error messages
+      if (error?.code === '23503') {
+        errorMessage = 'Profile setup incomplete. Please contact support.';
+      } else if (error?.code === '42501') {
+        errorMessage = 'Permission denied. Please check your workspace access.';
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: 'Error',
-        description: 'Failed to create bot from template',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
