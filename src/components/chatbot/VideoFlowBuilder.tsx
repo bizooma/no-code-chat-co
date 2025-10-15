@@ -55,7 +55,7 @@ const nodeTypes = {
 function VideoQuestionNode({ data, selected }: { data: VideoNodeData; selected: boolean }) {
   return (
     <>
-      <Handle type="target" position={Position.Top} className="!bg-primary" />
+      <Handle type="target" position={Position.Left} className="!bg-primary !w-3 !h-3" />
       <Card className={`min-w-[250px] p-4 ${selected ? 'ring-2 ring-primary' : ''}`}>
         <div className="flex items-center gap-2 mb-2">
           <Video className="h-4 w-4 text-primary" />
@@ -86,7 +86,7 @@ function VideoQuestionNode({ data, selected }: { data: VideoNodeData; selected: 
           </div>
         )}
       </Card>
-      <Handle type="source" position={Position.Bottom} className="!bg-primary" />
+      <Handle type="source" position={Position.Right} className="!bg-primary !w-3 !h-3" />
     </>
   );
 }
@@ -94,7 +94,7 @@ function VideoQuestionNode({ data, selected }: { data: VideoNodeData; selected: 
 function MultipleChoiceNode({ data, selected }: { data: VideoNodeData; selected: boolean }) {
   return (
     <>
-      <Handle type="target" position={Position.Top} className="!bg-primary" />
+      <Handle type="target" position={Position.Left} className="!bg-primary !w-3 !h-3" />
       <Card className={`min-w-[200px] p-4 ${selected ? 'ring-2 ring-primary' : ''}`}>
         <div className="flex items-center gap-2 mb-2">
           <MessageSquare className="h-4 w-4 text-primary" />
@@ -125,7 +125,7 @@ function MultipleChoiceNode({ data, selected }: { data: VideoNodeData; selected:
           </div>
         )}
       </Card>
-      <Handle type="source" position={Position.Bottom} className="!bg-primary" />
+      <Handle type="source" position={Position.Right} className="!bg-primary !w-3 !h-3" />
     </>
   );
 }
@@ -133,7 +133,7 @@ function MultipleChoiceNode({ data, selected }: { data: VideoNodeData; selected:
 function TextResponseNode({ data, selected }: { data: VideoNodeData; selected: boolean }) {
   return (
     <>
-      <Handle type="target" position={Position.Top} className="!bg-primary" />
+      <Handle type="target" position={Position.Left} className="!bg-primary !w-3 !h-3" />
       <Card className={`min-w-[200px] p-4 ${selected ? 'ring-2 ring-primary' : ''}`}>
         <div className="flex items-center gap-2 mb-2">
           <FormInput className="h-4 w-4 text-primary" />
@@ -155,7 +155,7 @@ function TextResponseNode({ data, selected }: { data: VideoNodeData; selected: b
           </div>
         )}
       </Card>
-      <Handle type="source" position={Position.Bottom} className="!bg-primary" />
+      <Handle type="source" position={Position.Right} className="!bg-primary !w-3 !h-3" />
     </>
   );
 }
@@ -163,7 +163,7 @@ function TextResponseNode({ data, selected }: { data: VideoNodeData; selected: b
 function LeadCaptureNode({ data, selected }: { data: VideoNodeData; selected: boolean }) {
   return (
     <>
-      <Handle type="target" position={Position.Top} className="!bg-primary" />
+      <Handle type="target" position={Position.Left} className="!bg-primary !w-3 !h-3" />
       <Card className={`min-w-[200px] p-4 ${selected ? 'ring-2 ring-primary' : ''}`}>
         <div className="flex items-center gap-2 mb-2">
           <UserPlus className="h-4 w-4 text-primary" />
@@ -194,7 +194,7 @@ function LeadCaptureNode({ data, selected }: { data: VideoNodeData; selected: bo
           </div>
         )}
       </Card>
-      <Handle type="source" position={Position.Bottom} className="!bg-primary" />
+      <Handle type="source" position={Position.Right} className="!bg-primary !w-3 !h-3" />
     </>
   );
 }
@@ -202,7 +202,7 @@ function LeadCaptureNode({ data, selected }: { data: VideoNodeData; selected: bo
 function EndNode({ data, selected }: { data: VideoNodeData; selected: boolean }) {
   return (
     <>
-      <Handle type="target" position={Position.Top} className="!bg-primary" />
+      <Handle type="target" position={Position.Left} className="!bg-primary !w-3 !h-3" />
       <Card className={`min-w-[150px] p-4 ${selected ? 'ring-2 ring-primary' : ''}`}>
         <div className="flex items-center gap-2 mb-2">
           <CheckCircle className="h-4 w-4 text-primary" />
