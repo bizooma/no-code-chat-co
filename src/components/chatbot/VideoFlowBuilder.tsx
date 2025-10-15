@@ -54,7 +54,7 @@ function VideoQuestionNode({ data, selected }: { data: VideoNodeData; selected: 
     <Card className={`min-w-[250px] p-4 ${selected ? 'ring-2 ring-primary' : ''}`}>
       <div className="flex items-center gap-2 mb-2">
         <Video className="h-4 w-4 text-primary" />
-        <h3 className="font-semibold text-sm">{data.title || 'Video Question'}</h3>
+        <h3 className="font-semibold text-sm">{data.title || 'Video + Question'}</h3>
       </div>
       {data.video_url && (
         <div className="w-full h-32 bg-muted rounded flex items-center justify-center mb-2">
@@ -79,8 +79,13 @@ function MultipleChoiceNode({ data, selected }: { data: VideoNodeData; selected:
     <Card className={`min-w-[200px] p-4 ${selected ? 'ring-2 ring-primary' : ''}`}>
       <div className="flex items-center gap-2 mb-2">
         <MessageSquare className="h-4 w-4 text-primary" />
-        <h3 className="font-semibold text-sm">{data.title || 'Multiple Choice'}</h3>
+        <h3 className="font-semibold text-sm">{data.title || 'Video + Buttons'}</h3>
       </div>
+      {data.video_url && (
+        <div className="w-full h-32 bg-muted rounded flex items-center justify-center mb-2">
+          <Video className="h-8 w-8 text-muted-foreground" />
+        </div>
+      )}
       {data.responses && data.responses.length > 0 && (
         <div className="space-y-1">
           {data.responses.map((r) => (
@@ -97,10 +102,15 @@ function MultipleChoiceNode({ data, selected }: { data: VideoNodeData; selected:
 function TextResponseNode({ data, selected }: { data: VideoNodeData; selected: boolean }) {
   return (
     <Card className={`min-w-[200px] p-4 ${selected ? 'ring-2 ring-primary' : ''}`}>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 mb-2">
         <FormInput className="h-4 w-4 text-primary" />
-        <h3 className="font-semibold text-sm">{data.title || 'Text Response'}</h3>
+        <h3 className="font-semibold text-sm">{data.title || 'Video + Text Input'}</h3>
       </div>
+      {data.video_url && (
+        <div className="w-full h-32 bg-muted rounded flex items-center justify-center">
+          <Video className="h-8 w-8 text-muted-foreground" />
+        </div>
+      )}
     </Card>
   );
 }
@@ -110,8 +120,13 @@ function LeadCaptureNode({ data, selected }: { data: VideoNodeData; selected: bo
     <Card className={`min-w-[200px] p-4 ${selected ? 'ring-2 ring-primary' : ''}`}>
       <div className="flex items-center gap-2 mb-2">
         <UserPlus className="h-4 w-4 text-primary" />
-        <h3 className="font-semibold text-sm">{data.title || 'Lead Capture'}</h3>
+        <h3 className="font-semibold text-sm">{data.title || 'Video + Lead Form'}</h3>
       </div>
+      {data.video_url && (
+        <div className="w-full h-32 bg-muted rounded flex items-center justify-center mb-2">
+          <Video className="h-8 w-8 text-muted-foreground" />
+        </div>
+      )}
       {data.lead_fields && data.lead_fields.length > 0 && (
         <div className="space-y-1">
           {data.lead_fields.map((field) => (
@@ -128,10 +143,15 @@ function LeadCaptureNode({ data, selected }: { data: VideoNodeData; selected: bo
 function EndNode({ data, selected }: { data: VideoNodeData; selected: boolean }) {
   return (
     <Card className={`min-w-[150px] p-4 ${selected ? 'ring-2 ring-primary' : ''}`}>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 mb-2">
         <CheckCircle className="h-4 w-4 text-primary" />
         <h3 className="font-semibold text-sm">{data.title || 'End'}</h3>
       </div>
+      {data.video_url && (
+        <div className="w-full h-32 bg-muted rounded flex items-center justify-center">
+          <Video className="h-8 w-8 text-muted-foreground" />
+        </div>
+      )}
     </Card>
   );
 }
@@ -176,12 +196,20 @@ export const VideoFlowBuilder = ({ chatbotId, workspaceId, onSave, initialNodes 
   }, []);
 
   const addNode = (type: string) => {
+    const defaultTitles: Record<string, string> = {
+      'video_question': 'Video + Question',
+      'multiple_choice': 'Video + Buttons',
+      'text_response': 'Video + Text Input',
+      'lead_capture': 'Video + Lead Form',
+      'end': 'End Screen'
+    };
+
     const newNode: Node = {
       id: `node-${Date.now()}`,
       type,
       position: { x: Math.random() * 300 + 100, y: Math.random() * 300 + 100 },
       data: { 
-        title: type === 'end' ? 'End' : 'New Node',
+        title: defaultTitles[type] || 'New Node',
         responses: type !== 'end' && type !== 'text_response' && type !== 'lead_capture' ? [] : undefined,
         lead_fields: type === 'lead_capture' ? [
           { id: 'field-name', label: 'Name', field_type: 'text', required: true },
@@ -239,6 +267,7 @@ export const VideoFlowBuilder = ({ chatbotId, workspaceId, onSave, initialNodes 
       {/* Left Sidebar - Node Palette */}
       <Card className="w-64 p-4 shrink-0">
         <h3 className="font-semibold mb-4">Add Nodes</h3>
+        <p className="text-xs text-muted-foreground mb-3">All nodes support video. Add overlay elements:</p>
         <div className="space-y-2">
           <Button
             variant="outline"
@@ -246,7 +275,7 @@ export const VideoFlowBuilder = ({ chatbotId, workspaceId, onSave, initialNodes 
             onClick={() => addNode('video_question')}
           >
             <Video className="h-4 w-4 mr-2" />
-            Video Question
+            Video + Question
           </Button>
           <Button
             variant="outline"
@@ -254,7 +283,7 @@ export const VideoFlowBuilder = ({ chatbotId, workspaceId, onSave, initialNodes 
             onClick={() => addNode('multiple_choice')}
           >
             <MessageSquare className="h-4 w-4 mr-2" />
-            Multiple Choice
+            Video + Buttons
           </Button>
           <Button
             variant="outline"
@@ -262,7 +291,7 @@ export const VideoFlowBuilder = ({ chatbotId, workspaceId, onSave, initialNodes 
             onClick={() => addNode('text_response')}
           >
             <FormInput className="h-4 w-4 mr-2" />
-            Text Response
+            Video + Text Input
           </Button>
           <Button
             variant="outline"
@@ -270,7 +299,7 @@ export const VideoFlowBuilder = ({ chatbotId, workspaceId, onSave, initialNodes 
             onClick={() => addNode('lead_capture')}
           >
             <UserPlus className="h-4 w-4 mr-2" />
-            Lead Capture
+            Video + Lead Form
           </Button>
           <Button
             variant="outline"
@@ -278,7 +307,7 @@ export const VideoFlowBuilder = ({ chatbotId, workspaceId, onSave, initialNodes 
             onClick={() => addNode('end')}
           >
             <CheckCircle className="h-4 w-4 mr-2" />
-            End Node
+            End Screen
           </Button>
         </div>
         <Button onClick={handleSave} className="w-full mt-4">
@@ -318,34 +347,37 @@ export const VideoFlowBuilder = ({ chatbotId, workspaceId, onSave, initialNodes 
                 />
               </div>
 
-              {(selectedNode.type === 'video_question') && (
-                <>
-                  <VideoUpload
-                    chatbotId={chatbotId}
-                    workspaceId={workspaceId}
-                    nodeId={selectedNode.id}
-                    currentVideo={selectedNode.data.video_url ? {
-                      type: selectedNode.data.video_url.includes('youtube') ? 'youtube' : 'uploaded',
-                      url: selectedNode.data.video_url,
-                      autoplay: false,
-                      controls: true,
-                      thumbnail: selectedNode.data.video_thumbnail
-                    } : null}
-                    onVideoUpload={(videoData) => {
-                      updateNodeData('video_url', videoData.url);
-                      if (videoData.thumbnail) {
-                        updateNodeData('video_thumbnail', videoData.thumbnail);
-                      }
-                    }}
+              {/* Video Upload - Available for ALL node types */}
+              <div>
+                <Label className="text-sm font-semibold mb-2 block">Video (Required)</Label>
+                <VideoUpload
+                  chatbotId={chatbotId}
+                  workspaceId={workspaceId}
+                  nodeId={selectedNode.id}
+                  currentVideo={selectedNode.data.video_url ? {
+                    type: selectedNode.data.video_url.includes('youtube') ? 'youtube' : 'uploaded',
+                    url: selectedNode.data.video_url,
+                    autoplay: false,
+                    controls: true,
+                    thumbnail: selectedNode.data.video_thumbnail
+                  } : null}
+                  onVideoUpload={(videoData) => {
+                    updateNodeData('video_url', videoData.url);
+                    if (videoData.thumbnail) {
+                      updateNodeData('video_thumbnail', videoData.thumbnail);
+                    }
+                  }}
+                />
+              </div>
+
+              {selectedNode.type === 'video_question' && (
+                <div>
+                  <Label>Description</Label>
+                  <Textarea
+                    value={selectedNode.data.description || ''}
+                    onChange={(e) => updateNodeData('description', e.target.value)}
                   />
-                  <div>
-                    <Label>Description</Label>
-                    <Textarea
-                      value={selectedNode.data.description || ''}
-                      onChange={(e) => updateNodeData('description', e.target.value)}
-                    />
-                  </div>
-                </>
+                </div>
               )}
 
               {selectedNode.type === 'lead_capture' && (

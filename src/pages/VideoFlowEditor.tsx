@@ -97,9 +97,9 @@ export default function VideoFlowEditor() {
         chatbot_id: id,
         message_key: node.data.title,
         message_text: node.data.description || '',
-        message_type: (node.type === 'video_question' ? 'youtube_video' : 'text') as 'youtube_video' | 'text',
-        video_url: node.data.video_url,
-        video_thumbnail: node.data.video_thumbnail,
+        message_type: (node.data.video_url ? 'youtube_video' : 'text') as 'youtube_video' | 'text',
+        video_url: node.data.video_url || null,
+        video_thumbnail: node.data.video_thumbnail || null,
         buttons: node.data.responses || [],
         node_position: node.position as any,
         node_connections: edges
