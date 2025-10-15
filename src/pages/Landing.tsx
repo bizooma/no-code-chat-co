@@ -81,7 +81,7 @@ const Landing = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
             {/* ChatFlow */}
-            <Card className="hover:shadow-xl transition-all duration-300 border-2">
+            <Card className="hover:shadow-xl transition-all duration-300 border-2 border-blue-200 dark:border-blue-900 bg-gradient-to-br from-blue-50/50 to-white dark:from-blue-950/20 dark:to-background">
               <CardHeader>
                 <div className="flex items-center justify-between mb-4">
                   <MessageSquare className="h-12 w-12 text-primary" />
@@ -111,10 +111,6 @@ const Landing = () => {
                     </div>
                     <div className="flex items-start gap-2">
                       <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                      <span className="text-sm">Customizable conversation flows</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                       <span className="text-sm">Lead collection forms</span>
                     </div>
                     <div className="flex items-start gap-2">
@@ -134,7 +130,7 @@ const Landing = () => {
             </Card>
 
             {/* VideoFlow */}
-            <Card className="hover:shadow-xl transition-all duration-300 border-2 border-primary relative">
+            <Card className="hover:shadow-xl transition-all duration-300 border-2 border-purple-200 dark:border-purple-900 bg-gradient-to-br from-purple-50/50 to-white dark:from-purple-950/20 dark:to-background relative">
               <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                 <span className="bg-primary text-primary-foreground px-4 py-1 rounded-full text-xs font-bold shadow-lg">
                   ⚡ NEW
@@ -192,7 +188,7 @@ const Landing = () => {
             </Card>
 
             {/* AvatarFlow */}
-            <Card className="hover:shadow-xl transition-all duration-300 border-2">
+            <Card className="hover:shadow-xl transition-all duration-300 border-2 border-green-200 dark:border-green-900 bg-gradient-to-br from-green-50/50 to-white dark:from-green-950/20 dark:to-background">
               <CardHeader>
                 <div className="flex items-center justify-between mb-4">
                   <Sparkles className="h-12 w-12 text-primary" />
