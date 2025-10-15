@@ -12,6 +12,9 @@ import ReactFlow, {
   EdgeChange,
   BackgroundVariant,
   MiniMap,
+  Handle,
+  Position,
+  MarkerType,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { Card } from '@/components/ui/card';
@@ -51,158 +54,177 @@ const nodeTypes = {
 
 function VideoQuestionNode({ data, selected }: { data: VideoNodeData; selected: boolean }) {
   return (
-    <Card className={`min-w-[250px] p-4 ${selected ? 'ring-2 ring-primary' : ''}`}>
-      <div className="flex items-center gap-2 mb-2">
-        <Video className="h-4 w-4 text-primary" />
-        <h3 className="font-semibold text-sm">{data.title || 'Video + Question'}</h3>
-      </div>
-      {data.video_url ? (
-        <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded overflow-hidden mb-2">
-          {data.video_thumbnail ? (
-            <img src={data.video_thumbnail} alt="Video" className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <Video className="h-8 w-8 text-muted-foreground" />
-            </div>
-          )}
+    <>
+      <Handle type="target" position={Position.Top} className="!bg-primary" />
+      <Card className={`min-w-[250px] p-4 ${selected ? 'ring-2 ring-primary' : ''}`}>
+        <div className="flex items-center gap-2 mb-2">
+          <Video className="h-4 w-4 text-primary" />
+          <h3 className="font-semibold text-sm">{data.title || 'Video + Question'}</h3>
         </div>
-      ) : (
-        <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded flex items-center justify-center mb-2">
-          <Video className="h-8 w-8 text-muted-foreground" />
-        </div>
-      )}
-      {data.responses && data.responses.length > 0 && (
-        <div className="mt-2 space-y-1">
-          {data.responses.map((r) => (
-            <div key={r.id} className="text-xs bg-secondary px-2 py-1 rounded">
-              {r.text}
-            </div>
-          ))}
-        </div>
-      )}
-    </Card>
+        {data.video_url ? (
+          <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded overflow-hidden mb-2">
+            {data.video_thumbnail ? (
+              <img src={data.video_thumbnail} alt="Video" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <Video className="h-8 w-8 text-muted-foreground" />
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded flex items-center justify-center mb-2">
+            <Video className="h-8 w-8 text-muted-foreground" />
+          </div>
+        )}
+        {data.responses && data.responses.length > 0 && (
+          <div className="mt-2 space-y-1">
+            {data.responses.map((r) => (
+              <div key={r.id} className="text-xs bg-secondary px-2 py-1 rounded">
+                {r.text}
+              </div>
+            ))}
+          </div>
+        )}
+      </Card>
+      <Handle type="source" position={Position.Bottom} className="!bg-primary" />
+    </>
   );
 }
 
 function MultipleChoiceNode({ data, selected }: { data: VideoNodeData; selected: boolean }) {
   return (
-    <Card className={`min-w-[200px] p-4 ${selected ? 'ring-2 ring-primary' : ''}`}>
-      <div className="flex items-center gap-2 mb-2">
-        <MessageSquare className="h-4 w-4 text-primary" />
-        <h3 className="font-semibold text-sm">{data.title || 'Video + Buttons'}</h3>
-      </div>
-      {data.video_url ? (
-        <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded overflow-hidden mb-2">
-          {data.video_thumbnail ? (
-            <img src={data.video_thumbnail} alt="Video" className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <Video className="h-8 w-8 text-muted-foreground" />
-            </div>
-          )}
+    <>
+      <Handle type="target" position={Position.Top} className="!bg-primary" />
+      <Card className={`min-w-[200px] p-4 ${selected ? 'ring-2 ring-primary' : ''}`}>
+        <div className="flex items-center gap-2 mb-2">
+          <MessageSquare className="h-4 w-4 text-primary" />
+          <h3 className="font-semibold text-sm">{data.title || 'Video + Buttons'}</h3>
         </div>
-      ) : (
-        <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded flex items-center justify-center mb-2">
-          <Video className="h-8 w-8 text-muted-foreground" />
-        </div>
-      )}
-      {data.responses && data.responses.length > 0 && (
-        <div className="space-y-1">
-          {data.responses.map((r) => (
-            <div key={r.id} className="text-xs bg-secondary px-2 py-1 rounded">
-              {r.text}
-            </div>
-          ))}
-        </div>
-      )}
-    </Card>
+        {data.video_url ? (
+          <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded overflow-hidden mb-2">
+            {data.video_thumbnail ? (
+              <img src={data.video_thumbnail} alt="Video" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <Video className="h-8 w-8 text-muted-foreground" />
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded flex items-center justify-center mb-2">
+            <Video className="h-8 w-8 text-muted-foreground" />
+          </div>
+        )}
+        {data.responses && data.responses.length > 0 && (
+          <div className="space-y-1">
+            {data.responses.map((r) => (
+              <div key={r.id} className="text-xs bg-secondary px-2 py-1 rounded">
+                {r.text}
+              </div>
+            ))}
+          </div>
+        )}
+      </Card>
+      <Handle type="source" position={Position.Bottom} className="!bg-primary" />
+    </>
   );
 }
 
 function TextResponseNode({ data, selected }: { data: VideoNodeData; selected: boolean }) {
   return (
-    <Card className={`min-w-[200px] p-4 ${selected ? 'ring-2 ring-primary' : ''}`}>
-      <div className="flex items-center gap-2 mb-2">
-        <FormInput className="h-4 w-4 text-primary" />
-        <h3 className="font-semibold text-sm">{data.title || 'Video + Text Input'}</h3>
-      </div>
-      {data.video_url ? (
-        <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded overflow-hidden">
-          {data.video_thumbnail ? (
-            <img src={data.video_thumbnail} alt="Video" className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <Video className="h-8 w-8 text-muted-foreground" />
-            </div>
-          )}
+    <>
+      <Handle type="target" position={Position.Top} className="!bg-primary" />
+      <Card className={`min-w-[200px] p-4 ${selected ? 'ring-2 ring-primary' : ''}`}>
+        <div className="flex items-center gap-2 mb-2">
+          <FormInput className="h-4 w-4 text-primary" />
+          <h3 className="font-semibold text-sm">{data.title || 'Video + Text Input'}</h3>
         </div>
-      ) : (
-        <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded flex items-center justify-center">
-          <Video className="h-8 w-8 text-muted-foreground" />
-        </div>
-      )}
-    </Card>
+        {data.video_url ? (
+          <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded overflow-hidden">
+            {data.video_thumbnail ? (
+              <img src={data.video_thumbnail} alt="Video" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <Video className="h-8 w-8 text-muted-foreground" />
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded flex items-center justify-center">
+            <Video className="h-8 w-8 text-muted-foreground" />
+          </div>
+        )}
+      </Card>
+      <Handle type="source" position={Position.Bottom} className="!bg-primary" />
+    </>
   );
 }
 
 function LeadCaptureNode({ data, selected }: { data: VideoNodeData; selected: boolean }) {
   return (
-    <Card className={`min-w-[200px] p-4 ${selected ? 'ring-2 ring-primary' : ''}`}>
-      <div className="flex items-center gap-2 mb-2">
-        <UserPlus className="h-4 w-4 text-primary" />
-        <h3 className="font-semibold text-sm">{data.title || 'Video + Lead Form'}</h3>
-      </div>
-      {data.video_url ? (
-        <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded overflow-hidden mb-2">
-          {data.video_thumbnail ? (
-            <img src={data.video_thumbnail} alt="Video" className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <Video className="h-8 w-8 text-muted-foreground" />
-            </div>
-          )}
+    <>
+      <Handle type="target" position={Position.Top} className="!bg-primary" />
+      <Card className={`min-w-[200px] p-4 ${selected ? 'ring-2 ring-primary' : ''}`}>
+        <div className="flex items-center gap-2 mb-2">
+          <UserPlus className="h-4 w-4 text-primary" />
+          <h3 className="font-semibold text-sm">{data.title || 'Video + Lead Form'}</h3>
         </div>
-      ) : (
-        <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded flex items-center justify-center mb-2">
-          <Video className="h-8 w-8 text-muted-foreground" />
-        </div>
-      )}
-      {data.lead_fields && data.lead_fields.length > 0 && (
-        <div className="space-y-1">
-          {data.lead_fields.map((field) => (
-            <div key={field.id} className="text-xs bg-secondary px-2 py-1 rounded">
-              {field.label} ({field.field_type})
-            </div>
-          ))}
-        </div>
-      )}
-    </Card>
+        {data.video_url ? (
+          <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded overflow-hidden mb-2">
+            {data.video_thumbnail ? (
+              <img src={data.video_thumbnail} alt="Video" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <Video className="h-8 w-8 text-muted-foreground" />
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded flex items-center justify-center mb-2">
+            <Video className="h-8 w-8 text-muted-foreground" />
+          </div>
+        )}
+        {data.lead_fields && data.lead_fields.length > 0 && (
+          <div className="space-y-1">
+            {data.lead_fields.map((field) => (
+              <div key={field.id} className="text-xs bg-secondary px-2 py-1 rounded">
+                {field.label} ({field.field_type})
+              </div>
+            ))}
+          </div>
+        )}
+      </Card>
+      <Handle type="source" position={Position.Bottom} className="!bg-primary" />
+    </>
   );
 }
 
 function EndNode({ data, selected }: { data: VideoNodeData; selected: boolean }) {
   return (
-    <Card className={`min-w-[150px] p-4 ${selected ? 'ring-2 ring-primary' : ''}`}>
-      <div className="flex items-center gap-2 mb-2">
-        <CheckCircle className="h-4 w-4 text-primary" />
-        <h3 className="font-semibold text-sm">{data.title || 'End'}</h3>
-      </div>
-      {data.video_url ? (
-        <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded overflow-hidden">
-          {data.video_thumbnail ? (
-            <img src={data.video_thumbnail} alt="Video" className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <Video className="h-8 w-8 text-muted-foreground" />
-            </div>
-          )}
+    <>
+      <Handle type="target" position={Position.Top} className="!bg-primary" />
+      <Card className={`min-w-[150px] p-4 ${selected ? 'ring-2 ring-primary' : ''}`}>
+        <div className="flex items-center gap-2 mb-2">
+          <CheckCircle className="h-4 w-4 text-primary" />
+          <h3 className="font-semibold text-sm">{data.title || 'End'}</h3>
         </div>
-      ) : (
-        <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded flex items-center justify-center">
-          <Video className="h-8 w-8 text-muted-foreground" />
-        </div>
-      )}
-    </Card>
+        {data.video_url ? (
+          <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded overflow-hidden">
+            {data.video_thumbnail ? (
+              <img src={data.video_thumbnail} alt="Video" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <Video className="h-8 w-8 text-muted-foreground" />
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded flex items-center justify-center">
+            <Video className="h-8 w-8 text-muted-foreground" />
+          </div>
+        )}
+      </Card>
+    </>
   );
 }
 
@@ -392,6 +414,12 @@ export const VideoFlowBuilder = forwardRef<VideoFlowBuilderRef, VideoFlowBuilder
           onConnect={onConnect}
           onNodeClick={onNodeClick}
           nodeTypes={nodeTypes}
+          defaultEdgeOptions={{
+            type: 'smoothstep',
+            animated: true,
+            style: { stroke: 'hsl(var(--primary))', strokeWidth: 2 },
+            markerEnd: { type: MarkerType.ArrowClosed, color: 'hsl(var(--primary))' }
+          }}
           fitView
         >
           <Background variant={BackgroundVariant.Dots} />
