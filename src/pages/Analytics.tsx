@@ -748,12 +748,6 @@ const Analytics = () => {
                       </div>
                     )}
                     
-                    {analytics.avgResponseTime > 5 && (
-                      <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                        <p className="font-medium text-blue-800">⚡ Speed improvement</p>
-                        <p className="text-sm text-blue-600">Response time of {analytics.avgResponseTime}s could be optimized for better user experience.</p>
-                      </div>
-                    )}
                     
                     {analytics.totalConversations > 100 && (
                       <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
