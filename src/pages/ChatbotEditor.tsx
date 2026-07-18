@@ -35,6 +35,7 @@ import { ChatPreview } from '@/components/chatbot/ChatPreview';
 
 interface Chatbot {
   id: string;
+  workspace_id: string;
   name: string;
   description: string | null;
   status: 'draft' | 'active' | 'inactive';
