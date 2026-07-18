@@ -95,6 +95,27 @@ serve(async (req) => {
       logStep("No active subscription found");
     }
 
+    // Cache resolved tier so generate-chat-response doesn't call Stripe per message.
+    try {
+      const { data: owned } = await supabaseClient
+        .from("workspaces")
+        .select("id")
+        .eq("owner_id", user.id);
+      if (owned && owned.length > 0) {
+        const rows = owned.map((w: { id: string }) => ({
+          workspace_id: w.id,
+          tier,
+          updated_at: new Date().toISOString(),
+        }));
+        const { error: planErr } = await supabaseClient
+          .from("workspace_plan")
+          .upsert(rows, { onConflict: "workspace_id" });
+        if (planErr) logStep("workspace_plan upsert error", planErr);
+      }
+    } catch (e) {
+      logStep("workspace_plan cache failed", { e: String(e) });
+    }
+
     return new Response(JSON.stringify({
       subscribed: hasActiveSub,
       tier,
