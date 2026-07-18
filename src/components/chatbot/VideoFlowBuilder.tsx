@@ -539,12 +539,35 @@ export const VideoFlowBuilder = forwardRef<VideoFlowBuilderRef, VideoFlowBuilder
                   </div>
                   <div className="space-y-2">
                     {((selectedNode.data.responses || []) as any[]).map((response) => (
-                      <Card key={response.id} className="p-2">
+                      <Card key={response.id} className="p-2 space-y-2">
                         <Input
                           value={response.text}
                           onChange={(e) => updateResponse(response.id, 'text', e.target.value)}
-                          className="mb-2"
+                          placeholder="Button label"
                         />
+                        <div>
+                          <Label className="text-xs">Goes to</Label>
+                          <Select
+                            value={response.next_node_id ?? '__none__'}
+                            onValueChange={(v) =>
+                              updateResponse(response.id, 'next_node_id', v === '__none__' ? null : v)
+                            }
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select next node" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="__none__">— End conversation —</SelectItem>
+                              {nodes
+                                .filter((n) => n.id !== selectedNode.id)
+                                .map((n) => (
+                                  <SelectItem key={n.id} value={n.id}>
+                                    {n.data?.title || n.id}
+                                  </SelectItem>
+                                ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
                         <Button
                           size="sm"
                           variant="destructive"
