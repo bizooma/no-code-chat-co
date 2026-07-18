@@ -114,7 +114,7 @@ const LeadIntegrations = () => {
         case 'zapier':
           setZapierWebhook(integration.config?.webhook_url || '');
           break;
-        case 'email_notifications':
+        case 'email':
           setEmailNotifications({
             enabled: integration.is_active,
             recipients: integration.config?.recipients || '',
@@ -473,7 +473,7 @@ const LeadIntegrations = () => {
                       Get notified via email when new leads are captured
                     </CardDescription>
                   </div>
-                  {getIntegrationStatus('email_notifications') && (
+                  {getIntegrationStatus('email') && (
                     <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
                       <CheckCircle className="mr-1 h-3 w-3" />
                       Active
@@ -553,7 +553,7 @@ const LeadIntegrations = () => {
                   </Button>
                   <Button
                     onClick={() => saveIntegration(
-                      'email_notifications',
+                      'email',
                       'Email Notifications',
                       {
                         recipients: emailNotifications.recipients,

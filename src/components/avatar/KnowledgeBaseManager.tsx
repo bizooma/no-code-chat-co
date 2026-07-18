@@ -68,13 +68,12 @@ export const KnowledgeBaseManager = ({ chatbotId }: KnowledgeBaseManagerProps) =
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const allowedTypes = ['text/plain', 'text/markdown', 'application/pdf', 
-                          'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-    
-    if (!allowedTypes.includes(file.type) && !file.name.match(/\.(txt|md|pdf|docx)$/)) {
+    const allowedTypes = ['text/plain', 'text/markdown'];
+
+    if (!allowedTypes.includes(file.type) && !file.name.match(/\.(txt|md)$/i)) {
       toast({
         title: "Invalid file type",
-        description: "Please upload a TXT, MD, PDF, or DOCX file",
+        description: "Please upload a TXT or MD file. PDF/DOCX parsing is not yet supported — paste text instead.",
         variant: "destructive",
       });
       return;
@@ -269,7 +268,7 @@ export const KnowledgeBaseManager = ({ chatbotId }: KnowledgeBaseManagerProps) =
             <CardHeader>
               <CardTitle>Upload Documents</CardTitle>
               <CardDescription>
-                Upload PDF, DOCX, TXT, or MD files (max 10MB)
+                Upload TXT or MD files (max 10MB). PDF/DOCX parsing coming soon — paste text for now.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -293,7 +292,7 @@ export const KnowledgeBaseManager = ({ chatbotId }: KnowledgeBaseManagerProps) =
                   id="file-upload"
                   type="file"
                   className="hidden"
-                  accept=".txt,.md,.pdf,.docx"
+                  accept=".txt,.md"
                   onChange={handleFileUpload}
                   disabled={uploading}
                 />

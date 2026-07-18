@@ -25,7 +25,27 @@ serve(async (req) => {
 
     console.log('Creating D-ID agent for chatbot:', chatbotId);
 
-    // Create agent in D-ID
+    // Load workspace knowledge sources so the agent can actually answer from them
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    const { data: sources } = await supabase
+      .from('avatar_knowledge_sources')
+      .select('source_name, content, status')
+      .eq('chatbot_id', chatbotId)
+      .eq('status', 'ready');
+
+    const knowledgePieces: string[] = [];
+    if (knowledgeBase && String(knowledgeBase).trim().length > 0) {
+      knowledgePieces.push(String(knowledgeBase).trim());
+    }
+    for (const s of sources ?? []) {
+      if (s?.content && String(s.content).trim().length > 0) {
+        knowledgePieces.push(`# ${s.source_name}\n${s.content}`);
+      }
+    }
+
     const agentPayload: any = {
       presenter: {
         type: 'talk',
@@ -40,7 +60,6 @@ serve(async (req) => {
       }
     };
 
-    // Add LLM configuration if provided
     if (llmModel && systemPrompt) {
       agentPayload.llm = {
         type: llmModel.includes('gpt') ? 'openai' : 'anthropic',
@@ -48,11 +67,10 @@ serve(async (req) => {
         instructions: systemPrompt
       };
 
-      // Add knowledge base if provided
-      if (knowledgeBase) {
+      if (knowledgePieces.length > 0) {
         agentPayload.knowledge = [{
           type: 'text',
-          content: knowledgeBase
+          content: knowledgePieces.join('\n\n---\n\n')
         }];
       }
     }
@@ -77,15 +95,25 @@ serve(async (req) => {
     const agentData = await createAgentResponse.json();
     console.log('D-ID agent created:', agentData.id);
 
-    // Generate client key for this agent
-    const allowedDomains = [
-      window.location?.origin,
-      'http://localhost:8080',
-      'https://*.lovable.app',
-      '*' // Allow all domains for embedded widgets
-    ].filter(Boolean);
+    // Fetch bot's allowed domains (embedding config) to build client-key allowlist
+    const { data: botRow } = await supabase
+      .from('avatar_chatbots')
+      .select('widget_config')
+      .eq('id', chatbotId)
+      .maybeSingle();
 
-    console.log('Generating client key for agent:', agentData.id);
+    const configuredDomains: string[] = Array.isArray((botRow?.widget_config as any)?.allowed_domains)
+      ? (botRow!.widget_config as any).allowed_domains
+      : [];
+
+    const allowedDomains = Array.from(new Set([
+      'https://no-code-chat-co.lovable.app',
+      'https://id-preview--63fdb9bb-fa8e-432e-84fe-145d05de64bf.lovable.app',
+      'http://localhost:8080',
+      ...configuredDomains,
+    ].filter(Boolean)));
+
+    console.log('Generating client key for agent:', agentData.id, 'domains:', allowedDomains);
 
     const clientKeyResponse = await fetch(`https://api.d-id.com/agents/${agentData.id}/client-key`, {
       method: 'POST',
@@ -106,11 +134,6 @@ serve(async (req) => {
 
     const clientKeyData = await clientKeyResponse.json();
     console.log('Client key generated successfully');
-
-    // Update chatbot in database
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
 
     const { error: updateError } = await supabase
       .from('avatar_chatbots')

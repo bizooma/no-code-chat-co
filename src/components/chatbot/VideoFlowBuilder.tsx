@@ -22,6 +22,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Video, MessageSquare, FormInput, CheckCircle, Plus, UserPlus } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { VideoUpload } from '@/components/video/VideoUpload';
@@ -52,7 +53,39 @@ const nodeTypes = {
   end: EndNode,
 };
 
+// Shared: render the small vertical thumbnail
+function NodeThumb({ url, thumbnail }: { url?: string; thumbnail?: string }) {
+  return (
+    <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded overflow-hidden mb-2">
+      {url && thumbnail ? (
+        <img src={thumbnail} alt="Video" className="w-full h-full object-cover" />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center">
+          <Video className="h-8 w-8 text-muted-foreground" />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Response row with its own source handle so canvas edges wire per-response.
+function ResponseRow({ response }: { response: { id: string; text: string } }) {
+  return (
+    <div className="relative text-xs bg-secondary px-2 py-1 rounded pr-4">
+      {response.text}
+      <Handle
+        type="source"
+        position={Position.Right}
+        id={response.id}
+        className="!bg-primary !w-3 !h-3"
+        style={{ right: -6, top: '50%' }}
+      />
+    </div>
+  );
+}
+
 function VideoQuestionNode({ data, selected }: { data: VideoNodeData; selected: boolean }) {
+  const responses = data.responses ?? [];
   return (
     <>
       <Handle type="target" position={Position.Left} className="!bg-primary !w-3 !h-3" />
@@ -61,37 +94,23 @@ function VideoQuestionNode({ data, selected }: { data: VideoNodeData; selected: 
           <Video className="h-4 w-4 text-primary" />
           <h3 className="font-semibold text-sm">{data.title || 'Video + Question'}</h3>
         </div>
-        {data.video_url ? (
-          <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded overflow-hidden mb-2">
-            {data.video_thumbnail ? (
-              <img src={data.video_thumbnail} alt="Video" className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <Video className="h-8 w-8 text-muted-foreground" />
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded flex items-center justify-center mb-2">
-            <Video className="h-8 w-8 text-muted-foreground" />
-          </div>
-        )}
-        {data.responses && data.responses.length > 0 && (
+        <NodeThumb url={data.video_url} thumbnail={data.video_thumbnail} />
+        {responses.length > 0 ? (
           <div className="mt-2 space-y-1">
-            {data.responses.map((r) => (
-              <div key={r.id} className="text-xs bg-secondary px-2 py-1 rounded">
-                {r.text}
-              </div>
+            {responses.map((r) => (
+              <ResponseRow key={r.id} response={r} />
             ))}
           </div>
+        ) : (
+          <Handle type="source" position={Position.Right} className="!bg-primary !w-3 !h-3" />
         )}
       </Card>
-      <Handle type="source" position={Position.Right} className="!bg-primary !w-3 !h-3" />
     </>
   );
 }
 
 function MultipleChoiceNode({ data, selected }: { data: VideoNodeData; selected: boolean }) {
+  const responses = data.responses ?? [];
   return (
     <>
       <Handle type="target" position={Position.Left} className="!bg-primary !w-3 !h-3" />
@@ -100,32 +119,17 @@ function MultipleChoiceNode({ data, selected }: { data: VideoNodeData; selected:
           <MessageSquare className="h-4 w-4 text-primary" />
           <h3 className="font-semibold text-sm">{data.title || 'Video + Buttons'}</h3>
         </div>
-        {data.video_url ? (
-          <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded overflow-hidden mb-2">
-            {data.video_thumbnail ? (
-              <img src={data.video_thumbnail} alt="Video" className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <Video className="h-8 w-8 text-muted-foreground" />
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded flex items-center justify-center mb-2">
-            <Video className="h-8 w-8 text-muted-foreground" />
-          </div>
-        )}
-        {data.responses && data.responses.length > 0 && (
+        <NodeThumb url={data.video_url} thumbnail={data.video_thumbnail} />
+        {responses.length > 0 ? (
           <div className="space-y-1">
-            {data.responses.map((r) => (
-              <div key={r.id} className="text-xs bg-secondary px-2 py-1 rounded">
-                {r.text}
-              </div>
+            {responses.map((r) => (
+              <ResponseRow key={r.id} response={r} />
             ))}
           </div>
+        ) : (
+          <Handle type="source" position={Position.Right} className="!bg-primary !w-3 !h-3" />
         )}
       </Card>
-      <Handle type="source" position={Position.Right} className="!bg-primary !w-3 !h-3" />
     </>
   );
 }
@@ -139,23 +143,9 @@ function TextResponseNode({ data, selected }: { data: VideoNodeData; selected: b
           <FormInput className="h-4 w-4 text-primary" />
           <h3 className="font-semibold text-sm">{data.title || 'Video + Text Input'}</h3>
         </div>
-        {data.video_url ? (
-          <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded overflow-hidden">
-            {data.video_thumbnail ? (
-              <img src={data.video_thumbnail} alt="Video" className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <Video className="h-8 w-8 text-muted-foreground" />
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded flex items-center justify-center">
-            <Video className="h-8 w-8 text-muted-foreground" />
-          </div>
-        )}
+        <NodeThumb url={data.video_url} thumbnail={data.video_thumbnail} />
       </Card>
-      <Handle type="source" position={Position.Right} className="!bg-primary !w-3 !h-3" />
+      <Handle type="source" position={Position.Right} id="default" className="!bg-primary !w-3 !h-3" />
     </>
   );
 }
@@ -169,21 +159,7 @@ function LeadCaptureNode({ data, selected }: { data: VideoNodeData; selected: bo
           <UserPlus className="h-4 w-4 text-primary" />
           <h3 className="font-semibold text-sm">{data.title || 'Video + Lead Form'}</h3>
         </div>
-        {data.video_url ? (
-          <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded overflow-hidden mb-2">
-            {data.video_thumbnail ? (
-              <img src={data.video_thumbnail} alt="Video" className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <Video className="h-8 w-8 text-muted-foreground" />
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded flex items-center justify-center mb-2">
-            <Video className="h-8 w-8 text-muted-foreground" />
-          </div>
-        )}
+        <NodeThumb url={data.video_url} thumbnail={data.video_thumbnail} />
         {data.lead_fields && data.lead_fields.length > 0 && (
           <div className="space-y-1">
             {data.lead_fields.map((field) => (
@@ -194,7 +170,7 @@ function LeadCaptureNode({ data, selected }: { data: VideoNodeData; selected: bo
           </div>
         )}
       </Card>
-      <Handle type="source" position={Position.Right} className="!bg-primary !w-3 !h-3" />
+      <Handle type="source" position={Position.Right} id="default" className="!bg-primary !w-3 !h-3" />
     </>
   );
 }
@@ -208,21 +184,7 @@ function EndNode({ data, selected }: { data: VideoNodeData; selected: boolean })
           <CheckCircle className="h-4 w-4 text-primary" />
           <h3 className="font-semibold text-sm">{data.title || 'End'}</h3>
         </div>
-        {data.video_url ? (
-          <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded overflow-hidden">
-            {data.video_thumbnail ? (
-              <img src={data.video_thumbnail} alt="Video" className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <Video className="h-8 w-8 text-muted-foreground" />
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded flex items-center justify-center">
-            <Video className="h-8 w-8 text-muted-foreground" />
-          </div>
-        )}
+        <NodeThumb url={data.video_url} thumbnail={data.video_thumbnail} />
       </Card>
     </>
   );
@@ -265,7 +227,30 @@ export const VideoFlowBuilder = forwardRef<VideoFlowBuilderRef, VideoFlowBuilder
   );
 
   const onConnect = useCallback(
-    (connection: Connection) => setEdges((eds) => addEdge(connection, eds)),
+    (connection: Connection) => {
+      // If the connection came from a response-specific handle, wire that
+      // response's next_node_id so the runtime follows the same route.
+      if (connection.sourceHandle && connection.source && connection.target) {
+        setNodes((nds) =>
+          nds.map((n) => {
+            if (n.id !== connection.source) return n;
+            const responses = (n.data?.responses ?? []) as Array<{ id: string; next_node_id: string | null }>;
+            if (!responses.some((r) => r.id === connection.sourceHandle)) return n;
+            const updated = responses.map((r) =>
+              r.id === connection.sourceHandle ? { ...r, next_node_id: connection.target! } : r
+            );
+            return { ...n, data: { ...n.data, responses: updated } };
+          })
+        );
+      }
+      setEdges((eds) => {
+        // Ensure only one outgoing edge per (source, sourceHandle) pair
+        const filtered = connection.sourceHandle
+          ? eds.filter((e) => !(e.source === connection.source && e.sourceHandle === connection.sourceHandle))
+          : eds;
+        return addEdge(connection, filtered);
+      });
+    },
     []
   );
 
@@ -339,12 +324,34 @@ export const VideoFlowBuilder = forwardRef<VideoFlowBuilderRef, VideoFlowBuilder
       r.id === responseId ? { ...r, [field]: value } : r
     );
     updateNodeData('responses', updatedResponses);
+
+    // Keep canvas edges in sync when the target is changed via the dropdown
+    if (field === 'next_node_id') {
+      setEdges((eds) => {
+        const withoutOld = eds.filter(
+          (e) => !(e.source === selectedNode.id && e.sourceHandle === responseId)
+        );
+        if (!value) return withoutOld;
+        return [
+          ...withoutOld,
+          {
+            id: `${selectedNode.id}-${responseId}-${value}`,
+            source: selectedNode.id,
+            sourceHandle: responseId,
+            target: value,
+          },
+        ];
+      });
+    }
   };
 
   const deleteResponse = (responseId: string) => {
     if (!selectedNode) return;
     const currentResponses = (selectedNode.data.responses || []) as any[];
     updateNodeData('responses', currentResponses.filter((r) => r.id !== responseId));
+    setEdges((eds) =>
+      eds.filter((e) => !(e.source === selectedNode.id && e.sourceHandle === responseId))
+    );
   };
 
   const handleSave = () => {
@@ -532,12 +539,35 @@ export const VideoFlowBuilder = forwardRef<VideoFlowBuilderRef, VideoFlowBuilder
                   </div>
                   <div className="space-y-2">
                     {((selectedNode.data.responses || []) as any[]).map((response) => (
-                      <Card key={response.id} className="p-2">
+                      <Card key={response.id} className="p-2 space-y-2">
                         <Input
                           value={response.text}
                           onChange={(e) => updateResponse(response.id, 'text', e.target.value)}
-                          className="mb-2"
+                          placeholder="Button label"
                         />
+                        <div>
+                          <Label className="text-xs">Goes to</Label>
+                          <Select
+                            value={response.next_node_id ?? '__none__'}
+                            onValueChange={(v) =>
+                              updateResponse(response.id, 'next_node_id', v === '__none__' ? null : v)
+                            }
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select next node" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="__none__">— End conversation —</SelectItem>
+                              {nodes
+                                .filter((n) => n.id !== selectedNode.id)
+                                .map((n) => (
+                                  <SelectItem key={n.id} value={n.id}>
+                                    {n.data?.title || n.id}
+                                  </SelectItem>
+                                ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
                         <Button
                           size="sm"
                           variant="destructive"

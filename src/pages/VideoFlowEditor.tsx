@@ -45,29 +45,57 @@ export default function VideoFlowEditor() {
 
       // Convert messages to ReactFlow nodes and edges
       if (messagesData && messagesData.length > 0) {
-        const nodes: Node[] = messagesData.map((msg) => ({
-          id: msg.id,
-          type: msg.message_type.includes('video') ? 'video_question' : 'multiple_choice',
-          position: msg.node_position as { x: number; y: number },
-          data: {
-            title: msg.message_key,
-            video_url: msg.video_url,
-            video_thumbnail: msg.video_thumbnail,
-            description: msg.message_text,
-            responses: msg.buttons || [],
-          },
-        }));
+        const nodes: Node[] = messagesData.map((msg) => {
+          const conditions = (msg.conditions as any) || {};
+          const nodeType: string =
+            conditions.node_type ||
+            (msg.message_type === 'form'
+              ? 'lead_capture'
+              : msg.message_type?.includes('video')
+                ? 'video_question'
+                : 'multiple_choice');
+          const responses = (msg.buttons as any[]) || [];
+          return {
+            id: msg.id,
+            type: nodeType,
+            position: msg.node_position as { x: number; y: number },
+            data: {
+              title: msg.message_key,
+              video_url: msg.video_url,
+              video_thumbnail: msg.video_thumbnail,
+              description: msg.message_text,
+              responses,
+              lead_fields: conditions.lead_fields || undefined,
+            },
+          };
+        });
 
         const edges: Edge[] = [];
         messagesData.forEach((msg) => {
+          const responses = (msg.buttons as any[]) || [];
+          // Prefer per-response next_node_id (drives runtime); fall back to legacy node_connections.
+          responses.forEach((r: any) => {
+            if (r?.next_node_id) {
+              edges.push({
+                id: `${msg.id}-${r.id}-${r.next_node_id}`,
+                source: msg.id,
+                sourceHandle: r.id,
+                target: r.next_node_id,
+                label: r.text,
+              });
+            }
+          });
           if (msg.node_connections) {
             (msg.node_connections as any[]).forEach((conn: any) => {
-              edges.push({
-                id: `${msg.id}-${conn.target}`,
-                source: msg.id,
-                target: conn.target,
-                label: conn.label,
-              });
+              // Only add if not already covered by a response edge
+              if (!edges.some((e) => e.source === msg.id && e.target === conn.target)) {
+                edges.push({
+                  id: `${msg.id}-${conn.target}`,
+                  source: msg.id,
+                  target: conn.target,
+                  label: conn.label,
+                });
+              }
             });
           }
         });
@@ -93,39 +121,50 @@ export default function VideoFlowEditor() {
       // Delete existing messages
       await supabase.from('chatbot_messages').delete().eq('chatbot_id', id);
 
-      // Convert nodes to chatbot_messages
-      const messages = nodes.map((node) => ({
-        chatbot_id: id,
-        message_key: node.data.title,
-        message_text: node.data.description || '',
-        message_type: (node.data.video_url ? 'youtube_video' : 'text') as 'youtube_video' | 'text',
-        video_url: node.data.video_url || null,
-        video_thumbnail: node.data.video_thumbnail || null,
-        buttons: node.data.responses || [],
-        node_position: node.position as any,
-        node_connections: edges
-          .filter((edge) => edge.source === node.id)
-          .map((edge) => ({
-            target: edge.target,
-            label: edge.label || '',
-          })) as any,
-      }));
+      // Map each response's next_node_id from canvas edges (edge.sourceHandle === response.id).
+      const messages = nodes.map((node) => {
+        const rawResponses = (node.data.responses || []) as any[];
+        const responses = rawResponses.map((r: any) => {
+          const edge = edges.find((e) => e.source === node.id && e.sourceHandle === r.id);
+          return { ...r, next_node_id: edge?.target ?? r.next_node_id ?? null };
+        });
+
+        const nodeType = node.type || 'video_question';
+        const messageType: 'youtube_video' | 'uploaded_video' | 'form' | 'text' | 'button' =
+          nodeType === 'lead_capture'
+            ? 'form'
+            : nodeType === 'end'
+              ? 'text'
+              : node.data.video_url
+                ? 'uploaded_video'
+                : 'text';
+
+        return {
+          chatbot_id: id,
+          message_key: node.data.title,
+          message_text: node.data.description || '',
+          message_type: messageType,
+          video_url: node.data.video_url || null,
+          video_thumbnail: node.data.video_thumbnail || null,
+          buttons: responses as any,
+          node_position: node.position as any,
+          node_connections: edges
+            .filter((edge) => edge.source === node.id)
+            .map((edge) => ({ target: edge.target, label: edge.label || '' })) as any,
+          conditions: {
+            node_type: nodeType,
+            lead_fields: node.data.lead_fields || null,
+          } as any,
+        };
+      });
 
       const { error } = await supabase.from('chatbot_messages').insert(messages);
-
       if (error) throw error;
 
-      toast({
-        title: 'Success',
-        description: 'Video flow saved successfully',
-      });
+      toast({ title: 'Success', description: 'Video flow saved successfully' });
     } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
-      });
-      throw error; // Re-throw to handle in publish
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      throw error;
     }
   };
 

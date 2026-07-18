@@ -44,10 +44,12 @@ serve(async (req) => {
           content = await fileData.text();
         }
       } else if (extension === 'pdf' || extension === 'docx') {
-        // For PDF and DOCX, we'd need a document parsing service
-        // For now, store the file URL and mark for manual processing
-        content = `File uploaded: ${sourceName}. Manual text extraction required.`;
-        metadata.requiresProcessing = true;
+        return new Response(
+          JSON.stringify({
+            error: 'PDF and DOCX parsing is not yet supported. Please paste the text directly or upload a .txt or .md file.'
+          }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
       }
       
       metadata.fileSize = sourceData.fileSize;
