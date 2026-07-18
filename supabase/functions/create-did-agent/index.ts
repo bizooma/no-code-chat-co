@@ -25,7 +25,27 @@ serve(async (req) => {
 
     console.log('Creating D-ID agent for chatbot:', chatbotId);
 
-    // Create agent in D-ID
+    // Load workspace knowledge sources so the agent can actually answer from them
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    const { data: sources } = await supabase
+      .from('avatar_knowledge_sources')
+      .select('source_name, content, status')
+      .eq('chatbot_id', chatbotId)
+      .eq('status', 'ready');
+
+    const knowledgePieces: string[] = [];
+    if (knowledgeBase && String(knowledgeBase).trim().length > 0) {
+      knowledgePieces.push(String(knowledgeBase).trim());
+    }
+    for (const s of sources ?? []) {
+      if (s?.content && String(s.content).trim().length > 0) {
+        knowledgePieces.push(`# ${s.source_name}\n${s.content}`);
+      }
+    }
+
     const agentPayload: any = {
       presenter: {
         type: 'talk',
@@ -40,7 +60,6 @@ serve(async (req) => {
       }
     };
 
-    // Add LLM configuration if provided
     if (llmModel && systemPrompt) {
       agentPayload.llm = {
         type: llmModel.includes('gpt') ? 'openai' : 'anthropic',
@@ -48,11 +67,10 @@ serve(async (req) => {
         instructions: systemPrompt
       };
 
-      // Add knowledge base if provided
-      if (knowledgeBase) {
+      if (knowledgePieces.length > 0) {
         agentPayload.knowledge = [{
           type: 'text',
-          content: knowledgeBase
+          content: knowledgePieces.join('\n\n---\n\n')
         }];
       }
     }
