@@ -592,6 +592,23 @@ const Widget = () => {
               <ScrollArea className="flex-1 p-4 h-64 md:h-80" ref={scrollAreaRef}>
                 <div className="space-y-4">
                   {conversation.map(renderMessage)}
+                  {isTyping && (
+                    <div className="flex gap-3 mb-4">
+                      <div
+                        className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                        style={{ backgroundColor: chatbot?.widget_config?.color || '#3B82F6' }}
+                      >
+                        <Bot className="h-4 w-4 text-white" />
+                      </div>
+                      <div className="rounded-lg px-3 py-2 bg-gray-100 dark:bg-gray-800">
+                        <span className="inline-flex gap-1">
+                          <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                          <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                          <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </ScrollArea>
 
