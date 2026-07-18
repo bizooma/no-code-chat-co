@@ -14,9 +14,48 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    // Require an authenticated caller who owns the target avatar bot's workspace
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    const userClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: userData } = await userClient.auth.getUser();
+    if (!userData?.user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     const { chatbotId, sourceType, sourceName, sourceData } = await req.json();
+
+    // Ownership: caller must be a member of the avatar bot's workspace
+    const { data: bot } = await supabase
+      .from('avatar_chatbots')
+      .select('id, workspace_id')
+      .eq('id', chatbotId)
+      .maybeSingle();
+    if (!bot) {
+      return new Response(JSON.stringify({ error: 'Chatbot not found' }), {
+        status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    const { data: isMember } = await supabase.rpc('is_workspace_member', {
+      user_uuid: userData.user.id, workspace_uuid: (bot as any).workspace_id,
+    });
+    if (!isMember) {
+      return new Response(JSON.stringify({ error: 'Forbidden' }), {
+        status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
 
     console.log('[PROCESS-KNOWLEDGE] Processing knowledge source:', { chatbotId, sourceType, sourceName });
 
