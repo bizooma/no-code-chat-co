@@ -27,12 +27,6 @@ const TemplateAnalytics = () => {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Badge variant="secondary" className="gap-1">
-                <TrendingUp className="w-3 h-3" />
-                Live Data
-              </Badge>
-            </div>
           </div>
         </div>
       </header>
