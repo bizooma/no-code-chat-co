@@ -139,7 +139,6 @@ const CreateChatbot = () => {
           ai_model: formData.ai_enabled ? formData.ai_model : null,
           widget_config: formData.widget_config,
           chatbot_type: formData.chatbot_type,
-          chatbot_type: formData.chatbot_type,
           status: 'draft'
         })
         .select()
