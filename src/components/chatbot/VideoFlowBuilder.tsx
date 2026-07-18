@@ -52,7 +52,39 @@ const nodeTypes = {
   end: EndNode,
 };
 
+// Shared: render the small vertical thumbnail
+function NodeThumb({ url, thumbnail }: { url?: string; thumbnail?: string }) {
+  return (
+    <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded overflow-hidden mb-2">
+      {url && thumbnail ? (
+        <img src={thumbnail} alt="Video" className="w-full h-full object-cover" />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center">
+          <Video className="h-8 w-8 text-muted-foreground" />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Response row with its own source handle so canvas edges wire per-response.
+function ResponseRow({ response }: { response: { id: string; text: string } }) {
+  return (
+    <div className="relative text-xs bg-secondary px-2 py-1 rounded pr-4">
+      {response.text}
+      <Handle
+        type="source"
+        position={Position.Right}
+        id={response.id}
+        className="!bg-primary !w-3 !h-3"
+        style={{ right: -6, top: '50%' }}
+      />
+    </div>
+  );
+}
+
 function VideoQuestionNode({ data, selected }: { data: VideoNodeData; selected: boolean }) {
+  const responses = data.responses ?? [];
   return (
     <>
       <Handle type="target" position={Position.Left} className="!bg-primary !w-3 !h-3" />
@@ -61,37 +93,23 @@ function VideoQuestionNode({ data, selected }: { data: VideoNodeData; selected: 
           <Video className="h-4 w-4 text-primary" />
           <h3 className="font-semibold text-sm">{data.title || 'Video + Question'}</h3>
         </div>
-        {data.video_url ? (
-          <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded overflow-hidden mb-2">
-            {data.video_thumbnail ? (
-              <img src={data.video_thumbnail} alt="Video" className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <Video className="h-8 w-8 text-muted-foreground" />
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded flex items-center justify-center mb-2">
-            <Video className="h-8 w-8 text-muted-foreground" />
-          </div>
-        )}
-        {data.responses && data.responses.length > 0 && (
+        <NodeThumb url={data.video_url} thumbnail={data.video_thumbnail} />
+        {responses.length > 0 ? (
           <div className="mt-2 space-y-1">
-            {data.responses.map((r) => (
-              <div key={r.id} className="text-xs bg-secondary px-2 py-1 rounded">
-                {r.text}
-              </div>
+            {responses.map((r) => (
+              <ResponseRow key={r.id} response={r} />
             ))}
           </div>
+        ) : (
+          <Handle type="source" position={Position.Right} className="!bg-primary !w-3 !h-3" />
         )}
       </Card>
-      <Handle type="source" position={Position.Right} className="!bg-primary !w-3 !h-3" />
     </>
   );
 }
 
 function MultipleChoiceNode({ data, selected }: { data: VideoNodeData; selected: boolean }) {
+  const responses = data.responses ?? [];
   return (
     <>
       <Handle type="target" position={Position.Left} className="!bg-primary !w-3 !h-3" />
@@ -100,32 +118,17 @@ function MultipleChoiceNode({ data, selected }: { data: VideoNodeData; selected:
           <MessageSquare className="h-4 w-4 text-primary" />
           <h3 className="font-semibold text-sm">{data.title || 'Video + Buttons'}</h3>
         </div>
-        {data.video_url ? (
-          <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded overflow-hidden mb-2">
-            {data.video_thumbnail ? (
-              <img src={data.video_thumbnail} alt="Video" className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <Video className="h-8 w-8 text-muted-foreground" />
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded flex items-center justify-center mb-2">
-            <Video className="h-8 w-8 text-muted-foreground" />
-          </div>
-        )}
-        {data.responses && data.responses.length > 0 && (
+        <NodeThumb url={data.video_url} thumbnail={data.video_thumbnail} />
+        {responses.length > 0 ? (
           <div className="space-y-1">
-            {data.responses.map((r) => (
-              <div key={r.id} className="text-xs bg-secondary px-2 py-1 rounded">
-                {r.text}
-              </div>
+            {responses.map((r) => (
+              <ResponseRow key={r.id} response={r} />
             ))}
           </div>
+        ) : (
+          <Handle type="source" position={Position.Right} className="!bg-primary !w-3 !h-3" />
         )}
       </Card>
-      <Handle type="source" position={Position.Right} className="!bg-primary !w-3 !h-3" />
     </>
   );
 }
@@ -139,23 +142,9 @@ function TextResponseNode({ data, selected }: { data: VideoNodeData; selected: b
           <FormInput className="h-4 w-4 text-primary" />
           <h3 className="font-semibold text-sm">{data.title || 'Video + Text Input'}</h3>
         </div>
-        {data.video_url ? (
-          <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded overflow-hidden">
-            {data.video_thumbnail ? (
-              <img src={data.video_thumbnail} alt="Video" className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <Video className="h-8 w-8 text-muted-foreground" />
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded flex items-center justify-center">
-            <Video className="h-8 w-8 text-muted-foreground" />
-          </div>
-        )}
+        <NodeThumb url={data.video_url} thumbnail={data.video_thumbnail} />
       </Card>
-      <Handle type="source" position={Position.Right} className="!bg-primary !w-3 !h-3" />
+      <Handle type="source" position={Position.Right} id="default" className="!bg-primary !w-3 !h-3" />
     </>
   );
 }
@@ -169,21 +158,7 @@ function LeadCaptureNode({ data, selected }: { data: VideoNodeData; selected: bo
           <UserPlus className="h-4 w-4 text-primary" />
           <h3 className="font-semibold text-sm">{data.title || 'Video + Lead Form'}</h3>
         </div>
-        {data.video_url ? (
-          <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded overflow-hidden mb-2">
-            {data.video_thumbnail ? (
-              <img src={data.video_thumbnail} alt="Video" className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <Video className="h-8 w-8 text-muted-foreground" />
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded flex items-center justify-center mb-2">
-            <Video className="h-8 w-8 text-muted-foreground" />
-          </div>
-        )}
+        <NodeThumb url={data.video_url} thumbnail={data.video_thumbnail} />
         {data.lead_fields && data.lead_fields.length > 0 && (
           <div className="space-y-1">
             {data.lead_fields.map((field) => (
@@ -194,7 +169,7 @@ function LeadCaptureNode({ data, selected }: { data: VideoNodeData; selected: bo
           </div>
         )}
       </Card>
-      <Handle type="source" position={Position.Right} className="!bg-primary !w-3 !h-3" />
+      <Handle type="source" position={Position.Right} id="default" className="!bg-primary !w-3 !h-3" />
     </>
   );
 }
@@ -208,21 +183,7 @@ function EndNode({ data, selected }: { data: VideoNodeData; selected: boolean })
           <CheckCircle className="h-4 w-4 text-primary" />
           <h3 className="font-semibold text-sm">{data.title || 'End'}</h3>
         </div>
-        {data.video_url ? (
-          <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded overflow-hidden">
-            {data.video_thumbnail ? (
-              <img src={data.video_thumbnail} alt="Video" className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <Video className="h-8 w-8 text-muted-foreground" />
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="w-32 aspect-[9/16] mx-auto bg-muted rounded flex items-center justify-center">
-            <Video className="h-8 w-8 text-muted-foreground" />
-          </div>
-        )}
+        <NodeThumb url={data.video_url} thumbnail={data.video_thumbnail} />
       </Card>
     </>
   );
