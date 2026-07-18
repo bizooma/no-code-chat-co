@@ -18,7 +18,7 @@ const Landing = () => {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Bot className="h-8 w-8 text-primary" />
-            <h1 className="text-2xl font-bold text-foreground">SupportBots.dev</h1>
+            <h1 className="text-2xl font-bold text-foreground">SupportBots</h1>
           </div>
           <div className="flex items-center space-x-4">
             <Link to="/auth" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
@@ -751,7 +751,7 @@ const Landing = () => {
         <div className="container mx-auto text-center">
           <div className="flex items-center justify-center space-x-2 mb-4">
             <Bot className="h-6 w-6 text-primary" />
-            <span className="font-bold text-foreground">SupportBots.dev</span>
+            <span className="font-bold text-foreground">SupportBots</span>
           </div>
           <p className="text-sm text-muted-foreground">
             © 2025 Support Bots.dev, A{" "}
