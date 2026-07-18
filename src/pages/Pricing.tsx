@@ -63,7 +63,7 @@ const pricingTiers: PricingTier[] = [
     popular: true,
     features: [
       'Unlimited chatbots',
-      'Unlimited conversations',
+      'Unlimited conversations (fair use)',
       'Advanced analytics',
       'Lead integrations',
       'Custom branding',
@@ -422,8 +422,7 @@ const Pricing = () => {
         <div className="text-center">
           <h3 className="text-2xl font-bold mb-4">Frequently Asked Questions</h3>
           <p className="text-muted-foreground mb-8">
-            Have questions? We're here to help.{' '}
-            <Link to="/contact" className="text-primary hover:underline">Contact us</Link> for more information.
+            Have questions? We're here to help.
           </p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left max-w-4xl mx-auto">

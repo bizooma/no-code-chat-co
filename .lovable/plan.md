@@ -1,89 +1,84 @@
-## 1. Avatar bots — fix crash + wire knowledge base
 
-**File:** `supabase/functions/create-did-agent/index.ts`
+# Final Cleanup Pass
 
-- Remove `window.location.origin` (crashes Deno). Replace `allowed_domains` with a static list, no `'*'`:
-  ```
-  ['https://no-code-chat-co.lovable.app', 'https://id-preview--63fdb9bb-fa8e-432e-84fe-145d05de64bf.lovable.app', 'http://localhost:8080', ...customer domains from bot's widget_config.allowed_domains]
-  ```
-- Fetch `avatar_knowledge_sources` rows for this `chatbotId` (service-role read), concatenate their `content` with the manual `knowledgeBase` field, and pass the combined text into D-ID's `agent.knowledge` payload so the avatar can actually cite uploaded content.
-- Leave the existing "always create a new agent" behavior alone (out of scope, and current DB has no ambient agents to clean up given every prior save crashed before persisting).
+Grouped exactly as requested. I'll do A → E in order so security-sensitive DB changes land last, after visible bug fixes are validated.
 
-**File:** `supabase/functions/process-knowledge-source/index.ts`
+---
 
-- Stop writing the placeholder `"Manual text extraction required"`. Return HTTP 400 for `pdf` / `docx` uploads with a clear message ("PDF/DOCX parsing not yet supported — please paste text or upload .txt/.md").
-- Keep `txt`, `md`, and `url` paths working.
+## A. Remove fabricated/mock data
 
-**File:** `src/components/avatar/KnowledgeBaseManager.tsx`
+- **ABTestDashboard.tsx** — remove the feature for now. Delete the component, drop the "A/B Testing" tab from `Analytics.tsx` and the placement in `ChatbotEditor.tsx`. Real A/B needs variant assignment + event collection we don't have.
+- **RealtimeDashboard.tsx** — remove the "Response Rate" tile entirely (grid becomes 3 cols). Compute nothing fake.
+- **TemplateMetrics.tsx / VideoFlowAnalytics.tsx** — strip hardcoded "+12%" style deltas and the "Live Data" badge. Show current value only.
+- **Analytics.tsx** — drop the hardcoded `avgResponseTime = 2.5` tile and the invented 75/60% funnel multipliers. Funnel becomes: sessions → conversations (real) → leads (real).
+- **PDFReport** — rename component + button to `HTMLReport` / "Export HTML" (it emits HTML). Not implementing a real PDF this pass.
+- **TemplateLibrary.tsx** — orphaned per section E; will be deleted, so hardcoded rating/downloads go with it.
 
-- Restrict the file input `accept` to `.txt,.md` and remove PDF/DOCX from the UI copy so users aren't misled.
+## B. Marketing / pricing reconciliation
 
-**Verify:** Create an avatar bot → `avatar_chatbots.did_agent_id` and `did_client_key` both populated; widget starts a session; add a `.txt` knowledge source with a distinctive fact, re-save the bot, ask the avatar → it answers using that fact.
+- **Landing.tsx** pricing: rewrite to match `Pricing.tsx` exactly — Free $0, Professional $29, Enterprise $99 (features from the Stripe-backed page).
+- Replace every "unlimited conversations" with "unlimited fair-use messages" (or plan-scoped copy).
+- Remove unsupported claims: HeyGen, native mobile app, live human takeover, auto multi-language, HubSpot/Google Sheets auto-sync. Keep D-ID avatar, video branching, standard chatbots, Slack + email lead notifications, embed script.
+- Testimonials block: **remove** (no real attributable ones). Also remove "Join thousands of businesses…" hero social proof.
+- Brand: standardize on **SupportBots** everywhere (drop the `.dev` suffix in UI copy; keep the domain only where it's actually a URL).
 
-## 2. Video-flow branching — connect edges to responses
+## C. Broken bug fixes
 
-**File:** `src/components/chatbot/VideoFlowBuilder.tsx`
+- Fix nav routes:
+  - `Dashboard.tsx`: `/lead-integrations` → `/leads/integrations`
+  - `ClientPortal.tsx`: `/create-chatbot` → `/chatbots/create`
+  - `Pricing.tsx` FAQ `/contact` → create a minimal `Contact.tsx` route with a mailto + form that inserts into `leads` (source=`contact_form`) so notifications reuse the same pipeline.
+- `FlowBuilder.tsx`: wire the pencil button to a proper edit dialog reusing the add-message form; call `updateMessage`.
+- `CreateChatbot.tsx`: on insert, if a template is selected, copy the template's `bot_config` (or equivalent) into the new chatbot and store `template_id`.
+- `ChatbotEditor.tsx`: remove the orphan "analytics" tab trigger and the stray inner `<Tabs>`. Pass the real `workspaceId` from `WorkspaceContext` wherever needed. (ABTestDashboard usage removed per section A.)
+- `UserManagement.tsx`: new **edge function `admin-list-users`** (verify_jwt=true, checks caller `platform_owner` via `has_role`) that uses service role + `auth.admin.listUsers()` to return `{id,email,created_at}`. Frontend calls it and joins to profiles/roles.
+- `public/widget.js`: derive `baseUrl` from `currentScript.src` origin (no hardcoded `supportbots.dev`); keep Supabase URL/anon key inline (public anon key is fine, but read chatbot type through an origin-agnostic call).
 
-- Give each response its own source `Handle` (id = response.id) inside the node card, replacing the single right-edge source handle on `VideoQuestionNode` and `MultipleChoiceNode`. Keep a single default source handle on `TextResponseNode` and `LeadCaptureNode`.
-- On save (in `VideoFlowEditor.handleSave`), for each node compute each `response.next_node_id` from edges where `edge.source === node.id && edge.sourceHandle === response.id`. Persist that into `data.responses` (which is what gets written to `chatbot_messages.buttons`). Keep also writing `node_connections` for backward compat.
-- Add a target-node dropdown in the right-panel response editor (list all other nodes) as a manual fallback / confirmation, syncing both the response's `next_node_id` and the edge.
-- Fix `handleSave` in `VideoFlowEditor.tsx` to preserve node type: map `lead_capture` → `'form'`, `end` → `'text'`, and keep the video-question/multiple-choice branches. Persist node type in `chatbot_messages.conditions.node_type` so we can round-trip it and the runtime knows it's a lead node.
+## D. Security hardening
 
-**File:** `src/hooks/useVideoFlowState.ts`
+**DB migration** (single migration, all GRANTs kept intact):
 
-- When building `nodeMap`, read `type` from `conditions.node_type` first, falling back to `message_type` mapping. Lead nodes get `type: 'lead_capture'` and their `lead_fields` from `conditions.lead_fields`.
+1. **`leads` insert policy** — drop `WITH CHECK (true)`. Replace with a policy that:
+   - Requires `chatbot_id` to reference an existing `chatbots` row where `is_active = true`.
+   - Enforces `workspace_id = (SELECT workspace_id FROM chatbots WHERE id = chatbot_id)`.
+   - Anonymous inserts still allowed but only when both conditions match; server code must send both fields (already does).
+2. **`conversations` / `conversation_messages`** — same "derive from chatbot" pattern. `workspace_id` in conversations must match its chatbot's workspace; `conversation_id` on messages must reference an existing conversation.
+3. Add a **BEFORE INSERT trigger** on `leads` and `conversations` that auto-fills `workspace_id` from `chatbot_id` if the client omits/mismatches it (defense in depth).
 
-**Verify:** Build a 3-node flow (question → 2 branches → different end nodes). Save. Play through: each button lands on its own target.
+**Edge functions**:
 
-## 3. Video-flow lead capture — reach the form
+- `save-avatar-conversation`: require the `visitor_id` on the existing row to match on update; verify `chatbot_id` is active on insert. Reject cross-visitor updates.
+- `slack-notifications`: derive `workspace_id` from the lead (require `leadId` instead of trusting a client-supplied `workspace_id`). Update the DB trigger call accordingly.
+- `process-knowledge-source`: 
+  - Verify the authenticated caller owns `chatbot_id` (has `verify_jwt=true` in config).
+  - SSRF guard: allow only `http:`/`https:`, resolve the hostname, block loopback (`127.0.0.0/8`), link-local (`169.254.0.0/16`), private ranges (`10/8`, `172.16/12`, `192.168/16`), `::1`, `fc00::/7`, `fe80::/10`, and metadata IPs (`169.254.169.254`).
+- `facebook-messenger-webhook`: constant-time compare of `hub.verify_token` against a `FACEBOOK_VERIFY_TOKEN` secret (I'll `generate_secret` a random one, user copies to Meta dashboard on setup). Validate `X-Hub-Signature-256` HMAC-SHA256 against `FACEBOOK_APP_SECRET` (user-supplied — add via `add_secret`).
+- `whatsapp-business-webhook`: same pattern with `WHATSAPP_VERIFY_TOKEN` (generated) and `WHATSAPP_APP_SECRET` (user-supplied).
 
-**File:** `src/components/chatbot/VideoFlowWidget.tsx`
+I'll only **generate** the two verify tokens automatically. The two app secrets require the user's Meta app — I'll prompt via `add_secret` after landing the code and infrastructure, per secrets policy.
 
-- After `moveToNextNode`, inspect the new `currentNode.type`. If it's `lead_capture`, transition `widgetState` to `COLLECTING_LEAD` and render the form using that node's `lead_fields` (dynamic fields, not the hardcoded name/email/phone).
-- On lead submit, call `captureLeadData`, then advance to next node via the node's default outgoing edge (or COMPLETED if none).
-- Same logic on initial load if the start node happens to be `lead_capture`.
+## E. Dead code removal
 
-**Verify:** A flow that ends on a lead-capture node presents the form; submitting inserts a row into `leads`.
+Delete:
+- `src/pages/Index.tsx` (unused Lovable stub — verify no route/import references remain).
+- `src/pages/TemplateLibrary.tsx` (orphaned; fake data).
+- `src/components/video/VideoLayoutPreview.tsx` (unused).
 
-## 4. Lead notifications — DB trigger + fix payload contract
+Update `App.tsx` routes/imports if any reference these.
 
-### Migration
+---
 
-- Enable `pg_net` (if not already) and create an `AFTER INSERT` trigger on `public.leads` that fires `net.http_post` to both `send-lead-notification` (with `{ leadId }`) and `slack-notifications` (with `{ workspace_id, lead }`), using the Supabase project's function URL + service-role auth header. Use a `SECURITY DEFINER` function to keep secrets out of the trigger body — read the URL/key from a config table or hardcode the project URL + service-role token from `vault`.
-- Since the service-role token can't be hardcoded in a migration safely, store project URL + service-role JWT in `vault.secrets` first (or use `current_setting('app.settings.<name>')` if easier). Simplest working approach: create a `public.notify_lead()` SECURITY DEFINER function that reads both values from `vault.decrypted_secrets` by name (`project_url`, `service_role_jwt`).
-- I'll add a one-time SQL to seed those two Vault entries from the values available in the migration context (project ref is known). If seeding the service-role JWT can't be done in migration SQL, I'll add a small admin RPC and call it once from an already-authenticated admin path.
+## Technical notes
 
-### Edge function `send-lead-notification`
+- Migration ordering: policy replacements use `DROP POLICY IF EXISTS` then `CREATE POLICY`. GRANTs on `leads`/`conversations`/`conversation_messages` already exist; not re-issuing.
+- Anonymous lead capture stays functional because the new check is a JOIN to `chatbots`, not an auth requirement.
+- No changes to the AI engine, avatar create/run, video flow branching, or lead-notification trigger — all verified working paths untouched.
 
-- Accept **both** shapes:
-  - `{ leadId: string }` → look up lead as today, resolve workspace's `integrations` row where `integration_type = 'email'`, send.
-  - `{ test: true, lead: {...}, recipients, subject, template }` → skip the DB lookup, send directly to the provided recipients.
-- Move to `verify_jwt = false` only if we want the trigger to call it without a JWT; otherwise the trigger will attach the service-role JWT and we leave `verify_jwt` as-is.
+## Judgment calls I'll take unless you say otherwise
 
-### UI fix
+1. **Delete** the A/B testing UI rather than stub it (section A).
+2. **Delete** testimonials + hero social proof rather than replace (section B).
+3. Create a minimal `/contact` page that writes to `leads` so the FAQ link resolves (section C).
+4. Standardize brand as plain **SupportBots** in UI copy (section B).
 
-**File:** `src/pages/LeadIntegrations.tsx`
-
-- Replace every `'email_notifications'` string with `'email'` (matches the actual enum). Enum has no `'email_notifications'` value, so current saves silently fail.
-- Remove/ignore `'google_sheets'` branch (also not in the enum) — out of scope for this pass; leave a TODO.
-
-**Verify:** Submit a real lead through a standard bot AND a video bot → row lands in `leads`, trigger fires, configured Resend email is sent, configured Slack webhook receives message. Test button in Integrations page also succeeds against the same function.
-
-## 5. Regression guards
-
-- Do NOT touch `generate-chat-response` or the button-flow path in `Widget.tsx` free-text branch.
-- Do NOT modify RLS on `avatar_chatbots` or the `get_avatar_widget_config` RPC.
-- Migration only adds: `pg_net` extension (if needed), `public.notify_lead()` function, `leads_notify_after_insert` trigger, and two Vault secrets.
-
-## Order of execution
-
-1. Migration (trigger + Vault seeds) — must run first, user approval gate.
-2. Edge function fixes: `create-did-agent`, `process-knowledge-source`, `send-lead-notification` — deployed automatically on save.
-3. Frontend: `VideoFlowBuilder`, `VideoFlowEditor`, `useVideoFlowState`, `VideoFlowWidget`, `KnowledgeBaseManager`, `LeadIntegrations`, `AvatarChatbotEditor` (already loads knowledge sources via manager, no change needed).
-4. Manual smoke test each of the 5 items.
-
-## Known caveats
-
-- **Vault seeding**: the migration can create Vault entries but can't know the project's service-role JWT from inside SQL. I'll either (a) have the migration create empty placeholders and a one-off admin-only RPC to set them, which you call once, or (b) skip pg_net and instead make the trigger write to a `pending_lead_notifications` queue table that a small edge function polls / a Supabase Realtime subscription reacts to. I'll go with (a) — it's the cleaner trigger approach the spec asks for. You'll get a one-time toast on the Integrations page telling you to click a "Enable notifications" button that seeds the secrets.
-- **Old avatar bots** created before the crash fix are unusable (no `did_client_key`). I'll surface a one-line notice in `AvatarChatbots.tsx` telling you to re-save any bot missing `did_agent_id`. No auto-migration.
-- **PDF/DOCX** knowledge uploads: rejected, not parsed. Real parsing needs an external service and is out of this scope.
+Reply "go" (or with tweaks) and I'll execute A→E in one pass, then summarize every edge function, policy, and trigger changed.

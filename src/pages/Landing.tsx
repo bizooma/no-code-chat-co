@@ -18,7 +18,7 @@ const Landing = () => {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Bot className="h-8 w-8 text-primary" />
-            <h1 className="text-2xl font-bold text-foreground">SupportBots.dev</h1>
+            <h1 className="text-2xl font-bold text-foreground">SupportBots</h1>
           </div>
           <div className="flex items-center space-x-4">
             <Link to="/auth" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
@@ -198,14 +198,14 @@ const Landing = () => {
                 </div>
                 <CardTitle className="text-2xl mb-2">AvatarFlow</CardTitle>
                 <CardDescription className="text-base">
-                  Realistic AI avatars powered by HeyGen/D-ID
+                  Realistic AI avatars powered by D-ID
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="mb-6">
                   <h4 className="font-semibold text-sm text-foreground mb-3">How It Works:</h4>
                   <p className="text-sm text-muted-foreground mb-4">
-                    An AI-powered digital human that speaks to visitors in real-time. Uses GPT for natural language understanding and D-ID/HeyGen for realistic avatar animation. Visitors talk or type, the avatar responds with voice and video.
+                    An AI-powered digital human that speaks to visitors in real-time. Uses GPT for natural language understanding and D-ID for realistic avatar animation. Visitors talk or type, the avatar responds with voice and video.
                   </p>
                 </div>
 
@@ -377,13 +377,13 @@ const Landing = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-12">
-            {/* Starter Plan */}
+            {/* Free Plan */}
             <Card className="relative hover:shadow-xl transition-shadow">
               <CardHeader>
-                <CardTitle className="text-2xl">Starter</CardTitle>
-                <CardDescription>Perfect for small businesses getting started</CardDescription>
+                <CardTitle className="text-2xl">Free</CardTitle>
+                <CardDescription>Perfect for getting started</CardDescription>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold text-foreground">$19</span>
+                  <span className="text-4xl font-bold text-foreground">$0</span>
                   <span className="text-muted-foreground">/month</span>
                 </div>
               </CardHeader>
@@ -397,15 +397,14 @@ const Landing = () => {
                     <p className="text-xs text-muted-foreground">Text-based conversational bots</p>
                   </div>
                 </div>
-                
                 <div className="space-y-3 mb-6">
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                    <span className="text-sm">Up to 5 chatbots</span>
+                    <span className="text-sm">1 chatbot</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                    <span className="text-sm">2,500 conversations/month</span>
+                    <span className="text-sm">100 AI messages/month</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
@@ -419,24 +418,16 @@ const Landing = () => {
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
                     <span className="text-sm">Basic analytics</span>
                   </div>
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                    <span className="text-sm">Email support</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                    <span className="text-sm">Template library</span>
-                  </div>
                 </div>
                 <Link to="/auth">
                   <Button className="w-full" variant="outline">
-                    Start Free Trial
+                    Get Started Free
                   </Button>
                 </Link>
               </CardContent>
             </Card>
 
-            {/* Pro Plan */}
+            {/* Professional Plan */}
             <Card className="relative border-2 border-primary shadow-lg hover:shadow-2xl transition-shadow">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                 <span className="bg-primary text-primary-foreground px-6 py-1.5 rounded-full text-sm font-bold shadow-lg">
@@ -447,7 +438,7 @@ const Landing = () => {
                 <CardTitle className="text-2xl">Professional</CardTitle>
                 <CardDescription>For growing businesses with video needs</CardDescription>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold text-foreground">$49</span>
+                  <span className="text-4xl font-bold text-foreground">$29</span>
                   <span className="text-muted-foreground">/month</span>
                 </div>
               </CardHeader>
@@ -467,19 +458,18 @@ const Landing = () => {
                     <p className="text-xs text-muted-foreground">Interactive video flows</p>
                   </div>
                 </div>
-                
                 <div className="space-y-3 mb-6">
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                    <span className="text-sm font-medium">Everything in Starter, plus:</span>
+                    <span className="text-sm font-medium">Everything in Free, plus:</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                    <span className="text-sm">Up to 15 chatbots</span>
+                    <span className="text-sm">Unlimited chatbots</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                    <span className="text-sm">10,000 conversations/month</span>
+                    <span className="text-sm">3,000 AI messages/month (fair use)</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
@@ -491,11 +481,7 @@ const Landing = () => {
                   </div>
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                    <span className="text-sm">A/B testing</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                    <span className="text-sm">Priority support</span>
+                    <span className="text-sm">Priority email support</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
@@ -504,7 +490,7 @@ const Landing = () => {
                 </div>
                 <Link to="/auth">
                   <Button className="w-full" size="lg">
-                    Start Pro Trial
+                    Upgrade to Pro
                   </Button>
                 </Link>
               </CardContent>
@@ -516,7 +502,7 @@ const Landing = () => {
                 <CardTitle className="text-2xl">Enterprise</CardTitle>
                 <CardDescription>Complete solution with AI avatars</CardDescription>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold text-foreground">$149</span>
+                  <span className="text-4xl font-bold text-foreground">$99</span>
                   <span className="text-muted-foreground">/month</span>
                 </div>
               </CardHeader>
@@ -542,23 +528,18 @@ const Landing = () => {
                     <p className="text-xs text-muted-foreground">Lifelike AI video avatars</p>
                   </div>
                 </div>
-                
                 <div className="space-y-3 mb-6">
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                    <span className="text-sm font-medium">Everything in Pro, plus:</span>
+                    <span className="text-sm font-medium">Everything in Professional, plus:</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                    <span className="text-sm">Unlimited chatbots</span>
+                    <span className="text-sm">20,000 AI messages/month (fair use)</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                    <span className="text-sm">50,000 conversations/month</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                    <span className="text-sm">AI avatar creation</span>
+                    <span className="text-sm">AI avatar creation (D-ID)</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
@@ -566,15 +547,15 @@ const Landing = () => {
                   </div>
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                    <span className="text-sm">White-label solution</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                    <span className="text-sm">24/7 dedicated support</span>
+                    <span className="text-sm">White-label options</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
                     <span className="text-sm">API access & webhooks</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
+                    <span className="text-sm">Dedicated support</span>
                   </div>
                 </div>
                 <Link to="/auth">
@@ -591,7 +572,7 @@ const Landing = () => {
             <h4 className="text-2xl font-bold text-center mb-8">Bot Type Availability</h4>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
               <div className="font-semibold text-left">Bot Type</div>
-              <div className="font-semibold">Starter</div>
+              <div className="font-semibold">Free</div>
               <div className="font-semibold">Professional</div>
               <div className="font-semibold">Enterprise</div>
               
@@ -678,25 +659,16 @@ const Landing = () => {
                   How do chatbots capture leads from website visitors?
                 </AccordionTrigger>
                 <AccordionContent>
-                  Our chatbot collects visitor details like name, email, and phone directly inside the chat. Leads are saved in your dashboard, exported to CSV, or synced automatically to your CRM.
+                  Our chatbot collects visitor details like name, email, and phone directly inside the chat. Leads are saved in your dashboard and can be exported to CSV.
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-4" className="bg-card rounded-lg px-6">
                 <AccordionTrigger className="text-left">
-                  Does your chatbot integrate with popular tools like Google Sheets, HubSpot, or Slack?
+                  Does your chatbot send lead notifications?
                 </AccordionTrigger>
                 <AccordionContent>
-                  Yes. You can connect your chatbot to Google Sheets, HubSpot, Slack, Mailchimp, or any app through Zapier and Make. This way, new leads and chat data flow directly into your existing systems.
-                </AccordionContent>
-              </AccordionItem>
-
-              <AccordionItem value="item-5" className="bg-card rounded-lg px-6">
-                <AccordionTrigger className="text-left">
-                  Can a human agent take over the conversation from the chatbot?
-                </AccordionTrigger>
-                <AccordionContent>
-                  Absolutely. Our platform offers live chat takeover. If the bot can't answer, a human can jump into the conversation in real time from the dashboard or mobile app.
+                  Yes. Every captured lead can automatically trigger an email notification and a Slack message to your workspace, so your team never misses a new lead.
                 </AccordionContent>
               </AccordionItem>
 
@@ -714,7 +686,7 @@ const Landing = () => {
                   Is your chatbot white-label so I can use it for my agency clients?
                 </AccordionTrigger>
                 <AccordionContent>
-                  Yes. With agency mode, you can rebrand the chatbot with your client's logo and colors. You can even give clients their own login and custom dashboard under your brand.
+                  Yes. On the Enterprise plan, you can rebrand the chatbot with your client's logo and colors.
                 </AccordionContent>
               </AccordionItem>
 
@@ -727,21 +699,12 @@ const Landing = () => {
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="item-9" className="bg-card rounded-lg px-6">
-                <AccordionTrigger className="text-left">
-                  Does your chatbot support multiple languages?
-                </AccordionTrigger>
-                <AccordionContent>
-                  Yes. Our chatbot can automatically detect and respond in multiple languages, making it ideal for businesses with international customers.
-                </AccordionContent>
-              </AccordionItem>
-
               <AccordionItem value="item-10" className="bg-card rounded-lg px-6">
                 <AccordionTrigger className="text-left">
                   What makes your chatbot platform different from other chatbot software?
                 </AccordionTrigger>
                 <AccordionContent>
-                  Unlike other chatbot tools, our platform offers unlimited conversations, pre-built industry templates, live chat takeover, AI + rule-based options, and full white-label agency features — all without expensive monthly fees.
+                  Our platform combines AI-driven text bots, interactive video flows, and lifelike AI avatars in one dashboard — with pre-built templates, custom branding, and generous per-plan message limits.
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
@@ -757,8 +720,8 @@ const Landing = () => {
             Ready to Build Your First Chatbot?
           </h3>
           <p className="text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
-            Join thousands of businesses already using SupportBots.dev to improve 
-            their customer engagement and generate more leads.
+            Use SupportBots to improve your customer engagement and generate
+            more leads — no code required.
           </p>
           <Link to="/auth">
             <Button variant="secondary" size="lg" className="flex items-center space-x-2 mx-auto">
@@ -788,7 +751,7 @@ const Landing = () => {
         <div className="container mx-auto text-center">
           <div className="flex items-center justify-center space-x-2 mb-4">
             <Bot className="h-6 w-6 text-primary" />
-            <span className="font-bold text-foreground">SupportBots.dev</span>
+            <span className="font-bold text-foreground">SupportBots</span>
           </div>
           <p className="text-sm text-muted-foreground">
             © 2025 Support Bots.dev, A{" "}

@@ -58,7 +58,7 @@ interface AnalyticsData {
   totalConversations: number;
   totalLeads: number;
   totalMessages: number;
-  avgResponseTime: number;
+  
   conversionRate: number;
   activeUsers: number;
   topChatbots: Array<{
@@ -108,7 +108,7 @@ const Analytics = () => {
     totalConversations: 0,
     totalLeads: 0,
     totalMessages: 0,
-    avgResponseTime: 0,
+    
     conversionRate: 0,
     activeUsers: 0,
     topChatbots: [],
@@ -238,8 +238,6 @@ const Analytics = () => {
     const totalMessages = messages.length;
     const conversionRate = totalConversations > 0 ? (totalLeads / totalConversations) * 100 : 0;
 
-    // Calculate average response time (simplified)
-    const avgResponseTime = 2.5; // Mock data for now
 
     // Active users (unique visitor IDs)
     const activeUsers = new Set(conversations.map(c => c.visitor_id)).size;
@@ -332,13 +330,10 @@ const Analytics = () => {
       color: statusColors[status] || '#6B7280'
     }));
 
-    // Conversion Funnel Analysis
+    // Conversion Funnel Analysis (only stages we can measure)
     const conversionFunnel = [
-      { stage: 'Visitors', count: totalConversations, percentage: 100 },
       { stage: 'Started Conversation', count: totalConversations, percentage: 100, dropoff: 0 },
-      { stage: 'Engaged (2+ messages)', count: Math.floor(totalConversations * 0.75), percentage: 75, dropoff: 25 },
-      { stage: 'Provided Contact Info', count: totalLeads, percentage: conversionRate, dropoff: 75 - conversionRate },
-      { stage: 'Qualified Lead', count: Math.floor(totalLeads * 0.6), percentage: conversionRate * 0.6, dropoff: conversionRate * 0.4 }
+      { stage: 'Provided Contact Info', count: totalLeads, percentage: conversionRate, dropoff: 100 - conversionRate },
     ];
 
     // Popular Questions Analysis
@@ -380,7 +375,7 @@ const Analytics = () => {
       totalConversations,
       totalLeads,
       totalMessages,
-      avgResponseTime,
+      
       conversionRate,
       activeUsers,
       topChatbots: topChatbots as any,
@@ -402,7 +397,7 @@ const Analytics = () => {
         ['Total Messages', analytics.totalMessages],
         ['Conversion Rate', `${analytics.conversionRate.toFixed(2)}%`],
         ['Active Users', analytics.activeUsers],
-        ['Avg Response Time', `${analytics.avgResponseTime}s`],
+        
         ['', ''],
         ['Top Chatbots', ''],
         ...analytics.topChatbots.map(bot => [bot.name, `${bot.conversations} conversations, ${bot.leads} leads`])
@@ -582,17 +577,6 @@ const Analytics = () => {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Avg Response</p>
-                  <p className="text-2xl font-bold">{analytics.avgResponseTime}s</p>
-                </div>
-                <Clock className="h-8 w-8 text-blue-500" />
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
         {/* Charts */}
@@ -761,12 +745,6 @@ const Analytics = () => {
                       </div>
                     )}
                     
-                    {analytics.avgResponseTime > 5 && (
-                      <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                        <p className="font-medium text-blue-800">⚡ Speed improvement</p>
-                        <p className="text-sm text-blue-600">Response time of {analytics.avgResponseTime}s could be optimized for better user experience.</p>
-                      </div>
-                    )}
                     
                     {analytics.totalConversations > 100 && (
                       <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">

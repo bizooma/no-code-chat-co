@@ -486,7 +486,7 @@ const Dashboard = () => {
                 <span className="text-sm font-medium">Leads</span>
               </Button>
             </Link>
-            <Link to="/lead-integrations">
+            <Link to="/leads/integrations">
               <Button variant="outline" className="w-full h-auto p-4 flex flex-col items-center gap-2">
                 <Target className="h-5 w-5" />
                 <span className="text-sm font-medium">Integrations</span>

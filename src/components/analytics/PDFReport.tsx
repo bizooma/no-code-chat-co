@@ -123,10 +123,6 @@ const PDFReport: React.FC<PDFReportProps> = ({ analytics, dateRange, chatbotName
               <div class="metric-value">${analytics.activeUsers}</div>
               <div class="metric-label">Active Users</div>
             </div>
-            <div class="metric-card">
-              <div class="metric-value">${analytics.avgResponseTime}s</div>
-              <div class="metric-label">Avg Response Time</div>
-            </div>
           </div>
           
           <div class="section">
@@ -191,7 +187,7 @@ const PDFReport: React.FC<PDFReportProps> = ({ analytics, dateRange, chatbotName
   return (
     <Button variant="outline" size="sm" onClick={generatePDFReport}>
       <FileText className="mr-2 h-4 w-4" />
-      Download Report
+      Export HTML
     </Button>
   );
 };
