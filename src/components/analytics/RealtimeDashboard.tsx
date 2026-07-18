@@ -9,7 +9,6 @@ interface RealtimeStats {
   activeConversations: number;
   onlineVisitors: number;
   messagesLastHour: number;
-  responseRate: number;
 }
 
 interface RealtimeDashboardProps {
