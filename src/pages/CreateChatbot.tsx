@@ -124,6 +124,9 @@ const CreateChatbot = () => {
 
     setLoading(true);
     try {
+      const selectedTemplate = templates.find(t => t.id === formData.template_id);
+      const templateWelcome = selectedTemplate?.template_config?.welcome_message;
+
       const { data, error } = await supabase
         .from('chatbots')
         .insert({
@@ -131,7 +134,7 @@ const CreateChatbot = () => {
           description: formData.description || null,
           workspace_id: formData.workspace_id,
           created_by: user?.id,
-          welcome_message: formData.welcome_message,
+          welcome_message: templateWelcome || formData.welcome_message,
           ai_enabled: formData.ai_enabled,
           ai_model: formData.ai_enabled ? formData.ai_model : null,
           widget_config: formData.widget_config,
@@ -143,12 +146,29 @@ const CreateChatbot = () => {
 
       if (error) throw error;
 
+      // Seed messages from template if present
+      const templateMessages = selectedTemplate?.template_config?.messages as any[] | undefined;
+      if (templateMessages && templateMessages.length > 0) {
+        const rows = templateMessages.map((m: any) => ({
+          chatbot_id: data.id,
+          message_key: m.key,
+          message_text: m.text,
+          message_type: m.type || 'text',
+          buttons: m.type === 'button' && Array.isArray(m.buttons) ? m.buttons : null,
+          collect_lead_info: !!m.collect_lead,
+          conditions: m.collect_lead && Array.isArray(m.lead_fields)
+            ? { lead_fields: m.lead_fields }
+            : null,
+        }));
+        const { error: msgErr } = await supabase.from('chatbot_messages').insert(rows);
+        if (msgErr) console.error('Template seed error:', msgErr);
+      }
+
       toast({
         title: "Success!",
         description: "Chatbot created successfully",
       });
 
-      // Navigate to editor
       navigate(`/chatbots/${data.id}/editor`);
     } catch (error) {
       console.error('Error creating chatbot:', error);

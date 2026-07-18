@@ -6,43 +6,54 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+async function verifySignature(rawBody: string, signatureHeader: string | null, secret: string) {
+  if (!signatureHeader || !signatureHeader.startsWith('sha256=')) return false;
+  const expected = signatureHeader.slice('sha256='.length);
+  const key = await crypto.subtle.importKey(
+    'raw', new TextEncoder().encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+  );
+  const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(rawBody));
+  const hex = Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, '0')).join('');
+  if (hex.length !== expected.length) return false;
+  let diff = 0;
+  for (let i = 0; i < hex.length; i++) diff |= hex.charCodeAt(i) ^ expected.charCodeAt(i);
+  return diff === 0;
+}
+
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
-
-  console.log('[FACEBOOK-MESSENGER] Request received:', req.method);
 
   try {
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
+    const VERIFY_TOKEN = Deno.env.get('META_VERIFY_TOKEN') ?? '';
+    const APP_SECRET = Deno.env.get('META_APP_SECRET') ?? '';
 
     if (req.method === 'GET') {
-      // Handle Facebook webhook verification
       const url = new URL(req.url);
       const mode = url.searchParams.get('hub.mode');
       const token = url.searchParams.get('hub.verify_token');
       const challenge = url.searchParams.get('hub.challenge');
 
-      console.log('[FACEBOOK-MESSENGER] Webhook verification:', { mode, token });
-
-      // You would typically verify the token against your stored verification token
-      if (mode === 'subscribe' && token) {
-        console.log('[FACEBOOK-MESSENGER] Webhook verified');
+      if (mode === 'subscribe' && VERIFY_TOKEN && token === VERIFY_TOKEN) {
         return new Response(challenge, { status: 200 });
       }
-
       return new Response('Verification failed', { status: 403 });
     }
 
     if (req.method === 'POST') {
-      const body = await req.json();
-      console.log('[FACEBOOK-MESSENGER] Webhook event:', JSON.stringify(body, null, 2));
+      const rawBody = await req.text();
+      if (!APP_SECRET || !(await verifySignature(rawBody, req.headers.get('x-hub-signature-256'), APP_SECRET))) {
+        console.warn('[FACEBOOK-MESSENGER] Invalid signature');
+        return new Response('Invalid signature', { status: 401 });
+      }
+      const body = JSON.parse(rawBody);
 
-      // Process Facebook Messenger webhook events
       if (body.object === 'page') {
         for (const entry of body.entry) {
           if (entry.messaging) {
@@ -60,6 +71,7 @@ serve(async (req) => {
     }
 
     return new Response('Method not allowed', { status: 405 });
+
 
   } catch (error) {
     console.error('[FACEBOOK-MESSENGER] Error:', error);

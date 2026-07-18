@@ -23,3 +23,15 @@ verify_jwt = true
 
 [functions.generate-chat-response]
 verify_jwt = false
+
+[functions.admin-list-users]
+verify_jwt = true
+
+[functions.slack-notifications]
+verify_jwt = false
+
+[functions.facebook-messenger-webhook]
+verify_jwt = false
+
+[functions.whatsapp-business-webhook]
+verify_jwt = false
