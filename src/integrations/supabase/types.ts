@@ -847,6 +847,30 @@ export type Database = {
         }
         Relationships: []
       }
+      rate_limit_events: {
+        Row: {
+          chatbot_id: string | null
+          conversation_id: string | null
+          created_at: string
+          id: number
+          ip: string
+        }
+        Insert: {
+          chatbot_id?: string | null
+          conversation_id?: string | null
+          created_at?: string
+          id?: number
+          ip: string
+        }
+        Update: {
+          chatbot_id?: string | null
+          conversation_id?: string | null
+          created_at?: string
+          id?: number
+          ip?: string
+        }
+        Relationships: []
+      }
       user_notification_preferences: {
         Row: {
           created_at: string | null
@@ -1048,18 +1072,21 @@ export type Database = {
         Row: {
           created_at: string
           openai_key: string
+          openai_key_secret_id: string | null
           updated_at: string
           workspace_id: string
         }
         Insert: {
           created_at?: string
           openai_key: string
+          openai_key_secret_id?: string | null
           updated_at?: string
           workspace_id: string
         }
         Update: {
           created_at?: string
           openai_key?: string
+          openai_key_secret_id?: string | null
           updated_at?: string
           workspace_id?: string
         }
@@ -1109,6 +1136,32 @@ export type Database = {
             foreignKeyName: "workspace_members_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_plan: {
+        Row: {
+          tier: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          tier?: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          tier?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_plan_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: true
             referencedRelation: "workspaces"
             referencedColumns: ["id"]
           },
@@ -1186,6 +1239,10 @@ export type Database = {
         Args: { email: string; full_name: string; password: string }
         Returns: string
       }
+      delete_workspace_ai_key: {
+        Args: { _workspace_id: string }
+        Returns: undefined
+      }
       get_avatar_widget_config: {
         Args: { _chatbot_id: string }
         Returns: {
@@ -1223,6 +1280,10 @@ export type Database = {
       is_workspace_member: {
         Args: { user_uuid: string; workspace_uuid: string }
         Returns: boolean
+      }
+      set_workspace_ai_key: {
+        Args: { _key: string; _workspace_id: string }
+        Returns: undefined
       }
       workspace_has_ai_key: {
         Args: { _workspace_id: string }
