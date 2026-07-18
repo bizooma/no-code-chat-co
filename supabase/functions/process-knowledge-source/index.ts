@@ -94,14 +94,45 @@ serve(async (req) => {
       metadata.fileSize = sourceData.fileSize;
       metadata.fileType = extension;
     } else if (sourceType === 'url') {
-      // Scrape URL
+      // Scrape URL — with SSRF protection
       try {
         console.log('[PROCESS-KNOWLEDGE] Fetching URL:', sourceData);
-        const response = await fetch(sourceData, {
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (compatible; KnowledgeBot/1.0)',
-          },
+
+        let parsed: URL;
+        try { parsed = new URL(sourceData); } catch {
+          throw new Error('Invalid URL');
+        }
+        if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+          throw new Error('Only http(s) URLs are allowed');
+        }
+        const host = parsed.hostname.toLowerCase();
+        const blockedHostnames = ['localhost', 'metadata.google.internal', 'metadata.goog'];
+        if (blockedHostnames.includes(host)) throw new Error('Blocked host');
+        // Block IP literals in private / loopback / link-local ranges
+        const ipv4 = host.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+        if (ipv4) {
+          const [a, b] = [parseInt(ipv4[1]), parseInt(ipv4[2])];
+          if (
+            a === 10 || a === 127 || a === 0 ||
+            (a === 172 && b >= 16 && b <= 31) ||
+            (a === 192 && b === 168) ||
+            (a === 169 && b === 254) ||
+            a >= 224
+          ) throw new Error('Private/reserved IP blocked');
+        }
+        if (host === '::1' || host.startsWith('fc') || host.startsWith('fd') || host.startsWith('fe80')) {
+          throw new Error('Private IPv6 blocked');
+        }
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        const response = await fetch(parsed.toString(), {
+          headers: { 'User-Agent': 'Mozilla/5.0 (compatible; KnowledgeBot/1.0)' },
+          redirect: 'error',
+          signal: controller.signal,
         });
+        clearTimeout(timeoutId);
+
         
         if (!response.ok) {
           throw new Error(`Failed to fetch URL: ${response.status}`);
