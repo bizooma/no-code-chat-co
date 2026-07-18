@@ -572,7 +572,7 @@ const Landing = () => {
             <h4 className="text-2xl font-bold text-center mb-8">Bot Type Availability</h4>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
               <div className="font-semibold text-left">Bot Type</div>
-              <div className="font-semibold">Starter</div>
+              <div className="font-semibold">Free</div>
               <div className="font-semibold">Professional</div>
               <div className="font-semibold">Enterprise</div>
               
