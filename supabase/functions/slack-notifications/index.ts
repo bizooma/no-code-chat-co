@@ -20,8 +20,70 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { workspace_id, lead, test = false } = await req.json();
-    console.log('[SLACK-NOTIFICATIONS] Processing notification:', { workspace_id, lead, test });
+    const { workspace_id: rawWorkspaceId, lead, leadId, test = false } = await req.json();
+    console.log('[SLACK-NOTIFICATIONS] Processing notification:', { rawWorkspaceId, leadId, test });
+
+    // Derive workspace_id server-side from the lead when a leadId is provided;
+    // never trust a client-supplied workspace_id for real (non-test) notifications.
+    let workspace_id: string | null = null;
+    let derivedLead: any = lead;
+
+    if (leadId) {
+      const { data: leadRow, error: leadErr } = await supabaseClient
+        .from('leads')
+        .select('*, chatbots(id, workspace_id, name)')
+        .eq('id', leadId)
+        .maybeSingle();
+      if (leadErr || !leadRow) {
+        return new Response(JSON.stringify({ error: 'Lead not found' }), {
+          status: 404,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      workspace_id = leadRow.workspace_id;
+      derivedLead = {
+        name: leadRow.name,
+        email: leadRow.email,
+        phone: leadRow.phone,
+        company: leadRow.company,
+        source: leadRow.source,
+        chatbot: (leadRow as any).chatbots?.name,
+      };
+    } else if (test) {
+      // Test notifications from the UI: caller must be authenticated and own the workspace
+      const authHeader = req.headers.get('Authorization');
+      if (!authHeader) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      const userClient = createClient(
+        Deno.env.get('SUPABASE_URL') ?? '',
+        Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+        { global: { headers: { Authorization: authHeader } } }
+      );
+      const { data: userData } = await userClient.auth.getUser();
+      if (!userData?.user) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      const { data: isMember } = await supabaseClient.rpc('is_workspace_member', {
+        user_uuid: userData.user.id, workspace_uuid: rawWorkspaceId,
+      });
+      if (!isMember) {
+        return new Response(JSON.stringify({ error: 'Forbidden' }), {
+          status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      workspace_id = rawWorkspaceId;
+    } else {
+      return new Response(JSON.stringify({ error: 'leadId required' }), {
+        status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const lead_for_msg = derivedLead || {};
 
     // Get Slack integration for the workspace
     const { data: integration, error: integrationError } = await supabaseClient
