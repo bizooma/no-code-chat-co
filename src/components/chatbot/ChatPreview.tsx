@@ -13,6 +13,9 @@ interface Chatbot {
   welcome_message: string;
   fallback_message: string;
   widget_config: any;
+  ai_enabled?: boolean;
+  ai_model?: string | null;
+  ai_prompt?: string | null;
 }
 
 interface ChatbotMessage {
