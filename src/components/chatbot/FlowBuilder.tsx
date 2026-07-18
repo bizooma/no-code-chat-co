@@ -462,8 +462,8 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
               <Button variant="outline" onClick={() => setDialogOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={addMessage}>
-                Add Message
+              <Button onClick={saveMessage}>
+                {editingMessage ? 'Save Changes' : 'Add Message'}
               </Button>
             </DialogFooter>
           </DialogContent>
