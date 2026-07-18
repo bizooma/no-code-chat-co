@@ -71,17 +71,11 @@ const AvatarChatbot: React.FC<AvatarChatbotProps> = ({ chatbotId, onClose }) => 
 
     setIsLoading(true);
     try {
-      // Fetch D-ID agent credentials from database
-      const { data: chatbotData, error: fetchError } = await supabase
-        .from('avatar_chatbots')
-        .select('did_agent_id, did_client_key')
-        .eq('id', chatbotId)
-        .single();
-
-      if (fetchError) {
-        console.error("Error fetching D-ID credentials:", fetchError);
-        throw new Error("Failed to fetch D-ID agent credentials");
-      }
+      // Reuse config already loaded via get_avatar_widget_config RPC
+      const chatbotData = chatbot as {
+        did_agent_id?: string | null;
+        did_client_key?: string | null;
+      };
 
       if (!chatbotData?.did_agent_id || !chatbotData?.did_client_key) {
         toast({
