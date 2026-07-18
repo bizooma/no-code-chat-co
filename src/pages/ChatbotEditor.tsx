@@ -32,6 +32,7 @@ import { VideoTemplateLibrary } from '@/components/templates/VideoTemplateLibrar
 import { ABTestDashboard } from '@/components/analytics/ABTestDashboard';
 import { HeatMapVisualizer } from '@/components/analytics/HeatMapVisualizer';
 import { ChatPreview } from '@/components/chatbot/ChatPreview';
+import { AiKeyAndUsagePanel } from '@/components/chatbot/AiKeyAndUsagePanel';
 
 interface Chatbot {
   id: string;
