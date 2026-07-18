@@ -20,7 +20,6 @@ const RealtimeDashboard: React.FC<RealtimeDashboardProps> = ({ chatbotId }) => {
     activeConversations: 0,
     onlineVisitors: 0,
     messagesLastHour: 0,
-    responseRate: 0
   });
   
   const [isActive, setIsActive] = useState(true);
