@@ -720,8 +720,8 @@ const Landing = () => {
             Ready to Build Your First Chatbot?
           </h3>
           <p className="text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
-            Join thousands of businesses already using SupportBots.dev to improve 
-            their customer engagement and generate more leads.
+            Use SupportBots to improve your customer engagement and generate
+            more leads — no code required.
           </p>
           <Link to="/auth">
             <Button variant="secondary" size="lg" className="flex items-center space-x-2 mx-auto">
