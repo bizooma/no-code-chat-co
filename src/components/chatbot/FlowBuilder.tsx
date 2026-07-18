@@ -478,7 +478,7 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
             <p className="text-muted-foreground mb-4">
               Start building your chatbot conversation flow by adding your first message.
             </p>
-            <Button onClick={() => setDialogOpen(true)}>
+            <Button onClick={openAddDialog}>
               <Plus className="mr-2 h-4 w-4" />
               Add First Message
             </Button>
