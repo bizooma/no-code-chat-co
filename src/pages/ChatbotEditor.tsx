@@ -29,7 +29,7 @@ import { useToast } from '@/hooks/use-toast';
 import { FlowBuilder } from '@/components/chatbot/FlowBuilder';
 import { VideoAnalytics } from '@/components/video/VideoAnalytics';
 import { VideoTemplateLibrary } from '@/components/templates/VideoTemplateLibrary';
-import { ABTestDashboard } from '@/components/analytics/ABTestDashboard';
+
 import { HeatMapVisualizer } from '@/components/analytics/HeatMapVisualizer';
 import { ChatPreview } from '@/components/chatbot/ChatPreview';
 import { AiKeyAndUsagePanel } from '@/components/chatbot/AiKeyAndUsagePanel';
