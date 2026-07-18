@@ -324,12 +324,34 @@ export const VideoFlowBuilder = forwardRef<VideoFlowBuilderRef, VideoFlowBuilder
       r.id === responseId ? { ...r, [field]: value } : r
     );
     updateNodeData('responses', updatedResponses);
+
+    // Keep canvas edges in sync when the target is changed via the dropdown
+    if (field === 'next_node_id') {
+      setEdges((eds) => {
+        const withoutOld = eds.filter(
+          (e) => !(e.source === selectedNode.id && e.sourceHandle === responseId)
+        );
+        if (!value) return withoutOld;
+        return [
+          ...withoutOld,
+          {
+            id: `${selectedNode.id}-${responseId}-${value}`,
+            source: selectedNode.id,
+            sourceHandle: responseId,
+            target: value,
+          },
+        ];
+      });
+    }
   };
 
   const deleteResponse = (responseId: string) => {
     if (!selectedNode) return;
     const currentResponses = (selectedNode.data.responses || []) as any[];
     updateNodeData('responses', currentResponses.filter((r) => r.id !== responseId));
+    setEdges((eds) =>
+      eds.filter((e) => !(e.source === selectedNode.id && e.sourceHandle === responseId))
+    );
   };
 
   const handleSave = () => {
