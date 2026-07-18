@@ -387,7 +387,11 @@ const ChatbotEditor = () => {
                 <Card>
                   <CardHeader>
                     <CardTitle>AI Configuration</CardTitle>
-                    <CardDescription>Configure AI-powered responses</CardDescription>
+                    <CardDescription>
+                      When AI is on, free-text messages are answered by OpenAI. Free-form
+                      usage counts against your plan's monthly message quota unless you add
+                      your own OpenAI key below.
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
@@ -395,12 +399,11 @@ const ChatbotEditor = () => {
                       <select
                         id="ai_model"
                         className="w-full px-3 py-2 border border-input bg-background rounded-md"
-                        value={chatbot.ai_model || 'gpt-3.5-turbo'}
+                        value={chatbot.ai_model || 'gpt-4o-mini'}
                         onChange={(e) => setChatbot(prev => prev ? { ...prev, ai_model: e.target.value } : null)}
                       >
-                        <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-                        <option value="gpt-4">GPT-4</option>
-                        <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                        <option value="gpt-4o-mini">GPT-4o mini (default — cheap & fast)</option>
+                        <option value="gpt-4o">GPT-4o (higher quality)</option>
                       </select>
                     </div>
 
@@ -414,6 +417,8 @@ const ChatbotEditor = () => {
                         rows={4}
                       />
                     </div>
+
+                    <AiKeyAndUsagePanel workspaceId={chatbot.workspace_id} />
                   </CardContent>
                 </Card>
               )}
