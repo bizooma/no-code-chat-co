@@ -400,7 +400,7 @@ const Analytics = () => {
         ['Total Messages', analytics.totalMessages],
         ['Conversion Rate', `${analytics.conversionRate.toFixed(2)}%`],
         ['Active Users', analytics.activeUsers],
-        ['Avg Response Time', `${analytics.avgResponseTime}s`],
+        
         ['', ''],
         ['Top Chatbots', ''],
         ...analytics.topChatbots.map(bot => [bot.name, `${bot.conversations} conversations, ${bot.leads} leads`])
