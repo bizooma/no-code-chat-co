@@ -1,14 +1,12 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import Stripe from "https://esm.sh/stripe@18.5.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Adjust these before shipping to prod.
 const PLAN_QUOTAS: Record<string, number> = {
   free: 100,
   professional: 3000,
@@ -18,8 +16,10 @@ const PLAN_QUOTAS: Record<string, number> = {
 
 const ALLOWED_MODELS = new Set(["gpt-4o-mini", "gpt-4o"]);
 const DEFAULT_MODEL = "gpt-4o-mini";
-const MAX_INPUT_CHARS = 4000;
+const MAX_INPUT_CHARS = 2000;
 const MAX_HISTORY = 12;
+const IP_LIMIT_PER_MINUTE = 20;
+const CONVERSATION_MSG_CAP = 50;
 
 interface HistoryItem {
   sender: "bot" | "user";
@@ -28,6 +28,21 @@ interface HistoryItem {
 
 const log = (step: string, details?: unknown) =>
   console.log(`[generate-chat-response] ${step}${details ? " " + JSON.stringify(details) : ""}`);
+
+function getClientIp(req: Request): string {
+  const fwd = req.headers.get("x-forwarded-for");
+  if (fwd) return fwd.split(",")[0].trim();
+  return req.headers.get("cf-connecting-ip") || req.headers.get("x-real-ip") || "unknown";
+}
+
+function normalizeOrigin(v: string | null): string | null {
+  if (!v) return null;
+  try {
+    return new URL(v).host.toLowerCase();
+  } catch {
+    return v.toLowerCase();
+  }
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -41,6 +56,7 @@ serve(async (req) => {
   try {
     const body = await req.json().catch(() => ({}));
     const chatbotId: string | undefined = body.chatbotId;
+    const conversationId: string | undefined = body.conversationId;
     const userMessage: string | undefined = body.message;
     const history: HistoryItem[] = Array.isArray(body.history) ? body.history : [];
 
@@ -51,13 +67,48 @@ serve(async (req) => {
       return json({ error: "message required" }, 400);
     }
     if (userMessage.length > MAX_INPUT_CHARS) {
-      return json({ error: "message too long" }, 400);
+      return json({ error: `Message too long (max ${MAX_INPUT_CHARS} characters).` }, 400);
+    }
+
+    const ip = getClientIp(req);
+
+    // Per-IP sliding window rate limit (fail-open on limiter error).
+    try {
+      const since = new Date(Date.now() - 60_000).toISOString();
+      const { count } = await supabase
+        .from("rate_limit_events")
+        .select("id", { count: "exact", head: true })
+        .eq("ip", ip)
+        .gte("created_at", since);
+      if ((count ?? 0) >= IP_LIMIT_PER_MINUTE) {
+        return json(
+          { error: "Too many requests. Please slow down and try again in a minute.", rateLimited: true },
+          429,
+        );
+      }
+    } catch (e) {
+      log("ip rate check failed (allowing)", { e: String(e) });
+    }
+
+    // Per-conversation cap (fail-open).
+    if (conversationId) {
+      try {
+        const { count } = await supabase
+          .from("rate_limit_events")
+          .select("id", { count: "exact", head: true })
+          .eq("conversation_id", conversationId);
+        if ((count ?? 0) >= CONVERSATION_MSG_CAP) {
+          return json({ error: "This conversation has reached its message limit.", conversationLimitReached: true }, 200);
+        }
+      } catch (e) {
+        log("conv cap check failed (allowing)", { e: String(e) });
+      }
     }
 
     // Load chatbot
     const { data: bot, error: botErr } = await supabase
       .from("chatbots")
-      .select("id, workspace_id, name, ai_enabled, ai_model, ai_prompt, fallback_message, status")
+      .select("id, workspace_id, name, ai_enabled, ai_model, ai_prompt, fallback_message, status, widget_config")
       .eq("id", chatbotId)
       .maybeSingle();
 
@@ -66,30 +117,61 @@ serve(async (req) => {
     if (bot.status !== "active") return json({ error: "chatbot inactive" }, 400);
     if (!bot.ai_enabled) return json({ error: "ai not enabled for this chatbot" }, 400);
 
+    // Origin allowlist (soft): only enforce when configured.
+    const allowed: string[] = Array.isArray((bot.widget_config as any)?.allowed_domains)
+      ? ((bot.widget_config as any).allowed_domains as string[]).map((d) => d.toLowerCase().trim()).filter(Boolean)
+      : [];
+    if (allowed.length > 0) {
+      const originHost = normalizeOrigin(req.headers.get("origin")) || normalizeOrigin(req.headers.get("referer"));
+      const ok = originHost && allowed.some((d) => originHost === d || originHost.endsWith("." + d));
+      if (!ok) {
+        log("origin blocked", { originHost, allowed });
+        return json({ error: "This chatbot is not permitted on this domain." }, 403);
+      }
+    }
+
     const model = ALLOWED_MODELS.has(bot.ai_model ?? "") ? bot.ai_model! : DEFAULT_MODEL;
     const systemPrompt =
       bot.ai_prompt?.trim() ||
       `You are a helpful support assistant for ${bot.name}. Answer clearly and concisely.`;
 
-    // Resolve key: BYO first
+    // Resolve key: BYO first (via Vault), else platform.
     let apiKey: string | null = null;
     let usingBYO = false;
     const { data: byoRow } = await supabase
       .from("workspace_ai_keys")
-      .select("openai_key")
+      .select("openai_key, openai_key_secret_id")
       .eq("workspace_id", bot.workspace_id)
       .maybeSingle();
-    if (byoRow?.openai_key) {
+
+    if (byoRow?.openai_key_secret_id) {
+      const { data: dec } = await supabase
+        .schema("vault")
+        .from("decrypted_secrets")
+        .select("decrypted_secret")
+        .eq("id", byoRow.openai_key_secret_id)
+        .maybeSingle();
+      if (dec?.decrypted_secret) {
+        apiKey = dec.decrypted_secret;
+        usingBYO = true;
+      }
+    } else if (byoRow?.openai_key) {
+      // Legacy plaintext fallback (should be migrated already).
       apiKey = byoRow.openai_key;
       usingBYO = true;
     }
 
-    // Platform key + quota enforcement
+    // Platform key + quota enforcement (tier from workspace_plan cache)
     if (!apiKey) {
       apiKey = Deno.env.get("OPENAI_API_KEY") ?? null;
       if (!apiKey) return json({ error: "AI is not configured" }, 500);
 
-      const tier = await resolveWorkspaceTier(supabase, bot.workspace_id);
+      const { data: planRow } = await supabase
+        .from("workspace_plan")
+        .select("tier")
+        .eq("workspace_id", bot.workspace_id)
+        .maybeSingle();
+      const tier = planRow?.tier ?? "free"; // fail closed
       const quota = PLAN_QUOTAS[tier] ?? PLAN_QUOTAS.free;
 
       const period = new Date();
@@ -109,6 +191,13 @@ serve(async (req) => {
         return json({ limitReached: true, tier, quota, used }, 200);
       }
     }
+
+    // Log the request for rate limiting AFTER limits pass, BEFORE OpenAI call
+    await supabase.from("rate_limit_events").insert({
+      ip,
+      chatbot_id: chatbotId,
+      conversation_id: conversationId ?? null,
+    });
 
     // Build messages
     const trimmedHistory = history.slice(-MAX_HISTORY).map((h) => ({
@@ -147,12 +236,19 @@ serve(async (req) => {
       bot.fallback_message ||
       "Sorry, I couldn't generate a response.";
 
-    // Meter only when using the platform key
     if (!usingBYO) {
       const { error: incErr } = await supabase.rpc("increment_ai_usage", {
         _workspace_id: bot.workspace_id,
       });
       if (incErr) log("increment_ai_usage error", incErr);
+    }
+
+    // Best-effort cleanup of old rate-limit rows (>10 min)
+    try {
+      const cutoff = new Date(Date.now() - 10 * 60_000).toISOString();
+      await supabase.from("rate_limit_events").delete().lt("created_at", cutoff);
+    } catch {
+      /* ignore */
     }
 
     return json({ reply, model, usingBYO }, 200);
@@ -162,47 +258,6 @@ serve(async (req) => {
     return json({ error: msg }, 500);
   }
 });
-
-async function resolveWorkspaceTier(
-  supabase: ReturnType<typeof createClient>,
-  workspaceId: string,
-): Promise<string> {
-  try {
-    const { data: ws } = await supabase
-      .from("workspaces")
-      .select("owner_id")
-      .eq("id", workspaceId)
-      .maybeSingle();
-    if (!ws?.owner_id) return "free";
-
-    const { data: userRes } = await supabase.auth.admin.getUserById(ws.owner_id);
-    const email = userRes?.user?.email;
-    if (!email) return "free";
-
-    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-    if (!stripeKey) return "free";
-    const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
-    const customers = await stripe.customers.list({ email, limit: 1 });
-    if (customers.data.length === 0) return "free";
-
-    const subs = await stripe.subscriptions.list({
-      customer: customers.data[0].id,
-      status: "active",
-      limit: 1,
-    });
-    if (subs.data.length === 0) return "free";
-
-    const productId = subs.data[0].items.data[0].price.product as string;
-    const mapping: Record<string, string> = {
-      prod_T7Ih26ZMAehp3r: "professional",
-      prod_T7IkTHwZAItNtS: "enterprise",
-    };
-    return mapping[productId] ?? "free";
-  } catch (e) {
-    log("resolveWorkspaceTier failed", { e: String(e) });
-    return "free";
-  }
-}
 
 function json(body: unknown, status: number) {
   return new Response(JSON.stringify(body), {
