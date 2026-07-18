@@ -58,7 +58,7 @@ interface AnalyticsData {
   totalConversations: number;
   totalLeads: number;
   totalMessages: number;
-  avgResponseTime: number;
+  
   conversionRate: number;
   activeUsers: number;
   topChatbots: Array<{
