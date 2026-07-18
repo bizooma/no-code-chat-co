@@ -25,18 +25,12 @@
   window.SupportBots.loaded = true;
   window.SupportBots.chatbotId = chatbotId;
   
-  // Get the base URL from the script src or use default
+  // Get the base URL from the script src (where widget.js was loaded from).
+  // This is the SupportBots app origin, NOT the customer's site.
   var scriptSrc = currentScript.src;
-  var baseUrl = scriptSrc.substring(0, scriptSrc.lastIndexOf('/'));
-  
-  // If running locally, use localhost
-  if (baseUrl.includes('localhost') || baseUrl.includes('127.0.0.1')) {
-    baseUrl = 'http://localhost:8080';
-  } else {
-    // Production URL - replace with your actual domain
-    baseUrl = 'https://supportbots.dev';
-  }
-  
+  var scriptUrl = new URL(scriptSrc, window.location.href);
+  var baseUrl = scriptUrl.protocol + '//' + scriptUrl.host;
+
   // Supabase configuration
   var SUPABASE_URL = 'https://jsyqavxvspkqitrwbeay.supabase.co';
   var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzeXFhdnh2c3BrcWl0cndiZWF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwMjY2NjgsImV4cCI6MjA3MzYwMjY2OH0.JVFxiqvteDQToL3nrhCeKbJC8lm6LivGcVurXkT8AeQ';
