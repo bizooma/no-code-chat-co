@@ -38,7 +38,12 @@ export const VideoFlowWidget = ({ chatbotId, position = 'bottom-right' }: VideoF
 
   // Auto-transition to the appropriate widget state whenever the current node changes.
   useEffect(() => {
-    if (!currentNode || widgetState === WidgetState.MINIMIZED) return;
+    if (widgetState === WidgetState.MINIMIZED) return;
+    if (state.isComplete) {
+      setWidgetState(WidgetState.COMPLETED);
+      return;
+    }
+    if (!currentNode) return;
     if (currentNode.type === 'lead_capture') {
       setWidgetState(WidgetState.COLLECTING_LEAD);
     } else if (currentNode.type === 'end') {
@@ -46,7 +51,7 @@ export const VideoFlowWidget = ({ chatbotId, position = 'bottom-right' }: VideoF
     } else if (widgetState !== WidgetState.PLAYING) {
       setWidgetState(WidgetState.PLAYING);
     }
-  }, [currentNode?.id, currentNode?.type]);
+  }, [currentNode?.id, currentNode?.type, state.isComplete]);
 
   const handleOpen = () => {
     setWidgetState(WidgetState.PLAYING);
