@@ -63,7 +63,7 @@ const pricingTiers: PricingTier[] = [
     popular: true,
     features: [
       'Unlimited chatbots',
-      'Unlimited conversations',
+      'Unlimited conversations (fair use)',
       'Advanced analytics',
       'Lead integrations',
       'Custom branding',
