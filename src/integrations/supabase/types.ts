@@ -1122,6 +1122,18 @@ export type Database = {
         Args: { email: string; full_name: string; password: string }
         Returns: string
       }
+      get_avatar_widget_config: {
+        Args: { _chatbot_id: string }
+        Returns: {
+          did_agent_id: string
+          did_client_key: string
+          id: string
+          is_active: boolean
+          name: string
+          presenter_id: string
+          voice_id: string
+        }[]
+      }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
