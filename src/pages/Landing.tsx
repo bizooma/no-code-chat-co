@@ -198,14 +198,14 @@ const Landing = () => {
                 </div>
                 <CardTitle className="text-2xl mb-2">AvatarFlow</CardTitle>
                 <CardDescription className="text-base">
-                  Realistic AI avatars powered by HeyGen/D-ID
+                  Realistic AI avatars powered by D-ID
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="mb-6">
                   <h4 className="font-semibold text-sm text-foreground mb-3">How It Works:</h4>
                   <p className="text-sm text-muted-foreground mb-4">
-                    An AI-powered digital human that speaks to visitors in real-time. Uses GPT for natural language understanding and D-ID/HeyGen for realistic avatar animation. Visitors talk or type, the avatar responds with voice and video.
+                    An AI-powered digital human that speaks to visitors in real-time. Uses GPT for natural language understanding and D-ID for realistic avatar animation. Visitors talk or type, the avatar responds with voice and video.
                   </p>
                 </div>
 
