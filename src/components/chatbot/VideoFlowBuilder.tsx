@@ -226,7 +226,30 @@ export const VideoFlowBuilder = forwardRef<VideoFlowBuilderRef, VideoFlowBuilder
   );
 
   const onConnect = useCallback(
-    (connection: Connection) => setEdges((eds) => addEdge(connection, eds)),
+    (connection: Connection) => {
+      // If the connection came from a response-specific handle, wire that
+      // response's next_node_id so the runtime follows the same route.
+      if (connection.sourceHandle && connection.source && connection.target) {
+        setNodes((nds) =>
+          nds.map((n) => {
+            if (n.id !== connection.source) return n;
+            const responses = (n.data?.responses ?? []) as Array<{ id: string; next_node_id: string | null }>;
+            if (!responses.some((r) => r.id === connection.sourceHandle)) return n;
+            const updated = responses.map((r) =>
+              r.id === connection.sourceHandle ? { ...r, next_node_id: connection.target! } : r
+            );
+            return { ...n, data: { ...n.data, responses: updated } };
+          })
+        );
+      }
+      setEdges((eds) => {
+        // Ensure only one outgoing edge per (source, sourceHandle) pair
+        const filtered = connection.sourceHandle
+          ? eds.filter((e) => !(e.source === connection.source && e.sourceHandle === connection.sourceHandle))
+          : eds;
+        return addEdge(connection, filtered);
+      });
+    },
     []
   );
 
