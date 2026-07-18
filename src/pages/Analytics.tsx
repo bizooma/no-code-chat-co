@@ -238,8 +238,6 @@ const Analytics = () => {
     const totalMessages = messages.length;
     const conversionRate = totalConversations > 0 ? (totalLeads / totalConversations) * 100 : 0;
 
-    // Calculate average response time (simplified)
-    const avgResponseTime = 2.5; // Mock data for now
 
     // Active users (unique visitor IDs)
     const activeUsers = new Set(conversations.map(c => c.visitor_id)).size;
