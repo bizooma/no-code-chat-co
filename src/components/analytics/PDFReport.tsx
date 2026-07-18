@@ -123,10 +123,6 @@ const PDFReport: React.FC<PDFReportProps> = ({ analytics, dateRange, chatbotName
               <div class="metric-value">${analytics.activeUsers}</div>
               <div class="metric-label">Active Users</div>
             </div>
-            <div class="metric-card">
-              <div class="metric-value">${analytics.avgResponseTime}s</div>
-              <div class="metric-label">Avg Response Time</div>
-            </div>
           </div>
           
           <div class="section">
