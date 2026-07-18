@@ -8,62 +8,87 @@ const corsHeaders = {
 };
 
 interface EmailRequest {
-  leadId: string;
+  leadId?: string;
+  test?: boolean;
+  lead?: any;
+  workspaceId?: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { leadId }: EmailRequest = await req.json();
-    
+    const body: EmailRequest = await req.json().catch(() => ({} as EmailRequest));
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Get lead details
-    const { data: lead, error: leadError } = await supabase
-      .from('leads')
-      .select(`
-        *,
-        chatbots(name),
-        workspaces(name)
-      `)
-      .eq('id', leadId)
-      .single();
+    let lead: any;
+    let workspaceId: string | undefined;
 
-    if (leadError || !lead) {
-      throw new Error('Lead not found');
+    if (body.leadId) {
+      const { data, error } = await supabase
+        .from('leads')
+        .select(`*, chatbots(name), workspaces(name)`)
+        .eq('id', body.leadId)
+        .single();
+      if (error || !data) {
+        throw new Error('Lead not found');
+      }
+      lead = data;
+      workspaceId = data.workspace_id;
+    } else if (body.lead) {
+      lead = {
+        name: body.lead.name ?? 'Test User',
+        email: body.lead.email ?? 'test@example.com',
+        phone: body.lead.phone ?? null,
+        company: body.lead.company ?? null,
+        source: body.lead.source ?? 'test',
+        created_at: new Date().toISOString(),
+        additional_data: body.lead.additional_data ?? null,
+        chatbots: { name: body.lead.chatbot_name ?? 'Test Chatbot' },
+        workspaces: { name: body.lead.workspace_name ?? 'Test Workspace' },
+      };
+      workspaceId = body.workspaceId;
+    } else {
+      throw new Error('Provide either leadId or a lead payload');
     }
 
-    // Get email integration config
-    const { data: integration } = await supabase
-      .from('integrations')
-      .select('config')
-      .eq('workspace_id', lead.workspace_id)
-      .eq('integration_type', 'email')
-      .eq('is_active', true)
-      .single();
+    // Find email integration for this workspace (if any).
+    let config: any = null;
+    if (workspaceId) {
+      const { data: integration } = await supabase
+        .from('integrations')
+        .select('config')
+        .eq('workspace_id', workspaceId)
+        .eq('integration_type', 'email')
+        .eq('is_active', true)
+        .maybeSingle();
+      config = integration?.config ?? null;
+    }
 
-    if (!integration?.config) {
-      console.log('No email integration found for workspace');
+    // Test calls may include ad-hoc recipients/subject overrides
+    const recipients = body.lead?.recipients ?? config?.recipients ?? null;
+    if (!recipients || !Array.isArray(recipients) || recipients.length === 0) {
+      console.log('No recipients configured for workspace', workspaceId);
       return new Response(JSON.stringify({ success: false, message: 'No email integration configured' }), {
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    const config = integration.config as any;
     const resendApiKey = Deno.env.get('RESEND_API_KEY');
-
     if (!resendApiKey) {
       throw new Error('RESEND_API_KEY not configured');
     }
 
-    // Send email notification
+    const fromEmail = config?.from_email || 'notifications@resend.dev';
+    const subject = (config?.subject_template || 'New Lead Captured')
+      .replace('{chatbot_name}', lead.chatbots?.name || 'Chatbot');
+
     const emailResponse = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -71,11 +96,11 @@ const handler = async (req: Request): Promise<Response> => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: config.from_email || 'notifications@resend.dev',
-        to: config.recipients || ['admin@example.com'],
-        subject: config.subject_template?.replace('{chatbot_name}', lead.chatbots?.name || 'Chatbot') || 'New Lead Captured',
+        from: fromEmail,
+        to: recipients,
+        subject,
         html: `
-          <h2>New Lead Captured</h2>
+          <h2>New Lead Captured${body.test ? ' (Test)' : ''}</h2>
           <p><strong>Chatbot:</strong> ${lead.chatbots?.name || 'Unknown'}</p>
           <p><strong>Workspace:</strong> ${lead.workspaces?.name || 'Unknown'}</p>
           <p><strong>Name:</strong> ${lead.name || 'Not provided'}</p>
