@@ -321,22 +321,16 @@ export const VideoFlowAnalytics = ({ chatbotId, timeRange = '7d' }: VideoFlowAna
       label: 'Total Interactions',
       value: nodeMetrics.reduce((sum, n) => sum + n.views, 0),
       icon: Play,
-      trend: '+12%',
-      trendUp: true,
     },
     {
       label: 'Completion Rate',
       value: completionData ? `${Math.round((completionData.completed / (completionData.completed + completionData.partial + completionData.abandoned)) * 100)}%` : '0%',
       icon: CheckCircle,
-      trend: '+5%',
-      trendUp: true,
     },
     {
       label: 'Lead Capture Rate',
       value: `${leadCaptureRate}%`,
       icon: Users,
-      trend: '-2%',
-      trendUp: false,
     },
     {
       label: 'Avg. Watch Time',
@@ -344,8 +338,6 @@ export const VideoFlowAnalytics = ({ chatbotId, timeRange = '7d' }: VideoFlowAna
         ? `${Math.round(nodeMetrics.reduce((sum, n) => sum + n.avg_watch_time, 0) / nodeMetrics.length)}s`
         : '0s',
       icon: BarChart3,
-      trend: '+8%',
-      trendUp: true,
     },
   ];
 
@@ -367,10 +359,6 @@ export const VideoFlowAnalytics = ({ chatbotId, timeRange = '7d' }: VideoFlowAna
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{metric.value}</div>
-              <p className={`text-xs ${metric.trendUp ? 'text-green-600' : 'text-red-600'} flex items-center gap-1 mt-1`}>
-                {metric.trendUp ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-                {metric.trend} from last period
-              </p>
             </CardContent>
           </Card>
         ))}
