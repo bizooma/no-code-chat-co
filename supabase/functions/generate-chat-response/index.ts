@@ -135,29 +135,15 @@ serve(async (req) => {
       bot.ai_prompt?.trim() ||
       `You are a helpful support assistant for ${bot.name}. Answer clearly and concisely.`;
 
-    // Resolve key: BYO first (via Vault), else platform.
+    // Resolve key: BYO first (decrypted via Vault through service-role RPC), else platform.
     let apiKey: string | null = null;
     let usingBYO = false;
-    const { data: byoRow } = await supabase
-      .from("workspace_ai_keys")
-      .select("openai_key, openai_key_secret_id")
-      .eq("workspace_id", bot.workspace_id)
-      .maybeSingle();
-
-    if (byoRow?.openai_key_secret_id) {
-      const { data: dec } = await supabase
-        .schema("vault")
-        .from("decrypted_secrets")
-        .select("decrypted_secret")
-        .eq("id", byoRow.openai_key_secret_id)
-        .maybeSingle();
-      if (dec?.decrypted_secret) {
-        apiKey = dec.decrypted_secret;
-        usingBYO = true;
-      }
-    } else if (byoRow?.openai_key) {
-      // Legacy plaintext fallback (should be migrated already).
-      apiKey = byoRow.openai_key;
+    const { data: byoKey, error: byoErr } = await supabase.rpc("get_workspace_ai_key", {
+      _workspace_id: bot.workspace_id,
+    });
+    if (byoErr) log("get_workspace_ai_key error", byoErr);
+    if (typeof byoKey === "string" && byoKey.length > 0) {
+      apiKey = byoKey;
       usingBYO = true;
     }
 
