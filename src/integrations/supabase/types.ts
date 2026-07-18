@@ -1265,6 +1265,7 @@ export type Database = {
           workspace_id: string
         }[]
       }
+      get_workspace_ai_key: { Args: { _workspace_id: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
