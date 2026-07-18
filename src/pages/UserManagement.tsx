@@ -45,11 +45,20 @@ export default function UserManagement() {
 
       if (profilesError) throw profilesError;
 
-      // Get user emails from auth.users via admin API call would be needed
-      // For now, we'll work with what we can get from profiles
+      // Fetch emails via admin edge function (platform_owner only)
+      let emails: Record<string, string> = {};
+      try {
+        const { data: emailData, error: emailErr } = await supabase.functions.invoke('admin-list-users');
+        if (!emailErr && emailData?.emails) {
+          emails = emailData.emails;
+        }
+      } catch (e) {
+        console.warn('Could not fetch emails:', e);
+      }
+
       const usersWithRoles = profilesData?.map(profile => ({
         id: profile.user_id,
-        email: 'Email not available', // Would need admin API
+        email: emails[profile.user_id] || 'Email not available',
         full_name: profile.full_name || 'No name',
         role: Array.isArray(profile.user_roles) && profile.user_roles.length > 0 
           ? profile.user_roles[0].role 
