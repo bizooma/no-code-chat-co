@@ -268,7 +268,7 @@ export const KnowledgeBaseManager = ({ chatbotId }: KnowledgeBaseManagerProps) =
             <CardHeader>
               <CardTitle>Upload Documents</CardTitle>
               <CardDescription>
-                Upload PDF, DOCX, TXT, or MD files (max 10MB)
+                Upload TXT or MD files (max 10MB). PDF/DOCX parsing coming soon — paste text for now.
               </CardDescription>
             </CardHeader>
             <CardContent>
