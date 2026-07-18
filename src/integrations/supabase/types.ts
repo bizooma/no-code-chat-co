@@ -83,6 +83,41 @@ export type Database = {
           },
         ]
       }
+      ai_usage: {
+        Row: {
+          created_at: string
+          id: string
+          message_count: number
+          period_month: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message_count?: number
+          period_month: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message_count?: number
+          period_month?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_usage_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       analytics_events: {
         Row: {
           chatbot_id: string
@@ -1009,6 +1044,35 @@ export type Database = {
           },
         ]
       }
+      workspace_ai_keys: {
+        Row: {
+          created_at: string
+          openai_key: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          openai_key: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          openai_key?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_ai_keys_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: true
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_members: {
         Row: {
           accepted_at: string | null
@@ -1151,12 +1215,17 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_ai_usage: { Args: { _workspace_id: string }; Returns: number }
       is_workspace_admin: {
         Args: { user_uuid: string; workspace_uuid: string }
         Returns: boolean
       }
       is_workspace_member: {
         Args: { user_uuid: string; workspace_uuid: string }
+        Returns: boolean
+      }
+      workspace_has_ai_key: {
+        Args: { _workspace_id: string }
         Returns: boolean
       }
     }
