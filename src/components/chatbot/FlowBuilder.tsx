@@ -277,18 +277,18 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
           </p>
         </div>
         
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) setEditingMessage(null); }}>
           <DialogTrigger asChild>
-            <Button>
+            <Button onClick={openAddDialog}>
               <Plus className="mr-2 h-4 w-4" />
               Add Message
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Add New Message</DialogTitle>
+              <DialogTitle>{editingMessage ? 'Edit Message' : 'Add New Message'}</DialogTitle>
               <DialogDescription>
-                Create a new message in your chatbot flow
+                {editingMessage ? 'Update this message in your flow' : 'Create a new message in your chatbot flow'}
               </DialogDescription>
             </DialogHeader>
 
