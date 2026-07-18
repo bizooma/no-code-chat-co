@@ -350,6 +350,20 @@ export const ChatPreview: React.FC<ChatPreviewProps> = ({
       <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
         <div className="space-y-4">
           {conversation.map(renderMessage)}
+          {isTyping && (
+            <div className="flex gap-3 mb-4">
+              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+                <Bot className="h-4 w-4 text-primary-foreground" />
+              </div>
+              <div className="rounded-lg px-3 py-2 bg-muted">
+                <span className="inline-flex gap-1">
+                  <span className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce" />
+                  <span className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <span className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                </span>
+              </div>
+            </div>
+          )}
         </div>
       </ScrollArea>
 
