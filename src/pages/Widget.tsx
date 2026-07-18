@@ -288,6 +288,8 @@ const Widget = () => {
     await saveMessage('bot', message.message_text, convId);
   };
 
+  const [isTyping, setIsTyping] = useState(false);
+
   const handleUserMessage = async (text: string, nextKey?: string) => {
     // Add user message to conversation
     const userMessage: ConversationMessage = {
@@ -301,9 +303,9 @@ const Widget = () => {
     setCurrentInput('');
     await saveMessage('user', text);
 
-    // Process next message
-    setTimeout(async () => {
-      if (nextKey) {
+    // Button path: follow the flow
+    if (nextKey) {
+      setTimeout(async () => {
         const nextMessage = findMessage(nextKey);
         if (nextMessage) {
           setCurrentMessageKey(nextKey);
@@ -311,18 +313,66 @@ const Widget = () => {
         } else {
           setCurrentMessageKey(null);
         }
-      } else {
-        // Fallback message
-        const fallbackMessage: ConversationMessage = {
+      }, 500);
+      return;
+    }
+
+    // Free-text path: use AI when enabled, otherwise fallback
+    const aiEnabled = (chatbot as any)?.ai_enabled;
+    if (aiEnabled && chatbotId) {
+      setIsTyping(true);
+      try {
+        const history = [...conversation, userMessage].slice(-12).map(m => ({
+          sender: m.sender,
+          text: m.text,
+        }));
+        const { data, error } = await supabase.functions.invoke('generate-chat-response', {
+          body: { chatbotId, message: text, history },
+        });
+        if (error) throw error;
+
+        let replyText: string;
+        if (data?.limitReached) {
+          replyText = "This assistant has reached its monthly message limit. Please try again next month or contact the site owner.";
+        } else if (data?.reply) {
+          replyText = data.reply;
+        } else {
+          replyText = chatbot?.fallback_message || "I didn't understand that.";
+        }
+        const aiMessage: ConversationMessage = {
           id: Date.now().toString(),
           sender: 'bot',
-          text: chatbot?.fallback_message || "I didn't understand that.",
-          timestamp: new Date()
+          text: replyText,
+          timestamp: new Date(),
         };
-        setConversation(prev => [...prev, fallbackMessage]);
-        await saveMessage('bot', fallbackMessage.text);
+        setConversation(prev => [...prev, aiMessage]);
+        await saveMessage('bot', replyText);
+      } catch (e) {
+        console.error('AI response error:', e);
+        const errMessage: ConversationMessage = {
+          id: Date.now().toString(),
+          sender: 'bot',
+          text: chatbot?.fallback_message || "Sorry, something went wrong.",
+          timestamp: new Date(),
+        };
+        setConversation(prev => [...prev, errMessage]);
+        await saveMessage('bot', errMessage.text);
+      } finally {
+        setIsTyping(false);
       }
-    }, 500);
+      return;
+    }
+
+    setTimeout(async () => {
+      const fallbackMessage: ConversationMessage = {
+        id: Date.now().toString(),
+        sender: 'bot',
+        text: chatbot?.fallback_message || "I didn't understand that.",
+        timestamp: new Date()
+      };
+      setConversation(prev => [...prev, fallbackMessage]);
+      await saveMessage('bot', fallbackMessage.text);
+    }, 400);
   };
 
   const handleButtonClick = (button: { text: string; next_key: string }) => {
