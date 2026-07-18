@@ -185,11 +185,6 @@ const TemplateMetrics = () => {
               </div>
               <Download className="h-8 w-8 text-blue-600" />
             </div>
-            <div className="flex items-center mt-2 text-sm">
-              <ArrowUp className="h-4 w-4 text-green-600 mr-1" />
-              <span className="text-green-600">12%</span>
-              <span className="text-muted-foreground ml-1">vs last month</span>
-            </div>
           </CardContent>
         </Card>
 
@@ -201,11 +196,6 @@ const TemplateMetrics = () => {
                 <p className="text-2xl font-bold">{totalConversations.toLocaleString()}</p>
               </div>
               <MessageCircle className="h-8 w-8 text-green-600" />
-            </div>
-            <div className="flex items-center mt-2 text-sm">
-              <ArrowUp className="h-4 w-4 text-green-600 mr-1" />
-              <span className="text-green-600">8%</span>
-              <span className="text-muted-foreground ml-1">vs last month</span>
             </div>
           </CardContent>
         </Card>
@@ -219,11 +209,6 @@ const TemplateMetrics = () => {
               </div>
               <Target className="h-8 w-8 text-orange-600" />
             </div>
-            <div className="flex items-center mt-2 text-sm">
-              <ArrowUp className="h-4 w-4 text-green-600 mr-1" />
-              <span className="text-green-600">15%</span>
-              <span className="text-muted-foreground ml-1">vs last month</span>
-            </div>
           </CardContent>
         </Card>
 
@@ -235,11 +220,6 @@ const TemplateMetrics = () => {
                 <p className="text-2xl font-bold">{avgConversionRate.toFixed(1)}%</p>
               </div>
               <TrendingUp className="h-8 w-8 text-purple-600" />
-            </div>
-            <div className="flex items-center mt-2 text-sm">
-              <ArrowUp className="h-4 w-4 text-green-600 mr-1" />
-              <span className="text-green-600">3%</span>
-              <span className="text-muted-foreground ml-1">vs last month</span>
             </div>
           </CardContent>
         </Card>
