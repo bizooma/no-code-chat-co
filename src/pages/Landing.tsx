@@ -377,13 +377,13 @@ const Landing = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-12">
-            {/* Starter Plan */}
+            {/* Free Plan */}
             <Card className="relative hover:shadow-xl transition-shadow">
               <CardHeader>
-                <CardTitle className="text-2xl">Starter</CardTitle>
-                <CardDescription>Perfect for small businesses getting started</CardDescription>
+                <CardTitle className="text-2xl">Free</CardTitle>
+                <CardDescription>Perfect for getting started</CardDescription>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold text-foreground">$19</span>
+                  <span className="text-4xl font-bold text-foreground">$0</span>
                   <span className="text-muted-foreground">/month</span>
                 </div>
               </CardHeader>
@@ -397,15 +397,14 @@ const Landing = () => {
                     <p className="text-xs text-muted-foreground">Text-based conversational bots</p>
                   </div>
                 </div>
-                
                 <div className="space-y-3 mb-6">
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                    <span className="text-sm">Up to 5 chatbots</span>
+                    <span className="text-sm">1 chatbot</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                    <span className="text-sm">2,500 conversations/month</span>
+                    <span className="text-sm">100 AI messages/month</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
@@ -419,24 +418,16 @@ const Landing = () => {
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
                     <span className="text-sm">Basic analytics</span>
                   </div>
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                    <span className="text-sm">Email support</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                    <span className="text-sm">Template library</span>
-                  </div>
                 </div>
                 <Link to="/auth">
                   <Button className="w-full" variant="outline">
-                    Start Free Trial
+                    Get Started Free
                   </Button>
                 </Link>
               </CardContent>
             </Card>
 
-            {/* Pro Plan */}
+            {/* Professional Plan */}
             <Card className="relative border-2 border-primary shadow-lg hover:shadow-2xl transition-shadow">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                 <span className="bg-primary text-primary-foreground px-6 py-1.5 rounded-full text-sm font-bold shadow-lg">
@@ -447,7 +438,7 @@ const Landing = () => {
                 <CardTitle className="text-2xl">Professional</CardTitle>
                 <CardDescription>For growing businesses with video needs</CardDescription>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold text-foreground">$49</span>
+                  <span className="text-4xl font-bold text-foreground">$29</span>
                   <span className="text-muted-foreground">/month</span>
                 </div>
               </CardHeader>
@@ -467,19 +458,18 @@ const Landing = () => {
                     <p className="text-xs text-muted-foreground">Interactive video flows</p>
                   </div>
                 </div>
-                
                 <div className="space-y-3 mb-6">
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                    <span className="text-sm font-medium">Everything in Starter, plus:</span>
+                    <span className="text-sm font-medium">Everything in Free, plus:</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                    <span className="text-sm">Up to 15 chatbots</span>
+                    <span className="text-sm">Unlimited chatbots</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                    <span className="text-sm">10,000 conversations/month</span>
+                    <span className="text-sm">3,000 AI messages/month (fair use)</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
@@ -491,11 +481,7 @@ const Landing = () => {
                   </div>
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                    <span className="text-sm">A/B testing</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                    <span className="text-sm">Priority support</span>
+                    <span className="text-sm">Priority email support</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
@@ -504,7 +490,7 @@ const Landing = () => {
                 </div>
                 <Link to="/auth">
                   <Button className="w-full" size="lg">
-                    Start Pro Trial
+                    Upgrade to Pro
                   </Button>
                 </Link>
               </CardContent>
@@ -516,7 +502,7 @@ const Landing = () => {
                 <CardTitle className="text-2xl">Enterprise</CardTitle>
                 <CardDescription>Complete solution with AI avatars</CardDescription>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold text-foreground">$149</span>
+                  <span className="text-4xl font-bold text-foreground">$99</span>
                   <span className="text-muted-foreground">/month</span>
                 </div>
               </CardHeader>
@@ -542,23 +528,18 @@ const Landing = () => {
                     <p className="text-xs text-muted-foreground">Lifelike AI video avatars</p>
                   </div>
                 </div>
-                
                 <div className="space-y-3 mb-6">
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                    <span className="text-sm font-medium">Everything in Pro, plus:</span>
+                    <span className="text-sm font-medium">Everything in Professional, plus:</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                    <span className="text-sm">Unlimited chatbots</span>
+                    <span className="text-sm">20,000 AI messages/month (fair use)</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                    <span className="text-sm">50,000 conversations/month</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                    <span className="text-sm">AI avatar creation</span>
+                    <span className="text-sm">AI avatar creation (D-ID)</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
@@ -566,15 +547,15 @@ const Landing = () => {
                   </div>
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                    <span className="text-sm">White-label solution</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                    <span className="text-sm">24/7 dedicated support</span>
+                    <span className="text-sm">White-label options</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
                     <span className="text-sm">API access & webhooks</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
+                    <span className="text-sm">Dedicated support</span>
                   </div>
                 </div>
                 <Link to="/auth">
