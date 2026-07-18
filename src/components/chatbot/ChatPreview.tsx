@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { X, Send, Bot, User, Minimize2 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { VideoPlayer } from '@/components/video/VideoPlayer';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Chatbot {
   id: string;
@@ -13,6 +14,9 @@ interface Chatbot {
   welcome_message: string;
   fallback_message: string;
   widget_config: any;
+  ai_enabled?: boolean;
+  ai_model?: string | null;
+  ai_prompt?: string | null;
 }
 
 interface ChatbotMessage {
@@ -114,8 +118,9 @@ export const ChatPreview: React.FC<ChatPreviewProps> = ({
     setConversation(prev => [...prev, newMessage]);
   };
 
-  const handleUserMessage = (text: string, nextKey?: string) => {
-    // Add user message to conversation
+  const [isTyping, setIsTyping] = useState(false);
+
+  const handleUserMessage = async (text: string, nextKey?: string) => {
     const userMessage: ConversationMessage = {
       id: Date.now().toString(),
       sender: 'user',
@@ -126,28 +131,61 @@ export const ChatPreview: React.FC<ChatPreviewProps> = ({
     setConversation(prev => [...prev, userMessage]);
     setCurrentInput('');
 
-    // Process next message
-    setTimeout(() => {
-      if (nextKey) {
+    if (nextKey) {
+      setTimeout(() => {
         const nextMessage = findMessage(nextKey);
         if (nextMessage) {
           setCurrentMessageKey(nextKey);
           sendBotMessage(nextMessage);
         } else {
-          // End of conversation
           setCurrentMessageKey(null);
         }
-      } else {
-        // If no specific next key, try to match user input or use fallback
-        const fallbackMessage: ConversationMessage = {
+      }, 500);
+      return;
+    }
+
+    if (chatbot.ai_enabled) {
+      setIsTyping(true);
+      try {
+        const history = [...conversation, userMessage].slice(-12).map(m => ({
+          sender: m.sender,
+          text: m.text,
+        }));
+        const { data, error } = await supabase.functions.invoke('generate-chat-response', {
+          body: { chatbotId: chatbot.id, message: text, history },
+        });
+        if (error) throw error;
+        const replyText = data?.limitReached
+          ? "This assistant has reached its monthly message limit."
+          : (data?.reply || chatbot.fallback_message);
+        setConversation(prev => [...prev, {
+          id: Date.now().toString(),
+          sender: 'bot',
+          text: replyText,
+          timestamp: new Date(),
+        }]);
+      } catch (e) {
+        console.error('AI preview error:', e);
+        setConversation(prev => [...prev, {
           id: Date.now().toString(),
           sender: 'bot',
           text: chatbot.fallback_message,
-          timestamp: new Date()
-        };
-        setConversation(prev => [...prev, fallbackMessage]);
+          timestamp: new Date(),
+        }]);
+      } finally {
+        setIsTyping(false);
       }
-    }, 500);
+      return;
+    }
+
+    setTimeout(() => {
+      setConversation(prev => [...prev, {
+        id: Date.now().toString(),
+        sender: 'bot',
+        text: chatbot.fallback_message,
+        timestamp: new Date(),
+      }]);
+    }, 400);
   };
 
   const handleButtonClick = (button: { text: string; next_key: string }) => {
@@ -312,6 +350,20 @@ export const ChatPreview: React.FC<ChatPreviewProps> = ({
       <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
         <div className="space-y-4">
           {conversation.map(renderMessage)}
+          {isTyping && (
+            <div className="flex gap-3 mb-4">
+              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+                <Bot className="h-4 w-4 text-primary-foreground" />
+              </div>
+              <div className="rounded-lg px-3 py-2 bg-muted">
+                <span className="inline-flex gap-1">
+                  <span className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce" />
+                  <span className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <span className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                </span>
+              </div>
+            </div>
+          )}
         </div>
       </ScrollArea>
 

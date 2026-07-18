@@ -288,6 +288,8 @@ const Widget = () => {
     await saveMessage('bot', message.message_text, convId);
   };
 
+  const [isTyping, setIsTyping] = useState(false);
+
   const handleUserMessage = async (text: string, nextKey?: string) => {
     // Add user message to conversation
     const userMessage: ConversationMessage = {
@@ -301,9 +303,9 @@ const Widget = () => {
     setCurrentInput('');
     await saveMessage('user', text);
 
-    // Process next message
-    setTimeout(async () => {
-      if (nextKey) {
+    // Button path: follow the flow
+    if (nextKey) {
+      setTimeout(async () => {
         const nextMessage = findMessage(nextKey);
         if (nextMessage) {
           setCurrentMessageKey(nextKey);
@@ -311,18 +313,66 @@ const Widget = () => {
         } else {
           setCurrentMessageKey(null);
         }
-      } else {
-        // Fallback message
-        const fallbackMessage: ConversationMessage = {
+      }, 500);
+      return;
+    }
+
+    // Free-text path: use AI when enabled, otherwise fallback
+    const aiEnabled = (chatbot as any)?.ai_enabled;
+    if (aiEnabled && chatbotId) {
+      setIsTyping(true);
+      try {
+        const history = [...conversation, userMessage].slice(-12).map(m => ({
+          sender: m.sender,
+          text: m.text,
+        }));
+        const { data, error } = await supabase.functions.invoke('generate-chat-response', {
+          body: { chatbotId, message: text, history },
+        });
+        if (error) throw error;
+
+        let replyText: string;
+        if (data?.limitReached) {
+          replyText = "This assistant has reached its monthly message limit. Please try again next month or contact the site owner.";
+        } else if (data?.reply) {
+          replyText = data.reply;
+        } else {
+          replyText = chatbot?.fallback_message || "I didn't understand that.";
+        }
+        const aiMessage: ConversationMessage = {
           id: Date.now().toString(),
           sender: 'bot',
-          text: chatbot?.fallback_message || "I didn't understand that.",
-          timestamp: new Date()
+          text: replyText,
+          timestamp: new Date(),
         };
-        setConversation(prev => [...prev, fallbackMessage]);
-        await saveMessage('bot', fallbackMessage.text);
+        setConversation(prev => [...prev, aiMessage]);
+        await saveMessage('bot', replyText);
+      } catch (e) {
+        console.error('AI response error:', e);
+        const errMessage: ConversationMessage = {
+          id: Date.now().toString(),
+          sender: 'bot',
+          text: chatbot?.fallback_message || "Sorry, something went wrong.",
+          timestamp: new Date(),
+        };
+        setConversation(prev => [...prev, errMessage]);
+        await saveMessage('bot', errMessage.text);
+      } finally {
+        setIsTyping(false);
       }
-    }, 500);
+      return;
+    }
+
+    setTimeout(async () => {
+      const fallbackMessage: ConversationMessage = {
+        id: Date.now().toString(),
+        sender: 'bot',
+        text: chatbot?.fallback_message || "I didn't understand that.",
+        timestamp: new Date()
+      };
+      setConversation(prev => [...prev, fallbackMessage]);
+      await saveMessage('bot', fallbackMessage.text);
+    }, 400);
   };
 
   const handleButtonClick = (button: { text: string; next_key: string }) => {
@@ -542,6 +592,23 @@ const Widget = () => {
               <ScrollArea className="flex-1 p-4 h-64 md:h-80" ref={scrollAreaRef}>
                 <div className="space-y-4">
                   {conversation.map(renderMessage)}
+                  {isTyping && (
+                    <div className="flex gap-3 mb-4">
+                      <div
+                        className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                        style={{ backgroundColor: chatbot?.widget_config?.color || '#3B82F6' }}
+                      >
+                        <Bot className="h-4 w-4 text-white" />
+                      </div>
+                      <div className="rounded-lg px-3 py-2 bg-gray-100 dark:bg-gray-800">
+                        <span className="inline-flex gap-1">
+                          <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                          <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                          <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </ScrollArea>
 
