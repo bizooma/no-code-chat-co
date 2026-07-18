@@ -477,39 +477,34 @@ const ChatbotEditor = () => {
               </Card>
             </TabsContent>
 
-          <Tabs defaultValue="templates" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="templates">Video Templates</TabsTrigger>
-              <TabsTrigger value="analytics">Advanced Analytics</TabsTrigger>
-              <TabsTrigger value="ab-testing">A/B Testing</TabsTrigger>
-              <TabsTrigger value="heatmaps">Interaction Heatmaps</TabsTrigger>
-            </TabsList>
+            <TabsContent value="analytics" className="p-4 space-y-6 overflow-y-auto h-full">
+              <Tabs defaultValue="templates" className="space-y-6">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="templates">Video Templates</TabsTrigger>
+                  <TabsTrigger value="video-analytics">Advanced Analytics</TabsTrigger>
+                  <TabsTrigger value="heatmaps">Interaction Heatmaps</TabsTrigger>
+                </TabsList>
 
-            <TabsContent value="templates">
-              <VideoTemplateLibrary
-                onTemplateSelect={(template) => {
-                  // Handle template selection
-                  console.log('Selected template:', template);
-                }}
-                onPreview={(template) => {
-                  // Handle template preview
-                  console.log('Preview template:', template);
-                }}
-              />
-            </TabsContent>
+                <TabsContent value="templates">
+                  <VideoTemplateLibrary
+                    onTemplateSelect={(template) => {
+                      console.log('Selected template:', template);
+                    }}
+                    onPreview={(template) => {
+                      console.log('Preview template:', template);
+                    }}
+                  />
+                </TabsContent>
 
-            <TabsContent value="analytics">
-              <VideoAnalytics chatbotId={id!} />
-            </TabsContent>
+                <TabsContent value="video-analytics">
+                  <VideoAnalytics chatbotId={id!} />
+                </TabsContent>
 
-            <TabsContent value="ab-testing">
-              <ABTestDashboard chatbotId={id!} workspaceId="workspace-id" />
+                <TabsContent value="heatmaps">
+                  <HeatMapVisualizer chatbotId={id!} />
+                </TabsContent>
+              </Tabs>
             </TabsContent>
-
-            <TabsContent value="heatmaps">
-              <HeatMapVisualizer chatbotId={id!} />
-            </TabsContent>
-          </Tabs>
 
             <TabsContent value="embed" className="p-4 space-y-6 overflow-y-auto h-full">
               <Card>
