@@ -510,7 +510,7 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setEditingMessage(message)}
+                          onClick={() => openEditDialog(message)}
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
