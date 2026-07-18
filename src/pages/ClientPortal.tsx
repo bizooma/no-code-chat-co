@@ -227,7 +227,7 @@ const ClientPortal: React.FC<ClientPortalProps> = ({ workspaceId: propWorkspaceI
                   </Link>
                 </Button>
                 <Button variant="outline" asChild>
-                  <Link to="/create-chatbot">
+                  <Link to="/chatbots/create">
                     <Play className="mr-2 h-4 w-4" />
                     Create New
                   </Link>
