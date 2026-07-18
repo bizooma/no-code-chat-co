@@ -91,7 +91,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const fromEmail = config?.from_email || 'notifications@resend.dev';
-    const subject = (config?.subject_template || 'New Lead Captured')
+    const subject = ((body as any).subject || config?.subject || config?.subject_template || 'New Lead Captured')
       .replace('{chatbot_name}', lead.chatbots?.name || 'Chatbot');
 
     const emailResponse = await fetch('https://api.resend.com/emails', {
