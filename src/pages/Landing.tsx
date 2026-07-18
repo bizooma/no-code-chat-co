@@ -659,25 +659,16 @@ const Landing = () => {
                   How do chatbots capture leads from website visitors?
                 </AccordionTrigger>
                 <AccordionContent>
-                  Our chatbot collects visitor details like name, email, and phone directly inside the chat. Leads are saved in your dashboard, exported to CSV, or synced automatically to your CRM.
+                  Our chatbot collects visitor details like name, email, and phone directly inside the chat. Leads are saved in your dashboard and can be exported to CSV.
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-4" className="bg-card rounded-lg px-6">
                 <AccordionTrigger className="text-left">
-                  Does your chatbot integrate with popular tools like Google Sheets, HubSpot, or Slack?
+                  Does your chatbot send lead notifications?
                 </AccordionTrigger>
                 <AccordionContent>
-                  Yes. You can connect your chatbot to Google Sheets, HubSpot, Slack, Mailchimp, or any app through Zapier and Make. This way, new leads and chat data flow directly into your existing systems.
-                </AccordionContent>
-              </AccordionItem>
-
-              <AccordionItem value="item-5" className="bg-card rounded-lg px-6">
-                <AccordionTrigger className="text-left">
-                  Can a human agent take over the conversation from the chatbot?
-                </AccordionTrigger>
-                <AccordionContent>
-                  Absolutely. Our platform offers live chat takeover. If the bot can't answer, a human can jump into the conversation in real time from the dashboard or mobile app.
+                  Yes. Every captured lead can automatically trigger an email notification and a Slack message to your workspace, so your team never misses a new lead.
                 </AccordionContent>
               </AccordionItem>
 
@@ -695,7 +686,7 @@ const Landing = () => {
                   Is your chatbot white-label so I can use it for my agency clients?
                 </AccordionTrigger>
                 <AccordionContent>
-                  Yes. With agency mode, you can rebrand the chatbot with your client's logo and colors. You can even give clients their own login and custom dashboard under your brand.
+                  Yes. On the Enterprise plan, you can rebrand the chatbot with your client's logo and colors.
                 </AccordionContent>
               </AccordionItem>
 
@@ -708,21 +699,12 @@ const Landing = () => {
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="item-9" className="bg-card rounded-lg px-6">
-                <AccordionTrigger className="text-left">
-                  Does your chatbot support multiple languages?
-                </AccordionTrigger>
-                <AccordionContent>
-                  Yes. Our chatbot can automatically detect and respond in multiple languages, making it ideal for businesses with international customers.
-                </AccordionContent>
-              </AccordionItem>
-
               <AccordionItem value="item-10" className="bg-card rounded-lg px-6">
                 <AccordionTrigger className="text-left">
                   What makes your chatbot platform different from other chatbot software?
                 </AccordionTrigger>
                 <AccordionContent>
-                  Unlike other chatbot tools, our platform offers unlimited conversations, pre-built industry templates, live chat takeover, AI + rule-based options, and full white-label agency features — all without expensive monthly fees.
+                  Our platform combines AI-driven text bots, interactive video flows, and lifelike AI avatars in one dashboard — with pre-built templates, custom branding, and generous per-plan message limits.
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
