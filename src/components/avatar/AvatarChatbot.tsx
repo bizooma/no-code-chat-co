@@ -39,9 +39,7 @@ const AvatarChatbot: React.FC<AvatarChatbotProps> = ({ chatbotId, onClose }) => 
   useEffect(() => {
     const fetchChatbot = async () => {
       const { data, error } = await supabase
-        .from("avatar_chatbots")
-        .select("*")
-        .eq("id", chatbotId)
+        .rpc("get_avatar_widget_config", { _chatbot_id: chatbotId })
         .single();
 
       if (error) {
