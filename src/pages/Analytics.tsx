@@ -378,7 +378,7 @@ const Analytics = () => {
       totalConversations,
       totalLeads,
       totalMessages,
-      avgResponseTime,
+      
       conversionRate,
       activeUsers,
       topChatbots: topChatbots as any,
