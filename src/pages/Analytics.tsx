@@ -580,17 +580,6 @@ const Analytics = () => {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Avg Response</p>
-                  <p className="text-2xl font-bold">{analytics.avgResponseTime}s</p>
-                </div>
-                <Clock className="h-8 w-8 text-blue-500" />
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
         {/* Charts */}
