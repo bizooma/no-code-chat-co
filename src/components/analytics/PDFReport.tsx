@@ -187,7 +187,7 @@ const PDFReport: React.FC<PDFReportProps> = ({ analytics, dateRange, chatbotName
   return (
     <Button variant="outline" size="sm" onClick={generatePDFReport}>
       <FileText className="mr-2 h-4 w-4" />
-      Download Report
+      Export HTML
     </Button>
   );
 };
