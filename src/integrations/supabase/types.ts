@@ -1071,21 +1071,18 @@ export type Database = {
       workspace_ai_keys: {
         Row: {
           created_at: string
-          openai_key: string
           openai_key_secret_id: string | null
           updated_at: string
           workspace_id: string
         }
         Insert: {
           created_at?: string
-          openai_key: string
           openai_key_secret_id?: string | null
           updated_at?: string
           workspace_id: string
         }
         Update: {
           created_at?: string
-          openai_key?: string
           openai_key_secret_id?: string | null
           updated_at?: string
           workspace_id?: string
