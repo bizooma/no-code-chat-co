@@ -62,14 +62,10 @@ const RealtimeDashboard: React.FC<RealtimeDashboardProps> = ({ chatbotId }) => {
         });
       }
       
-      // Calculate response rate (simplified)
-      const responseRate = recentMessages ? Math.min(95 + Math.random() * 5, 100) : 0;
-      
       setStats({
         activeConversations: activeConversations?.length || 0,
         onlineVisitors: uniqueVisitors.size,
         messagesLastHour: recentMessages?.length || 0,
-        responseRate: Number(responseRate.toFixed(1))
       });
       
       setLastUpdate(new Date());
