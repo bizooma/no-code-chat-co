@@ -121,39 +121,50 @@ export default function VideoFlowEditor() {
       // Delete existing messages
       await supabase.from('chatbot_messages').delete().eq('chatbot_id', id);
 
-      // Convert nodes to chatbot_messages
-      const messages = nodes.map((node) => ({
-        chatbot_id: id,
-        message_key: node.data.title,
-        message_text: node.data.description || '',
-        message_type: (node.data.video_url ? 'youtube_video' : 'text') as 'youtube_video' | 'text',
-        video_url: node.data.video_url || null,
-        video_thumbnail: node.data.video_thumbnail || null,
-        buttons: node.data.responses || [],
-        node_position: node.position as any,
-        node_connections: edges
-          .filter((edge) => edge.source === node.id)
-          .map((edge) => ({
-            target: edge.target,
-            label: edge.label || '',
-          })) as any,
-      }));
+      // Map each response's next_node_id from canvas edges (edge.sourceHandle === response.id).
+      const messages = nodes.map((node) => {
+        const rawResponses = (node.data.responses || []) as any[];
+        const responses = rawResponses.map((r: any) => {
+          const edge = edges.find((e) => e.source === node.id && e.sourceHandle === r.id);
+          return { ...r, next_node_id: edge?.target ?? r.next_node_id ?? null };
+        });
+
+        const nodeType = node.type || 'video_question';
+        const messageType: 'youtube_video' | 'uploaded_video' | 'form' | 'text' | 'button' =
+          nodeType === 'lead_capture'
+            ? 'form'
+            : nodeType === 'end'
+              ? 'text'
+              : node.data.video_url
+                ? 'uploaded_video'
+                : 'text';
+
+        return {
+          chatbot_id: id,
+          message_key: node.data.title,
+          message_text: node.data.description || '',
+          message_type: messageType,
+          video_url: node.data.video_url || null,
+          video_thumbnail: node.data.video_thumbnail || null,
+          buttons: responses as any,
+          node_position: node.position as any,
+          node_connections: edges
+            .filter((edge) => edge.source === node.id)
+            .map((edge) => ({ target: edge.target, label: edge.label || '' })) as any,
+          conditions: {
+            node_type: nodeType,
+            lead_fields: node.data.lead_fields || null,
+          } as any,
+        };
+      });
 
       const { error } = await supabase.from('chatbot_messages').insert(messages);
-
       if (error) throw error;
 
-      toast({
-        title: 'Success',
-        description: 'Video flow saved successfully',
-      });
+      toast({ title: 'Success', description: 'Video flow saved successfully' });
     } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
-      });
-      throw error; // Re-throw to handle in publish
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      throw error;
     }
   };
 
