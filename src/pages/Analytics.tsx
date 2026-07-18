@@ -330,13 +330,10 @@ const Analytics = () => {
       color: statusColors[status] || '#6B7280'
     }));
 
-    // Conversion Funnel Analysis
+    // Conversion Funnel Analysis (only stages we can measure)
     const conversionFunnel = [
-      { stage: 'Visitors', count: totalConversations, percentage: 100 },
       { stage: 'Started Conversation', count: totalConversations, percentage: 100, dropoff: 0 },
-      { stage: 'Engaged (2+ messages)', count: Math.floor(totalConversations * 0.75), percentage: 75, dropoff: 25 },
-      { stage: 'Provided Contact Info', count: totalLeads, percentage: conversionRate, dropoff: 75 - conversionRate },
-      { stage: 'Qualified Lead', count: Math.floor(totalLeads * 0.6), percentage: conversionRate * 0.6, dropoff: conversionRate * 0.4 }
+      { stage: 'Provided Contact Info', count: totalLeads, percentage: conversionRate, dropoff: 100 - conversionRate },
     ];
 
     // Popular Questions Analysis
