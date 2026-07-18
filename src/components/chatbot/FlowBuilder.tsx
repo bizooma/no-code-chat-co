@@ -77,7 +77,7 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
   const { toast } = useToast();
   const [editingMessage, setEditingMessage] = useState<ChatbotMessage | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [newMessage, setNewMessage] = useState<NewMessageData>({
+  const emptyMessage: NewMessageData = {
     message_key: '',
     message_text: '',
     message_type: 'text',
@@ -86,8 +86,85 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
     lead_fields: [],
     video_url: '',
     video_autoplay: false,
-    video_controls: true
-  });
+    video_controls: true,
+  };
+  const [newMessage, setNewMessage] = useState<NewMessageData>(emptyMessage);
+
+  const openAddDialog = () => {
+    setEditingMessage(null);
+    setNewMessage(emptyMessage);
+    setDialogOpen(true);
+  };
+
+  const openEditDialog = (msg: ChatbotMessage) => {
+    setEditingMessage(msg);
+    setNewMessage({
+      message_key: msg.message_key,
+      message_text: msg.message_text,
+      message_type: (['text','form','button','youtube_video','uploaded_video','video_intro'].includes(msg.message_type)
+        ? msg.message_type
+        : 'text') as NewMessageData['message_type'],
+      buttons: Array.isArray(msg.buttons) ? msg.buttons : [],
+      collect_lead_info: !!msg.collect_lead_info,
+      lead_fields: (msg.conditions && Array.isArray(msg.conditions.lead_fields)) ? msg.conditions.lead_fields : [],
+      video_url: msg.video_url || '',
+      video_autoplay: !!msg.video_autoplay,
+      video_controls: msg.video_controls !== false,
+    });
+    setDialogOpen(true);
+  };
+
+  const saveMessage = async () => {
+    if (!newMessage.message_key || !newMessage.message_text) {
+      toast({ title: "Error", description: "Please fill in all required fields", variant: "destructive" });
+      return;
+    }
+
+    if (messages.some(m => m.message_key === newMessage.message_key && m.id !== editingMessage?.id)) {
+      toast({ title: "Error", description: "Message key must be unique", variant: "destructive" });
+      return;
+    }
+
+    const payload = {
+      chatbot_id: chatbotId,
+      message_key: newMessage.message_key,
+      message_text: newMessage.message_text,
+      message_type: newMessage.message_type,
+      buttons: newMessage.message_type === 'button' ? newMessage.buttons : null,
+      collect_lead_info: newMessage.collect_lead_info,
+      conditions: newMessage.collect_lead_info ? { lead_fields: newMessage.lead_fields } : null,
+      video_url: newMessage.video_url || null,
+      video_autoplay: newMessage.video_autoplay || false,
+      video_controls: newMessage.video_controls !== false,
+    };
+
+    try {
+      if (editingMessage) {
+        const { error } = await supabase
+          .from('chatbot_messages')
+          .update(payload)
+          .eq('id', editingMessage.id);
+        if (error) throw error;
+        onMessagesUpdate(messages.map(m => m.id === editingMessage.id ? { ...m, ...payload } as ChatbotMessage : m));
+        toast({ title: "Success", description: "Message updated" });
+      } else {
+        const { data, error } = await supabase
+          .from('chatbot_messages')
+          .insert(payload)
+          .select()
+          .single();
+        if (error) throw error;
+        onMessagesUpdate([...messages, data]);
+        toast({ title: "Success", description: "Message added" });
+      }
+      setDialogOpen(false);
+      setEditingMessage(null);
+      setNewMessage(emptyMessage);
+    } catch (err) {
+      console.error('Error saving message:', err);
+      toast({ title: "Error", description: "Failed to save message", variant: "destructive" });
+    }
+  };
 
   const addMessage = async () => {
     if (!newMessage.message_key || !newMessage.message_text) {
