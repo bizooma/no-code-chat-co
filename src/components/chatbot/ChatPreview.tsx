@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { X, Send, Bot, User, Minimize2 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { VideoPlayer } from '@/components/video/VideoPlayer';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Chatbot {
   id: string;
