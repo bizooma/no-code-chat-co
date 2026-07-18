@@ -71,7 +71,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Test calls may include ad-hoc recipients/subject overrides
-    const recipients = body.lead?.recipients ?? config?.recipients ?? null;
+    const recipients = (body as any).recipients ?? body.lead?.recipients ?? config?.recipients ?? null;
     if (!recipients || !Array.isArray(recipients) || recipients.length === 0) {
       console.log('No recipients configured for workspace', workspaceId);
       return new Response(JSON.stringify({ success: false, message: 'No email integration configured' }), {
