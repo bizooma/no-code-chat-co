@@ -120,7 +120,7 @@ const RealtimeDashboard: React.FC<RealtimeDashboardProps> = ({ chatbotId }) => {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
@@ -143,19 +143,6 @@ const RealtimeDashboard: React.FC<RealtimeDashboardProps> = ({ chatbotId }) => {
               <span className="text-sm text-muted-foreground">Messages/Hour</span>
             </div>
             <p className="text-2xl font-bold">{stats.messagesLastHour}</p>
-          </div>
-          
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <Activity className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">Response Rate</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <p className="text-2xl font-bold">{stats.responseRate}%</p>
-              <Badge variant={stats.responseRate >= 90 ? "default" : "secondary"}>
-                {stats.responseRate >= 90 ? "Excellent" : "Good"}
-              </Badge>
-            </div>
           </div>
         </div>
       </CardContent>
