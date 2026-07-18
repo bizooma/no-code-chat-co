@@ -292,7 +292,7 @@ export const KnowledgeBaseManager = ({ chatbotId }: KnowledgeBaseManagerProps) =
                   id="file-upload"
                   type="file"
                   className="hidden"
-                  accept=".txt,.md,.pdf,.docx"
+                  accept=".txt,.md"
                   onChange={handleFileUpload}
                   disabled={uploading}
                 />
