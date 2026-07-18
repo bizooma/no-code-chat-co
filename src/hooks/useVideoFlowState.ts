@@ -71,6 +71,10 @@ export const useVideoFlowState = (chatbotId: string, visitorId: string) => {
       // Convert to node map
       const nodeMap: Record<string, VideoNode> = {};
       messages.forEach((msg) => {
+        const conditions = (msg.conditions as any) || {};
+        const nodeType: string =
+          conditions.node_type ||
+          (msg.message_type === 'form' ? 'lead_capture' : msg.message_type);
         nodeMap[msg.id] = {
           id: msg.id,
           title: msg.message_key,
@@ -78,10 +82,9 @@ export const useVideoFlowState = (chatbotId: string, visitorId: string) => {
           video_thumbnail: msg.video_thumbnail || undefined,
           description: msg.message_text,
           responses: (msg.buttons as any) || [],
-          lead_fields: msg.message_type === 'form' && msg.conditions 
-            ? ((msg.conditions as any)?.lead_fields || []) 
-            : undefined,
-          type: msg.message_type,
+          lead_fields:
+            nodeType === 'lead_capture' ? conditions.lead_fields || [] : undefined,
+          type: nodeType,
         };
       });
 
