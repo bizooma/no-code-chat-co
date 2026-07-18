@@ -71,24 +71,27 @@ export const AiKeyAndUsagePanel: React.FC<Props> = ({ workspaceId }) => {
       return;
     }
     setSavingKey(true);
-    const { error } = await supabase
-      .from('workspace_ai_keys')
-      .upsert({ workspace_id: workspaceId, openai_key: newKey }, { onConflict: 'workspace_id' });
+    const { error } = await supabase.rpc('set_workspace_ai_key', {
+      _workspace_id: workspaceId,
+      _key: newKey,
+    });
     setSavingKey(false);
     if (error) {
       toast({ title: 'Failed to save key', description: error.message, variant: 'destructive' });
       return;
     }
     setNewKey('');
-    toast({ title: 'OpenAI key saved', description: 'This workspace now uses your own key with no monthly limit.' });
+    toast({
+      title: 'OpenAI key saved',
+      description: 'Encrypted in Supabase Vault. This workspace now has no monthly limit.',
+    });
     refresh();
   };
 
   const removeKey = async () => {
-    const { error } = await supabase
-      .from('workspace_ai_keys')
-      .delete()
-      .eq('workspace_id', workspaceId);
+    const { error } = await supabase.rpc('delete_workspace_ai_key', {
+      _workspace_id: workspaceId,
+    });
     if (error) {
       toast({ title: 'Failed to remove key', description: error.message, variant: 'destructive' });
       return;
