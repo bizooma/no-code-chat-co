@@ -109,12 +109,12 @@ serve(async (req) => {
 
     // Format lead information for Slack
     const leadInfo = [
-      lead.name ? `*Name:* ${lead.name}` : null,
-      lead.email ? `*Email:* ${lead.email}` : null,
-      lead.phone ? `*Phone:* ${lead.phone}` : null,
-      lead.company ? `*Company:* ${lead.company}` : null,
-      lead.chatbot ? `*Chatbot:* ${lead.chatbot}` : null,
-      lead.source ? `*Source:* ${lead.source}` : null
+      lead_for_msg.name ? `*Name:* ${lead_for_msg.name}` : null,
+      lead_for_msg.email ? `*Email:* ${lead_for_msg.email}` : null,
+      lead_for_msg.phone ? `*Phone:* ${lead_for_msg.phone}` : null,
+      lead_for_msg.company ? `*Company:* ${lead_for_msg.company}` : null,
+      lead_for_msg.chatbot ? `*Chatbot:* ${lead_for_msg.chatbot}` : null,
+      lead_for_msg.source ? `*Source:* ${lead_for_msg.source}` : null
     ].filter(Boolean).join('\n');
 
     const slackMessage = {
