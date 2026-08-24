@@ -1270,6 +1270,39 @@ export type Database = {
           voice_id: string
         }[]
       }
+      get_chatbot_widget_config: {
+        Args: { _chatbot_id: string }
+        Returns: {
+          chatbot_type: string
+          fallback_message: string
+          id: string
+          name: string
+          welcome_message: string
+          widget_config: Json
+        }[]
+      }
+      get_chatbot_widget_messages: {
+        Args: { _chatbot_id: string }
+        Returns: {
+          buttons: Json
+          collect_lead_info: boolean
+          conditions: Json
+          created_at: string
+          id: string
+          interactive_elements: Json
+          message_key: string
+          message_text: string
+          message_type: string
+          next_message_key: string
+          video_autoplay: boolean
+          video_chapters: Json
+          video_controls: boolean
+          video_duration: number
+          video_layout: string
+          video_thumbnail: string
+          video_url: string
+        }[]
+      }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]

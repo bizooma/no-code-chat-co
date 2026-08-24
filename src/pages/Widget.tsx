@@ -28,7 +28,7 @@ interface Chatbot {
   welcome_message: string;
   fallback_message: string;
   widget_config: any;
-  status: string;
+  
 }
 
 interface ChatbotMessage {
@@ -120,6 +120,20 @@ const Widget = () => {
     }
   }, [chatbotId]);
 
+  // Tell the embedding page how much space the widget needs
+  useEffect(() => {
+    if (window.parent === window) return; // not embedded
+    const size = !chatbot
+      ? { width: 0, height: 0 }
+      : !isOpen
+        ? { width: 80, height: 80 }
+        : isMinimized
+          ? { width: 384, height: 72 }
+          : { width: 384, height: 560 };
+    window.parent.postMessage({ type: 'SUPPORTBOTS_RESIZE', ...size }, '*');
+  }, [chatbot, isOpen, isMinimized]);
+
+
   useEffect(() => {
     // Auto-scroll to bottom when new messages are added
     if (scrollAreaRef.current && conversation.length > 0) {
@@ -134,17 +148,14 @@ const Widget = () => {
 
   const fetchChatbot = async () => {
     if (!chatbotId) return;
-    
+
     try {
-      const { data, error } = await supabase
-        .from('chatbots')
-        .select('*')
-        .eq('id', chatbotId)
-        .eq('status', 'active')
-        .single();
+      const { data, error } = await supabase.rpc('get_chatbot_widget_config', {
+        _chatbot_id: chatbotId,
+      });
 
       if (error) throw error;
-      setChatbot(data as Chatbot);
+      setChatbot((data?.[0] ?? null) as Chatbot | null);
     } catch (error) {
       console.error('Error fetching chatbot:', error);
     }
@@ -152,13 +163,11 @@ const Widget = () => {
 
   const fetchMessages = async () => {
     if (!chatbotId) return;
-    
+
     try {
-      const { data, error } = await supabase
-        .from('chatbot_messages')
-        .select('*')
-        .eq('chatbot_id', chatbotId)
-        .order('created_at');
+      const { data, error } = await supabase.rpc('get_chatbot_widget_messages', {
+        _chatbot_id: chatbotId,
+      });
 
       if (error) throw error;
       setMessages((data || []) as ChatbotMessage[]);
@@ -551,7 +560,7 @@ const Widget = () => {
         </Button>
       ) : (
         // Chat Window
-        <Card className="w-80 h-96 md:w-96 md:h-[500px] shadow-xl border-0 rounded-lg overflow-hidden bg-white dark:bg-gray-900">
+        <Card className="w-[368px] h-[544px] shadow-xl border-0 rounded-lg overflow-hidden bg-white dark:bg-gray-900">
           {/* Header */}
           <div 
             className="px-4 py-3 flex items-center justify-between text-white"
@@ -578,7 +587,12 @@ const Widget = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  setIsOpen(false);
+                  if (window.parent !== window) {
+                    window.parent.postMessage({ type: 'SUPPORTBOTS_CLOSE' }, '*');
+                  }
+                }}
                 className="text-white hover:bg-white/20 p-1 h-auto"
               >
                 <X className="h-4 w-4" />

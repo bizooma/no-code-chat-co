@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { 
@@ -516,13 +517,21 @@ const ChatbotEditor = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
+                    {chatbot.status !== 'active' && (
+                      <Alert variant="destructive">
+                        <AlertDescription>
+                          This chatbot is in draft. The embed code will not display anything on your
+                          website until you activate it. Use the Activate button above.
+                        </AlertDescription>
+                      </Alert>
+                    )}
                     <div className="relative">
                       <pre className="bg-muted p-4 rounded-md text-sm overflow-x-auto">
                         <code>{getEmbedCode()}</code>
                       </pre>
                     </div>
                     <div className="flex gap-2">
-                      <Button onClick={copyEmbedCode} className="flex-1">
+                      <Button onClick={copyEmbedCode} className="flex-1" disabled={chatbot.status !== 'active'}>
                         Copy Embed Code
                       </Button>
                       <Link to={`/embed-demo?id=${id}`}>
