@@ -75,7 +75,29 @@ const Widget = () => {
   const chatbotId = searchParams.get('chatbotId') || searchParams.get('id');
   const widgetType = searchParams.get('type');
   const isEmbedded = searchParams.get('embedded') === 'true';
-  
+
+  // When embedded, make the document transparent so no white box shows behind the bubble
+  useEffect(() => {
+    if (!isEmbedded) return;
+    const targets = [
+      document.documentElement,
+      document.body,
+      document.getElementById('root'),
+    ].filter(Boolean) as HTMLElement[];
+    const previous = targets.map((el) => el.style.background);
+    const hadBgClass = targets.map((el) => el.classList.contains('bg-background'));
+    targets.forEach((el) => {
+      el.style.background = 'transparent';
+      el.classList.remove('bg-background');
+    });
+    return () => {
+      targets.forEach((el, i) => {
+        el.style.background = previous[i];
+        if (hadBgClass[i]) el.classList.add('bg-background');
+      });
+    };
+  }, [isEmbedded]);
+
   // If it's a video bot, render VideoFlowWidget
   if (widgetType === 'video' && chatbotId) {
     return (
