@@ -28,7 +28,7 @@ interface Chatbot {
   welcome_message: string;
   fallback_message: string;
   widget_config: any;
-  status: string;
+  
 }
 
 interface ChatbotMessage {
@@ -134,17 +134,14 @@ const Widget = () => {
 
   const fetchChatbot = async () => {
     if (!chatbotId) return;
-    
+
     try {
-      const { data, error } = await supabase
-        .from('chatbots')
-        .select('*')
-        .eq('id', chatbotId)
-        .eq('status', 'active')
-        .single();
+      const { data, error } = await supabase.rpc('get_chatbot_widget_config', {
+        _chatbot_id: chatbotId,
+      });
 
       if (error) throw error;
-      setChatbot(data as Chatbot);
+      setChatbot((data?.[0] ?? null) as Chatbot | null);
     } catch (error) {
       console.error('Error fetching chatbot:', error);
     }
@@ -152,13 +149,11 @@ const Widget = () => {
 
   const fetchMessages = async () => {
     if (!chatbotId) return;
-    
+
     try {
-      const { data, error } = await supabase
-        .from('chatbot_messages')
-        .select('*')
-        .eq('chatbot_id', chatbotId)
-        .order('created_at');
+      const { data, error } = await supabase.rpc('get_chatbot_widget_messages', {
+        _chatbot_id: chatbotId,
+      });
 
       if (error) throw error;
       setMessages((data || []) as ChatbotMessage[]);
