@@ -1,166 +1,133 @@
 (function() {
   'use strict';
-  
-  // Get the script tag that loaded this widget
+
   var currentScript = document.currentScript || (function() {
     var scripts = document.getElementsByTagName('script');
     return scripts[scripts.length - 1];
   })();
-  
-  // Extract chatbot ID from script attributes
+
   var chatbotId = currentScript.getAttribute('data-chatbot-id');
-  
+
   if (!chatbotId) {
     console.error('SupportBots: No chatbot ID provided. Please add data-chatbot-id attribute to the script tag.');
     return;
   }
-  
-  // Prevent loading multiple times
+
   if (window.SupportBots && window.SupportBots.loaded) {
     return;
   }
-  
-  // Create SupportBots namespace
+
   window.SupportBots = window.SupportBots || {};
   window.SupportBots.loaded = true;
   window.SupportBots.chatbotId = chatbotId;
-  
-  // Get the base URL from the script src (where widget.js was loaded from).
-  // This is the SupportBots app origin, NOT the customer's site.
-  var scriptSrc = currentScript.src;
-  var scriptUrl = new URL(scriptSrc, window.location.href);
+
+  // Base URL = where widget.js was loaded from (the SupportBots app origin,
+  // NOT the customer's site).
+  var scriptUrl = new URL(currentScript.src, window.location.href);
   var baseUrl = scriptUrl.protocol + '//' + scriptUrl.host;
 
-  // Supabase configuration
   var SUPABASE_URL = 'https://jsyqavxvspkqitrwbeay.supabase.co';
   var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzeXFhdnh2c3BrcWl0cndiZWF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwMjY2NjgsImV4cCI6MjA3MzYwMjY2OH0.JVFxiqvteDQToL3nrhCeKbJC8lm6LivGcVurXkT8AeQ';
-  
-  // Fetch chatbot data to determine type
-  fetch(SUPABASE_URL + '/rest/v1/chatbots?id=eq.' + chatbotId + '&select=id,name,chatbot_type,widget_config', {
+
+  // Collapsed bubble footprint. The iframe is intentionally small so it never
+  // covers (and never steals clicks from) the customer's page.
+  var CLOSED = { width: 96, height: 96 };
+  var MARGIN = 16;
+
+  // Public read path: SECURITY DEFINER RPC, active bots only.
+  fetch(SUPABASE_URL + '/rest/v1/rpc/get_chatbot_widget_config', {
+    method: 'POST',
     headers: {
       'apikey': SUPABASE_ANON_KEY,
-      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
-    }
+      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ _chatbot_id: chatbotId })
   })
-  .then(function(response) {
-    return response.json();
-  })
+  .then(function(response) { return response.json(); })
   .then(function(data) {
-    if (!data || data.length === 0) {
-      console.error('SupportBots: Chatbot not found');
+    if (!data || !data.length) {
+      console.error('SupportBots: Chatbot not found, or it is not active yet. Activate the chatbot in your SupportBots dashboard.');
       return;
     }
-    
+
     var chatbotData = data[0];
     var chatbotType = chatbotData.chatbot_type || 'standard';
-    
-    console.log('SupportBots: Loading ' + chatbotType + ' widget for chatbot ' + chatbotId);
-    
-    // Create widget container
+    var config = chatbotData.widget_config || {};
+    var position = config.position || 'bottom-right';
+
     var widgetContainer = document.createElement('div');
     widgetContainer.id = 'supportbots-widget-' + chatbotId;
-    widgetContainer.style.cssText = 'position: fixed; z-index: 2147483647; pointer-events: none;';
-    
-    // Determine widget URL based on type
-    var widgetUrl;
-    if (chatbotType === 'video_bot') {
-      widgetUrl = baseUrl + '/widget?id=' + encodeURIComponent(chatbotId) + '&type=video';
-    } else if (chatbotType === 'avatar_bot') {
-      widgetUrl = baseUrl + '/widget?id=' + encodeURIComponent(chatbotId) + '&type=avatar';
-    } else {
-      widgetUrl = baseUrl + '/widget?id=' + encodeURIComponent(chatbotId);
+
+    // Anchor the container itself; size it to the collapsed bubble and grow it
+    // only when the widget page asks (SUPPORTBOTS_RESIZE).
+    function anchor(width, height) {
+      var vertical = position.indexOf('top') === 0 ? 'top' : 'bottom';
+      var horizontal = position.indexOf('left') !== -1 ? 'left' : 'right';
+      widgetContainer.style.cssText = [
+        'position: fixed',
+        vertical + ': 0',
+        horizontal + ': 0',
+        'width: ' + width + 'px',
+        'height: ' + height + 'px',
+        'max-width: 100vw',
+        'max-height: 100vh',
+        'border: none',
+        'background: transparent',
+        'overflow: hidden',
+        'z-index: 2147483647'
+      ].join('; ');
     }
-    
-    // Create iframe for the widget
+
+    anchor(CLOSED.width, CLOSED.height);
+
+    var widgetUrl = baseUrl + '/widget?id=' + encodeURIComponent(chatbotId) + '&embedded=true';
+    if (chatbotType === 'video_bot') {
+      widgetUrl += '&type=video';
+    } else if (chatbotType === 'avatar_bot') {
+      widgetUrl += '&type=avatar';
+    }
+
     var iframe = document.createElement('iframe');
     iframe.src = widgetUrl;
     iframe.style.cssText = [
-      'width: 100vw',
-      'height: 100vh', 
+      'width: 100%',
+      'height: 100%',
       'border: none',
       'background: transparent',
-      'pointer-events: auto',
-      'position: absolute',
-      'top: 0',
-      'left: 0'
+      'display: block',
+      'color-scheme: normal'
     ].join('; ');
     iframe.setAttribute('allowtransparency', 'true');
     iframe.setAttribute('title', 'SupportBots Chat Widget');
-    
-    // Add iframe to container
+    iframe.setAttribute('allow', 'microphone; camera; autoplay');
+
     widgetContainer.appendChild(iframe);
-    
-    // Add container to page
     document.body.appendChild(widgetContainer);
-  
-    // Handle iframe communication (optional)
+
     window.addEventListener('message', function(event) {
-      // Verify origin for security
       if (event.origin !== baseUrl) return;
-      
-      var data = event.data;
-      
-      if (data.type === 'SUPPORTBOTS_RESIZE') {
-        // Handle widget resize if needed
-        console.log('SupportBots: Widget resize requested', data);
-      } else if (data.type === 'SUPPORTBOTS_CLOSE') {
-        // Handle widget close
-        if (widgetContainer && widgetContainer.parentNode) {
-          widgetContainer.parentNode.removeChild(widgetContainer);
-        }
+      var payload = event.data || {};
+
+      if (payload.type === 'SUPPORTBOTS_RESIZE') {
+        var w = Math.max(CLOSED.width, Number(payload.width) || CLOSED.width);
+        var h = Math.max(CLOSED.height, Number(payload.height) || CLOSED.height);
+        anchor(w + MARGIN, h + MARGIN);
+      } else if (payload.type === 'SUPPORTBOTS_CLOSE') {
+        anchor(CLOSED.width, CLOSED.height);
       }
     });
-    
-    // Expose API methods
+
     window.SupportBots.api = {
-      show: function() {
-        if (widgetContainer) {
-          widgetContainer.style.display = 'block';
-        }
-      },
-      hide: function() {
-        if (widgetContainer) {
-          widgetContainer.style.display = 'none';
-        }
-      },
+      show: function() { widgetContainer.style.display = 'block'; },
+      hide: function() { widgetContainer.style.display = 'none'; },
       destroy: function() {
-        if (widgetContainer && widgetContainer.parentNode) {
+        if (widgetContainer.parentNode) {
           widgetContainer.parentNode.removeChild(widgetContainer);
         }
         delete window.SupportBots;
       }
     };
-    
-    // CSS injection for better mobile support
-    var css = [
-      '@media (max-width: 768px) {',
-      '  #supportbots-widget-' + chatbotId + ' iframe {',
-      '    width: 100vw !important;',
-      '    height: 100vh !important;',
-      '  }',
-      '}',
-      '',
-      '/* Hide scrollbars on the widget container */',
-      '#supportbots-widget-' + chatbotId + ' {',
-      '  overflow: hidden;',
-      '}',
-      '',
-      '/* Ensure the widget doesn\'t interfere with page scrolling */',
-      '#supportbots-widget-' + chatbotId + ' iframe {',
-      '  pointer-events: auto;',
-      '}'
-    ].join('\n');
-    
-    var style = document.createElement('style');
-    style.type = 'text/css';
-    if (style.styleSheet) {
-      style.styleSheet.cssText = css;
-    } else {
-      style.appendChild(document.createTextNode(css));
-    }
-    document.head.appendChild(style);
-    
-    console.log('SupportBots: ' + chatbotType + ' widget loaded successfully');
   })
   .catch(function(error) {
     console.error('SupportBots: Error loading chatbot data', error);
