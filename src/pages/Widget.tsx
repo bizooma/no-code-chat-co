@@ -560,7 +560,7 @@ const Widget = () => {
         </Button>
       ) : (
         // Chat Window
-        <Card className="w-80 h-96 md:w-96 md:h-[500px] shadow-xl border-0 rounded-lg overflow-hidden bg-white dark:bg-gray-900">
+        <Card className="w-[368px] h-[544px] shadow-xl border-0 rounded-lg overflow-hidden bg-white dark:bg-gray-900">
           {/* Header */}
           <div 
             className="px-4 py-3 flex items-center justify-between text-white"
@@ -587,7 +587,12 @@ const Widget = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  setIsOpen(false);
+                  if (window.parent !== window) {
+                    window.parent.postMessage({ type: 'SUPPORTBOTS_CLOSE' }, '*');
+                  }
+                }}
                 className="text-white hover:bg-white/20 p-1 h-auto"
               >
                 <X className="h-4 w-4" />
