@@ -1,6 +1,25 @@
 (function() {
   'use strict';
 
+  // Resolve our own origin at load time. Must happen here: init() is often
+  // invoked from script.onload, where document.currentScript is null.
+  var thisScript = document.currentScript;
+  if (!thisScript) {
+    var scripts = document.getElementsByTagName('script');
+    for (var i = scripts.length - 1; i >= 0; i--) {
+      if (scripts[i].src && scripts[i].src.indexOf('avatar-widget.js') !== -1) {
+        thisScript = scripts[i];
+        break;
+      }
+    }
+  }
+  var WIDGET_ORIGIN = thisScript && thisScript.src
+    ? (function() {
+        var u = new URL(thisScript.src, window.location.href);
+        return u.protocol + '//' + u.host;
+      })()
+    : window.location.protocol + '//' + window.location.host;
+
   // Prevent multiple initializations
   if (window.AvatarChatbotWidget) {
     console.warn('AvatarChatbotWidget already initialized');
@@ -15,10 +34,8 @@
       }
 
       this.chatbotId = config.chatbotId;
-      this.baseUrl = window.location.hostname === 'localhost' 
-        ? 'http://localhost:8080'
-        : 'https://supportbots.dev';
-      
+      this.baseUrl = WIDGET_ORIGIN;
+
       this.createWidget();
       this.attachStyles();
     },
