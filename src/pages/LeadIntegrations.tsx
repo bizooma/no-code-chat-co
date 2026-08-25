@@ -52,7 +52,7 @@ const LeadIntegrations = () => {
     enabled: false,
     recipients: '',
     subject: 'New Lead Captured',
-    template: 'Hello,\n\nA new lead has been captured:\n\nName: {{name}}\nEmail: {{email}}\nPhone: {{phone}}\nCompany: {{company}}\nChatbot: {{chatbot}}\n\nBest regards,\nYour SupportBots Team'
+    template: 'Hello,\n\nA new lead has been captured:\n\nName: {{name}}\nEmail: {{email}}\nPhone: {{phone}}\nCompany: {{company}}\nChatbot: {{chatbot}}\n\nBest regards,\nYour CatchJar Team'
   });
   const [hubspotConfig, setHubspotConfig] = useState({
     api_key: '',

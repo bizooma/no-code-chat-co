@@ -9,19 +9,20 @@
   var chatbotId = currentScript.getAttribute('data-chatbot-id');
 
   if (!chatbotId) {
-    console.error('SupportBots: No chatbot ID provided. Please add data-chatbot-id attribute to the script tag.');
+    console.error('CatchJar: No chatbot ID provided. Please add data-chatbot-id attribute to the script tag.');
     return;
   }
 
-  if (window.SupportBots && window.SupportBots.loaded) {
+  if (window.CatchJar && window.CatchJar.loaded) {
     return;
   }
 
-  window.SupportBots = window.SupportBots || {};
-  window.SupportBots.loaded = true;
-  window.SupportBots.chatbotId = chatbotId;
+  window.CatchJar = window.CatchJar || {};
+  window.SupportBots = window.CatchJar; // back-compat alias, safe to drop later
+  window.CatchJar.loaded = true;
+  window.CatchJar.chatbotId = chatbotId;
 
-  // Base URL = where widget.js was loaded from (the SupportBots app origin,
+  // Base URL = where widget.js was loaded from (the CatchJar app origin,
   // NOT the customer's site).
   var scriptUrl = new URL(currentScript.src, window.location.href);
   var baseUrl = scriptUrl.protocol + '//' + scriptUrl.host;
@@ -47,7 +48,7 @@
   .then(function(response) { return response.json(); })
   .then(function(data) {
     if (!data || !data.length) {
-      console.error('SupportBots: Chatbot not found, or it is not active yet. Activate the chatbot in your SupportBots dashboard.');
+      console.error('CatchJar: Chatbot not found, or it is not active yet. Activate the chatbot in your CatchJar dashboard.');
       return;
     }
 
@@ -57,10 +58,10 @@
     var position = config.position || 'bottom-right';
 
     var widgetContainer = document.createElement('div');
-    widgetContainer.id = 'supportbots-widget-' + chatbotId;
+    widgetContainer.id = 'catchjar-widget-' + chatbotId;
 
     // Anchor the container itself; size it to the collapsed bubble and grow it
-    // only when the widget page asks (SUPPORTBOTS_RESIZE).
+    // only when the widget page asks (CATCHJAR_RESIZE).
     function anchor(width, height) {
       var vertical = position.indexOf('top') === 0 ? 'top' : 'bottom';
       var horizontal = position.indexOf('left') !== -1 ? 'left' : 'right';
@@ -99,7 +100,7 @@
       'color-scheme: normal'
     ].join('; ');
     iframe.setAttribute('allowtransparency', 'true');
-    iframe.setAttribute('title', 'SupportBots Chat Widget');
+    iframe.setAttribute('title', 'CatchJar Chat Widget');
     iframe.setAttribute('allow', 'microphone; camera; autoplay');
 
     widgetContainer.appendChild(iframe);
@@ -109,27 +110,28 @@
       if (event.origin !== baseUrl) return;
       var payload = event.data || {};
 
-      if (payload.type === 'SUPPORTBOTS_RESIZE') {
+      if (payload.type === 'CATCHJAR_RESIZE' || payload.type === 'SUPPORTBOTS_RESIZE') {
         var w = Math.max(CLOSED.width, Number(payload.width) || CLOSED.width);
         var h = Math.max(CLOSED.height, Number(payload.height) || CLOSED.height);
         anchor(w + MARGIN, h + MARGIN);
-      } else if (payload.type === 'SUPPORTBOTS_CLOSE') {
+      } else if (payload.type === 'CATCHJAR_CLOSE' || payload.type === 'SUPPORTBOTS_CLOSE') {
         anchor(CLOSED.width, CLOSED.height);
       }
     });
 
-    window.SupportBots.api = {
+    window.CatchJar.api = {
       show: function() { widgetContainer.style.display = 'block'; },
       hide: function() { widgetContainer.style.display = 'none'; },
       destroy: function() {
         if (widgetContainer.parentNode) {
           widgetContainer.parentNode.removeChild(widgetContainer);
         }
+        delete window.CatchJar;
         delete window.SupportBots;
       }
     };
   })
   .catch(function(error) {
-    console.error('SupportBots: Error loading chatbot data', error);
+    console.error('CatchJar: Error loading chatbot data', error);
   });
 })();

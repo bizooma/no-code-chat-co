@@ -152,7 +152,7 @@ const Widget = () => {
         : isMinimized
           ? { width: 384, height: 72 }
           : { width: 384, height: 560 };
-    window.parent.postMessage({ type: 'SUPPORTBOTS_RESIZE', ...size }, '*');
+    window.parent.postMessage({ type: 'CATCHJAR_RESIZE', ...size }, '*');
   }, [chatbot, isOpen, isMinimized]);
 
 
@@ -635,7 +635,7 @@ const Widget = () => {
                 onClick={() => {
                   setIsOpen(false);
                   if (window.parent !== window) {
-                    window.parent.postMessage({ type: 'SUPPORTBOTS_CLOSE' }, '*');
+                    window.parent.postMessage({ type: 'CATCHJAR_CLOSE' }, '*');
                   }
                 }}
                 className="text-white hover:bg-white/20 p-1 h-auto"
