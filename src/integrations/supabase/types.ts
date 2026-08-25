@@ -1250,6 +1250,19 @@ export type Database = {
         Args: { target_user_id: string }
         Returns: undefined
       }
+      capture_widget_lead: {
+        Args: {
+          _additional_data?: Json
+          _chatbot_id: string
+          _company?: string
+          _conversation_id: string
+          _email?: string
+          _name?: string
+          _phone?: string
+          _source?: string
+        }
+        Returns: string
+      }
       create_platform_owner: {
         Args: { email: string; full_name: string; password: string }
         Returns: string
@@ -1333,6 +1346,10 @@ export type Database = {
       set_workspace_ai_key: {
         Args: { _key: string; _workspace_id: string }
         Returns: undefined
+      }
+      start_widget_conversation: {
+        Args: { _chatbot_id: string; _visitor_id: string; _visitor_info?: Json }
+        Returns: string
       }
       workspace_has_ai_key: {
         Args: { _workspace_id: string }
