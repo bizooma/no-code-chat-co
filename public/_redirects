@@ -1,1 +1,8 @@
-/*    /index.html   200
+# Legacy domain → CatchJar. Must stay ABOVE the SPA catch-all below:
+# _redirects is first-match-wins, and /* would otherwise match everything first.
+# The 301! force flag is required so the rule also applies to paths where a real
+# file exists (widget.js, avatar-widget.js, assets).
+https://supportbots.dev/*  https://catchjar.com/:splat  301!
+
+# SPA fallback — every app route is served by index.html.
+/*  /index.html  200
