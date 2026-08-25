@@ -101,26 +101,21 @@ export const useVideoFlowState = (chatbotId: string, visitorId: string) => {
         }));
 
         // Create conversation with visitor info
-        const { data: conversation, error: convError } = await supabase
-          .from('conversations')
-          .insert({
-            chatbot_id: chatbotId,
-            visitor_id: visitorId,
-            status: 'active',
-            visitor_info: {
-              user_agent: navigator.userAgent,
-              screen_size: `${window.screen.width}x${window.screen.height}`,
-              timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-              started_at: new Date().toISOString(),
-            },
-          })
-          .select()
-          .single();
+        const { data, error: convError } = await supabase.rpc('start_widget_conversation', {
+          _chatbot_id: chatbotId,
+          _visitor_id: visitorId,
+          _visitor_info: {
+            user_agent: navigator.userAgent,
+            screen_size: `${window.screen.width}x${window.screen.height}`,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            started_at: new Date().toISOString(),
+          },
+        });
 
         if (convError) throw convError;
 
-        setState((prev) => ({ ...prev, conversationId: conversation.id }));
-        console.log('[VIDEO-FLOW] Created conversation:', conversation.id);
+        setState((prev) => ({ ...prev, conversationId: data as string }));
+        console.log('[VIDEO-FLOW] Created conversation:', data);
 
         // Track analytics - conversation started
         await supabase.from('analytics_events').insert({
