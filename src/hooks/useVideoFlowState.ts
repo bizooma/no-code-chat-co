@@ -120,7 +120,7 @@ export const useVideoFlowState = (chatbotId: string, visitorId: string) => {
         // Track analytics - conversation started
         await supabase.from('analytics_events').insert({
           chatbot_id: chatbotId,
-          conversation_id: conversation.id,
+          conversation_id: data as string,
           visitor_id: visitorId,
           event_type: 'conversation_started',
           event_data: {
@@ -131,7 +131,7 @@ export const useVideoFlowState = (chatbotId: string, visitorId: string) => {
 
         // Track first node view
         await supabase.from('conversation_messages').insert({
-          conversation_id: conversation.id,
+          conversation_id: data as string,
           sender: 'bot',
           message_text: startNode.message_text || startNode.message_key,
           message_type: startNode.message_type,
@@ -317,23 +317,16 @@ export const useVideoFlowState = (chatbotId: string, visitorId: string) => {
 
       // Save lead to database
       if (state.conversationId) {
-        const { data: workspaceData } = await supabase
-          .from('chatbots')
-          .select('workspace_id')
-          .eq('id', chatbotId)
-          .single();
-
-        const { error: leadError } = await supabase.from('leads').insert([{
-          conversation_id: state.conversationId,
-          chatbot_id: chatbotId,
-          workspace_id: workspaceData?.workspace_id || '',
-          name: data.name,
-          email: data.email,
-          phone: data.phone,
-          additional_data: data,
-          status: 'new',
-          source: 'video_bot',
-        }] as any);
+        const { error: leadError } = await supabase.rpc('capture_widget_lead', {
+          _conversation_id: state.conversationId,
+          _chatbot_id: chatbotId,
+          _name: data.name || null,
+          _email: data.email || null,
+          _phone: data.phone || null,
+          _company: data.company || null,
+          _additional_data: data,
+          _source: 'video_bot',
+        });
 
         if (leadError) {
           console.error('[VIDEO-FLOW] Error saving lead:', leadError);
