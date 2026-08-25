@@ -107,7 +107,7 @@
     document.body.appendChild(widgetContainer);
 
     window.addEventListener('message', function(event) {
-      if (event.origin !== baseUrl) return;
+      if (event.source !== iframe.contentWindow) return;
       var payload = event.data || {};
 
       if (payload.type === 'CATCHJAR_RESIZE' || payload.type === 'SUPPORTBOTS_RESIZE') {
