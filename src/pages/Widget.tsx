@@ -432,18 +432,47 @@ const Widget = () => {
         visitor_id: visitorId,
       });
 
-      handleUserMessage('Thank you for providing your information!');
+      const thankYouText = 'Thank you for providing your information!';
+      setConversation((prev) => [
+        ...prev,
+        {
+          id: `lead-thanks-${Date.now()}`,
+          sender: 'bot',
+          text: thankYouText,
+          timestamp: new Date(),
+        },
+      ]);
+      await saveMessage('bot', thankYouText);
+
+      // If the flow author wired a follow-up step onto this form message, honour it.
+      // Otherwise the flow ends here without re-triggering the free-text fallback.
+      const formMessage = currentMessageKey
+        ? (findMessage(currentMessageKey) as (ChatbotMessage & { next_message_key?: string | null }) | undefined)
+        : undefined;
+      if (formMessage?.next_message_key) {
+        const nextMessage = findMessage(formMessage.next_message_key);
+        if (nextMessage) {
+          setCurrentMessageKey(formMessage.next_message_key);
+          setTimeout(() => { void sendBotMessage(nextMessage); }, 500);
+        } else {
+          setCurrentMessageKey(null);
+        }
+      } else {
+        setCurrentMessageKey(null);
+      }
     } catch (error) {
       console.error('Error saving lead:', error);
+      const errorText = "Sorry — I couldn't save your details. Please check your email address or phone number and try again.";
       setConversation((prev) => [
         ...prev,
         {
           id: `lead-error-${Date.now()}`,
           sender: 'bot',
-          text: "Sorry — I couldn't save your details. Please check your email address or phone number and try again.",
+          text: errorText,
           timestamp: new Date(),
         },
       ]);
+      await saveMessage('bot', errorText);
     }
   };
 
