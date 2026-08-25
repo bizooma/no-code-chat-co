@@ -91,7 +91,7 @@ const ClientPortal: React.FC<ClientPortalProps> = ({ workspaceId: propWorkspaceI
   // Apply workspace branding
   const brandColor = workspace?.brand_color || '#3B82F6';
   const isWhiteLabeled = workspace?.white_label_enabled;
-  const brandName = isWhiteLabeled ? (workspace?.agency_name || 'SupportBots') : 'SupportBots';
+  const brandName = isWhiteLabeled ? (workspace?.agency_name || 'CatchJar') : 'CatchJar';
   const clientName = workspace?.client_name || 'Client';
 
   return (
@@ -279,7 +279,7 @@ const ClientPortal: React.FC<ClientPortalProps> = ({ workspaceId: propWorkspaceI
         ) : (
           <div className="mt-12 text-center">
             <p className="text-sm text-muted-foreground">
-              Powered by <span className="font-semibold">SupportBots</span> • 
+              Powered by <span className="font-semibold">CatchJar</span> • 
               <Link to="/pricing" className="ml-1 hover:underline">
                 Upgrade your plan
               </Link>

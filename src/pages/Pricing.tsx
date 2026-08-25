@@ -109,7 +109,7 @@ const Pricing = () => {
     if (searchParams.get('success') === 'true') {
       toast({
         title: "Payment Successful!",
-        description: "Your subscription has been activated. Welcome to SupportBots!",
+        description: "Your subscription has been activated. Welcome to CatchJar!",
       });
     } else if (searchParams.get('canceled') === 'true') {
       toast({

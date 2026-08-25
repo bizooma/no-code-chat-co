@@ -21,7 +21,7 @@ const Dashboard = () => {
 
   const brandColor = currentWorkspace?.brand_color || '#3B82F6';
   const isWhiteLabeled = currentWorkspace?.white_label_enabled;
-  const brandName = isWhiteLabeled ? (currentWorkspace?.agency_name || 'SupportBots') : 'SupportBots';
+  const brandName = isWhiteLabeled ? (currentWorkspace?.agency_name || 'CatchJar') : 'CatchJar';
 
   return (
     <div className="min-h-screen bg-background">
@@ -44,7 +44,7 @@ const Dashboard = () => {
                   {brandName.charAt(0)}
                 </div>
               )}
-              <h1 className="text-xl font-bold">{isWhiteLabeled ? brandName : 'SupportBots.dev'}</h1>
+              <h1 className="text-xl font-bold">{isWhiteLabeled ? brandName : 'CatchJar'}</h1>
             </div>
             
             <WorkspaceSwitcher />
@@ -219,8 +219,8 @@ const Dashboard = () => {
                   <Crown className="h-8 w-8 text-green-600" />
                   <div>
                     <h3 className="text-lg font-semibold">
-                      {subscription.tier === 'professional' ? 'SupportBots Professional' : 
-                       subscription.tier === 'enterprise' ? 'SupportBots Enterprise' : 'Premium Plan'}
+                      {subscription.tier === 'professional' ? 'CatchJar Professional' : 
+                       subscription.tier === 'enterprise' ? 'CatchJar Enterprise' : 'Premium Plan'}
                     </h3>
                     <p className="text-muted-foreground">
                       {subscription.subscription_end && 
