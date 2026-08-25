@@ -202,32 +202,29 @@ const Widget = () => {
     if (!chatbotId || conversationId) return;
 
     try {
-      const { data, error } = await supabase
-        .from('conversations')
-        .insert({
-          chatbot_id: chatbotId,
-          visitor_id: visitorId,
-          visitor_info: {
-            user_agent: navigator.userAgent,
-            url: window.location.href,
-            referrer: document.referrer
-          }
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-      setConversationId(data.id);
-      
-      // Track conversation started event
-      await supabase.from('analytics_events').insert({
-        chatbot_id: chatbotId,
-        conversation_id: data.id,
-        event_type: 'conversation_started',
-        visitor_id: visitorId
+      const { data, error } = await supabase.rpc('start_widget_conversation', {
+        _chatbot_id: chatbotId,
+        _visitor_id: visitorId,
+        _visitor_info: {
+          user_agent: navigator.userAgent,
+          url: window.location.href,
+          referrer: document.referrer,
+        },
       });
 
-      return data.id;
+      if (error) throw error;
+      const newConversationId = data as string;
+      setConversationId(newConversationId);
+
+      // Plain insert with no .select() — this works for anonymous visitors.
+      await supabase.from('analytics_events').insert({
+        chatbot_id: chatbotId,
+        conversation_id: newConversationId,
+        event_type: 'conversation_started',
+        visitor_id: visitorId,
+      });
+
+      return newConversationId;
     } catch (error) {
       console.error('Error creating conversation:', error);
       return null;
