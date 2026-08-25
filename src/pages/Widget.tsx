@@ -408,46 +408,43 @@ const Widget = () => {
   };
 
   const handleFormSubmit = async (formData: Record<string, string>) => {
-    // Save lead data
-    if (conversationId && chatbotId) {
-      try {
-        const { data: chatbotData } = await supabase
-          .from('chatbots')
-          .select('workspace_id')
-          .eq('id', chatbotId)
-          .single();
+    if (!conversationId || !chatbotId) return;
 
-        if (chatbotData) {
-          await supabase.from('leads').insert({
-            conversation_id: conversationId,
-            chatbot_id: chatbotId,
-            workspace_id: chatbotData.workspace_id,
-            email: formData.email || null,
-            phone: formData.phone || null,
-            name: formData.name || null,
-            company: formData.company || null,
-            additional_data: formData
-          });
+    try {
+      const { error } = await supabase.rpc('capture_widget_lead', {
+        _conversation_id: conversationId,
+        _chatbot_id: chatbotId,
+        _name: formData.name || null,
+        _email: formData.email || null,
+        _phone: formData.phone || null,
+        _company: formData.company || null,
+        _additional_data: formData,
+        _source: 'website_chat',
+      });
 
-          // Track lead captured event
-          await supabase.from('analytics_events').insert({
-            chatbot_id: chatbotId,
-            conversation_id: conversationId,
-            event_type: 'lead_captured',
-            event_data: { fields: Object.keys(formData) },
-            visitor_id: visitorId
-          });
-        }
-      } catch (error) {
-        console.error('Error saving lead:', error);
-      }
+      if (error) throw error;
+
+      await supabase.from('analytics_events').insert({
+        chatbot_id: chatbotId,
+        conversation_id: conversationId,
+        event_type: 'lead_captured',
+        event_data: { fields: Object.keys(formData) },
+        visitor_id: visitorId,
+      });
+
+      handleUserMessage('Thank you for providing your information!');
+    } catch (error) {
+      console.error('Error saving lead:', error);
+      setConversation((prev) => [
+        ...prev,
+        {
+          id: `lead-error-${Date.now()}`,
+          sender: 'bot',
+          text: "Sorry — I couldn't save your details. Please check your email address or phone number and try again.",
+          timestamp: new Date(),
+        },
+      ]);
     }
-
-    const formText = Object.entries(formData)
-      .map(([key, value]) => `${key}: ${value}`)
-      .join(', ');
-    
-    handleUserMessage(`Thank you for providing your information!`);
   };
 
   const handleSendMessage = () => {
