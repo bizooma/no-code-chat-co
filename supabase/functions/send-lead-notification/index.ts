@@ -90,9 +90,35 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error('RESEND_API_KEY not configured');
     }
 
-    const fromEmail = config?.from_email || 'notifications@resend.dev';
+    const fromEmail =
+      Deno.env.get('LEAD_FROM_EMAIL') ||
+      config?.from_email ||
+      'CatchJar <leads@catchjar.com>';
     const subject = ((body as any).subject || config?.subject || config?.subject_template || 'New Lead Captured')
       .replace('{chatbot_name}', lead.chatbots?.name || 'Chatbot');
+
+    const emailPayload: Record<string, unknown> = {
+      from: fromEmail,
+      to: recipients,
+      subject,
+      html: `
+        <h2>New Lead Captured${body.test ? ' (Test)' : ''}</h2>
+        <p><strong>Chatbot:</strong> ${lead.chatbots?.name || 'Unknown'}</p>
+        <p><strong>Workspace:</strong> ${lead.workspaces?.name || 'Unknown'}</p>
+        <p><strong>Name:</strong> ${lead.name || 'Not provided'}</p>
+        <p><strong>Email:</strong> ${lead.email || 'Not provided'}</p>
+        <p><strong>Phone:</strong> ${lead.phone || 'Not provided'}</p>
+        <p><strong>Company:</strong> ${lead.company || 'Not provided'}</p>
+        <p><strong>Source:</strong> ${lead.source}</p>
+        <p><strong>Date:</strong> ${new Date(lead.created_at).toLocaleString()}</p>
+        ${lead.additional_data ? `<p><strong>Additional Data:</strong> ${JSON.stringify(lead.additional_data, null, 2)}</p>` : ''}
+      `,
+    };
+
+    // Let the business owner reply straight to the prospect.
+    if (lead.email) {
+      emailPayload.reply_to = lead.email;
+    }
 
     const emailResponse = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -100,23 +126,7 @@ const handler = async (req: Request): Promise<Response> => {
         'Authorization': `Bearer ${resendApiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        from: fromEmail,
-        to: recipients,
-        subject,
-        html: `
-          <h2>New Lead Captured${body.test ? ' (Test)' : ''}</h2>
-          <p><strong>Chatbot:</strong> ${lead.chatbots?.name || 'Unknown'}</p>
-          <p><strong>Workspace:</strong> ${lead.workspaces?.name || 'Unknown'}</p>
-          <p><strong>Name:</strong> ${lead.name || 'Not provided'}</p>
-          <p><strong>Email:</strong> ${lead.email || 'Not provided'}</p>
-          <p><strong>Phone:</strong> ${lead.phone || 'Not provided'}</p>
-          <p><strong>Company:</strong> ${lead.company || 'Not provided'}</p>
-          <p><strong>Source:</strong> ${lead.source}</p>
-          <p><strong>Date:</strong> ${new Date(lead.created_at).toLocaleString()}</p>
-          ${lead.additional_data ? `<p><strong>Additional Data:</strong> ${JSON.stringify(lead.additional_data, null, 2)}</p>` : ''}
-        `,
-      }),
+      body: JSON.stringify(emailPayload),
     });
 
     const emailResult = await emailResponse.json();
