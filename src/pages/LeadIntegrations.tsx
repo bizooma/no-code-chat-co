@@ -51,8 +51,7 @@ const LeadIntegrations = () => {
   const [emailNotifications, setEmailNotifications] = useState({
     enabled: false,
     recipients: '',
-    subject: 'New Lead Captured',
-    template: 'Hello,\n\nA new lead has been captured:\n\nName: {{name}}\nEmail: {{email}}\nPhone: {{phone}}\nCompany: {{company}}\nChatbot: {{chatbot}}\n\nBest regards,\nYour CatchJar Team'
+    subject: 'New Lead Captured'
   });
   const [hubspotConfig, setHubspotConfig] = useState({
     api_key: '',
@@ -118,8 +117,7 @@ const LeadIntegrations = () => {
           setEmailNotifications({
             enabled: integration.is_active,
             recipients: integration.config?.recipients || '',
-            subject: integration.config?.subject || 'New Lead Captured',
-            template: integration.config?.template || emailNotifications.template
+            subject: integration.config?.subject || 'New Lead Captured'
           });
           break;
         case 'hubspot':
@@ -280,7 +278,6 @@ const LeadIntegrations = () => {
           test: true,
           recipients: emailNotifications.recipients.split(',').map(e => e.trim()),
           subject: emailNotifications.subject,
-          template: emailNotifications.template,
           lead: {
             name: "Test User",
             email: "test@example.com",
@@ -523,21 +520,6 @@ const LeadIntegrations = () => {
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="email-template">Email Template</Label>
-                  <Textarea
-                    id="email-template"
-                    rows={8}
-                    value={emailNotifications.template}
-                    onChange={(e) => 
-                      setEmailNotifications(prev => ({ ...prev, template: e.target.value }))
-                    }
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    Use variables: {'{'}{'{'} name {'}'}{'}'}, {'{'}{'{'} email {'}'}{'}'}, {'{'}{'{'} phone {'}'}{'}'}, {'{'}{'{'} company {'}'}{'}'}, {'{'}{'{'} chatbot {'}'}{'}'}
-                  </p>
-                </div>
-
                 <div className="flex gap-2">
                   <Button
                     onClick={testEmailNotification}
@@ -557,8 +539,7 @@ const LeadIntegrations = () => {
                       'Email Notifications',
                       {
                         recipients: emailNotifications.recipients,
-                        subject: emailNotifications.subject,
-                        template: emailNotifications.template
+                        subject: emailNotifications.subject
                       },
                       emailNotifications.enabled
                     )}
