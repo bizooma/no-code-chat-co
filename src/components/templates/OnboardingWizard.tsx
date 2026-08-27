@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { normalizeFlowButton } from '@/lib/buttonLink';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -171,7 +172,9 @@ const OnboardingWizard = () => {
           message_text: msg.text,
           message_type: msg.type || 'text',
           next_message_key: msg.next_key || null,
-          buttons: msg.buttons || null,
+          buttons: Array.isArray(msg.buttons)
+            ? msg.buttons.map(normalizeFlowButton)
+            : (msg.buttons || null),
           collect_lead_info: msg.collect_lead || false,
           conditions: msg.conditions || null
         }));

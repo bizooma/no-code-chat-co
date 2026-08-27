@@ -14,13 +14,15 @@ import {
   Phone,
   Mail,
   Building,
-  UserIcon
+  UserIcon,
+  ExternalLink
 } from 'lucide-react';
 import { VideoPlayer } from '@/components/video/VideoPlayer';
 import { supabase } from '@/integrations/supabase/client';
 import { useSearchParams } from 'react-router-dom';
 import AvatarChatbot from '@/components/avatar/AvatarChatbot';
 import { VideoFlowWidget } from '@/components/chatbot/VideoFlowWidget';
+import { FlowButton, safeExternalUrl, normalizeFlowButton } from '@/lib/buttonLink';
 
 interface Chatbot {
   id: string;
@@ -55,7 +57,7 @@ interface ConversationMessage {
   sender: 'bot' | 'user';
   text: string;
   timestamp: Date;
-  buttons?: { text: string; next_key: string }[];
+  buttons?: FlowButton[];
   isForm?: boolean;
   formFields?: string[];
   hasVideo?: boolean;
@@ -298,7 +300,9 @@ const Widget = () => {
       sender: 'bot',
       text: message.message_text,
       timestamp: new Date(),
-      buttons: message.buttons ? message.buttons : undefined,
+      buttons: Array.isArray(message.buttons)
+        ? message.buttons.map(normalizeFlowButton)
+        : undefined,
       isForm: isLeadForm,
       formFields: isLeadForm && message.conditions?.lead_fields ? message.conditions.lead_fields : undefined,
       hasVideo,
@@ -405,8 +409,34 @@ const Widget = () => {
     }, 400);
   };
 
-  const handleButtonClick = (button: { text: string; next_key: string }) => {
+  const handleButtonClick = (button: FlowButton) => {
     handleUserMessage(button.text, button.next_key);
+  };
+
+  const handleLinkClick = async (button: FlowButton, url: string) => {
+    // Record the click in the transcript so the conversation doesn't go silent
+    const userMessage: ConversationMessage = {
+      id: Date.now().toString(),
+      sender: 'user',
+      text: button.text,
+      timestamp: new Date(),
+    };
+    setConversation((prev) => [...prev, userMessage]);
+    await saveMessage('user', button.text);
+
+    if (!chatbotId) return;
+    try {
+      await supabase.from('analytics_events').insert({
+        chatbot_id: chatbotId,
+        conversation_id: conversationId,
+        // event_type is a db enum without a link value; keep the detail in event_data
+        event_type: 'bot_triggered',
+        event_data: { action: 'link_clicked', button_text: button.text, url },
+        visitor_id: visitorId,
+      });
+    } catch (e) {
+      console.error('Error tracking link click:', e);
+    }
   };
 
   const handleFormSubmit = async (formData: Record<string, string>) => {
@@ -548,15 +578,42 @@ const Widget = () => {
         {message.buttons && message.buttons.length > 0 && (
           <div className="mt-2 space-y-1">
             {message.buttons.map((button, index) => (
-              <Button
-                key={index}
-                variant="outline"
-                size="sm"
-                className="mr-2 mb-1 text-xs"
-                onClick={() => handleButtonClick(button)}
-              >
-                {button.text}
-              </Button>
+              (() => {
+                const href = safeExternalUrl(button.url);
+                if (href) {
+                  return (
+                    <Button
+                      key={index}
+                      asChild
+                      variant="outline"
+                      size="sm"
+                      className="mr-2 mb-1 text-xs"
+                    >
+                      <a
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => handleLinkClick(button, href)}
+                      >
+                        {button.text}
+                        <ExternalLink className="ml-1 h-3 w-3" />
+                      </a>
+                    </Button>
+                  );
+                }
+                if (button.url) return null; // unsafe/malformed url: render nothing
+                return (
+                  <Button
+                    key={index}
+                    variant="outline"
+                    size="sm"
+                    className="mr-2 mb-1 text-xs"
+                    onClick={() => handleButtonClick(button)}
+                  >
+                    {button.text}
+                  </Button>
+                );
+              })()
             ))}
           </div>
         )}

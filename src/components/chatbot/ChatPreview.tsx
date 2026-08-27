@@ -3,7 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { X, Send, Bot, User, Minimize2 } from 'lucide-react';
+import { X, Send, Bot, User, Minimize2, ExternalLink } from 'lucide-react';
+import { FlowButton, safeExternalUrl, normalizeFlowButton } from '@/lib/buttonLink';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { VideoPlayer } from '@/components/video/VideoPlayer';
 import { supabase } from '@/integrations/supabase/client';
@@ -40,7 +41,7 @@ interface ConversationMessage {
   sender: 'bot' | 'user';
   text: string;
   timestamp: Date;
-  buttons?: { text: string; next_key: string }[];
+  buttons?: FlowButton[];
   isForm?: boolean;
   formFields?: string[];
   messageType?: 'text' | 'image' | 'file' | 'form' | 'button' | 'youtube_video' | 'uploaded_video' | 'video_intro';
@@ -106,7 +107,7 @@ export const ChatPreview: React.FC<ChatPreviewProps> = ({
       sender: 'bot',
       text: message.message_text,
       timestamp: new Date(),
-      buttons: message.buttons && Array.isArray(message.buttons) ? message.buttons : undefined,
+      buttons: Array.isArray(message.buttons) ? message.buttons.map(normalizeFlowButton) : undefined,
       isForm: message.collect_lead_info,
       formFields: message.collect_lead_info && message.conditions?.lead_fields ? message.conditions.lead_fields : undefined,
       messageType: message.message_type,
@@ -188,7 +189,7 @@ export const ChatPreview: React.FC<ChatPreviewProps> = ({
     }, 400);
   };
 
-  const handleButtonClick = (button: { text: string; next_key: string }) => {
+  const handleButtonClick = (button: FlowButton) => {
     handleUserMessage(button.text, button.next_key);
   };
 
@@ -263,15 +264,31 @@ export const ChatPreview: React.FC<ChatPreviewProps> = ({
         {message.buttons && message.buttons.length > 0 && (
           <div className="mt-2 space-y-1">
             {message.buttons.map((button, index) => (
-              <Button
-                key={index}
-                variant="outline"
-                size="sm"
-                className="mr-2 mb-1"
-                onClick={() => handleButtonClick(button)}
-              >
-                {button.text}
-              </Button>
+              (() => {
+                const href = safeExternalUrl(button.url);
+                if (href) {
+                  return (
+                    <Button key={index} asChild variant="outline" size="sm" className="mr-2 mb-1">
+                      <a href={href} target="_blank" rel="noopener noreferrer">
+                        {button.text}
+                        <ExternalLink className="ml-1 h-3 w-3" />
+                      </a>
+                    </Button>
+                  );
+                }
+                if (button.url) return null;
+                return (
+                  <Button
+                    key={index}
+                    variant="outline"
+                    size="sm"
+                    className="mr-2 mb-1"
+                    onClick={() => handleButtonClick(button)}
+                  >
+                    {button.text}
+                  </Button>
+                );
+              })()
             ))}
           </div>
         )}

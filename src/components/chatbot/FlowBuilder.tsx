@@ -28,6 +28,7 @@ import {
   Check,
   ChevronsUpDown
 } from 'lucide-react';
+import { FlowButton, isSafeExternalUrl, normalizeFlowButton } from '@/lib/buttonLink';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -65,7 +66,7 @@ interface NewMessageData {
   message_key: string;
   message_text: string;
   message_type: 'text' | 'form' | 'button' | 'youtube_video' | 'uploaded_video' | 'video_intro';
-  buttons: { text: string; next_key: string }[];
+  buttons: FlowButton[];
   collect_lead_info: boolean;
   lead_fields: string[];
   video_url?: string;
@@ -109,7 +110,7 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
       message_type: (['text','form','button','youtube_video','uploaded_video','video_intro'].includes(msg.message_type)
         ? msg.message_type
         : 'text') as NewMessageData['message_type'],
-      buttons: Array.isArray(msg.buttons) ? msg.buttons : [],
+      buttons: Array.isArray(msg.buttons) ? msg.buttons.map(normalizeFlowButton) : [],
       collect_lead_info: !!msg.collect_lead_info,
       lead_fields: (msg.conditions && Array.isArray(msg.conditions.lead_fields)) ? msg.conditions.lead_fields : [],
       video_url: msg.video_url || '',
@@ -135,7 +136,13 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
       message_key: newMessage.message_key,
       message_text: newMessage.message_text,
       message_type: newMessage.message_type,
-      buttons: newMessage.message_type === 'button' ? newMessage.buttons : null,
+      buttons: newMessage.message_type === 'button'
+        ? newMessage.buttons.map((b) =>
+            b.url !== undefined
+              ? { text: b.text, url: (b.url || '').trim() }
+              : { text: b.text, next_key: b.next_key || '' }
+          )
+        : null,
       collect_lead_info: newMessage.collect_lead_info,
       conditions: newMessage.collect_lead_info ? { lead_fields: newMessage.lead_fields } : null,
       video_url: newMessage.video_url || null,
@@ -238,11 +245,24 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
     }));
   };
 
-  const updateButton = (index: number, field: 'text' | 'next_key', value: string) => {
+  const updateButton = (index: number, field: 'text' | 'next_key' | 'url', value: string) => {
     setNewMessage(prev => ({
       ...prev,
       buttons: prev.buttons.map((btn, i) => 
         i === index ? { ...btn, [field]: value } : btn
+      )
+    }));
+  };
+
+  const setButtonMode = (index: number, mode: 'next_key' | 'url') => {
+    setNewMessage(prev => ({
+      ...prev,
+      buttons: prev.buttons.map((btn, i) =>
+        i === index
+          ? (mode === 'url'
+              ? { text: btn.text, url: btn.url || '' }
+              : { text: btn.text, next_key: btn.next_key || '' })
+          : btn
       )
     }));
   };
@@ -465,34 +485,71 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
                     </Button>
                   </div>
                   
-                  {newMessage.buttons.map((button, index) => (
-                    <div key={index} className="flex gap-2 items-end">
-                      <div className="flex-1 space-y-2">
-                        <Label>Button Text</Label>
-                        <Input
-                          placeholder="Button text"
-                          value={button.text}
-                          onChange={(e) => updateButton(index, 'text', e.target.value)}
-                        />
+                  {newMessage.buttons.map((button, index) => {
+                    const isLink = button.url !== undefined;
+                    const urlInvalid = !!button.url && !isSafeExternalUrl(button.url);
+                    return (
+                      <div key={index} className="flex gap-2 items-end">
+                        <div className="flex-1 space-y-2">
+                          <Label>Button Text</Label>
+                          <Input
+                            placeholder="Button text"
+                            value={button.text}
+                            onChange={(e) => updateButton(index, 'text', e.target.value)}
+                          />
+                        </div>
+                        <div className="w-32 space-y-2">
+                          <Label>Action</Label>
+                          <Select
+                            value={isLink ? 'url' : 'next_key'}
+                            onValueChange={(mode) => setButtonMode(index, mode as 'next_key' | 'url')}
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="next_key">Message</SelectItem>
+                              <SelectItem value="url">Link (URL)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="flex-1 space-y-2">
+                          {isLink ? (
+                            <>
+                              <Label>Destination URL</Label>
+                              <Input
+                                placeholder="https://example.com/checkout"
+                                value={button.url || ''}
+                                onChange={(e) => updateButton(index, 'url', e.target.value)}
+                              />
+                              {urlInvalid && (
+                                <p className="text-xs text-yellow-600">
+                                  Must be a full https:// URL — this button won't render until it is.
+                                </p>
+                              )}
+                            </>
+                          ) : (
+                            <>
+                              <Label>Next Message Key</Label>
+                              <MessageKeyPicker
+                                value={button.next_key || ''}
+                                onChange={(value) => updateButton(index, 'next_key', value)}
+                                placeholder="Select or type a key..."
+                              />
+                            </>
+                          )}
+                        </div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => removeButton(index)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
-                      <div className="flex-1 space-y-2">
-                        <Label>Next Message Key</Label>
-                        <MessageKeyPicker
-                          value={button.next_key}
-                          onChange={(value) => updateButton(index, 'next_key', value)}
-                          placeholder="Select or type a key..."
-                        />
-                      </div>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => removeButton(index)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
 
@@ -654,7 +711,9 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
                           <div key={btnIndex} className="flex items-center gap-2 text-xs">
                             <Badge variant="outline">{button.text}</Badge>
                             <ArrowRight className="h-3 w-3" />
-                            <span className="text-muted-foreground">{button.next_key || 'End'}</span>
+                            <span className="text-muted-foreground break-all">
+                              {button.url ? button.url : (button.next_key || 'End')}
+                            </span>
                           </div>
                         ))}
                       </div>
