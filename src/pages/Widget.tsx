@@ -55,7 +55,7 @@ interface ConversationMessage {
   sender: 'bot' | 'user';
   text: string;
   timestamp: Date;
-  buttons?: { text: string; next_key: string }[];
+  buttons?: FlowButton[];
   isForm?: boolean;
   formFields?: string[];
   hasVideo?: boolean;
