@@ -426,8 +426,9 @@ const Widget = () => {
       await supabase.from('analytics_events').insert({
         chatbot_id: chatbotId,
         conversation_id: conversationId,
-        event_type: 'link_clicked',
-        event_data: { button_text: button.text, url },
+        // event_type is a db enum without a link value; keep the detail in event_data
+        event_type: 'bot_triggered',
+        event_data: { action: 'link_clicked', button_text: button.text, url },
         visitor_id: visitorId,
       });
     } catch (e) {
