@@ -40,7 +40,7 @@ interface ConversationMessage {
   sender: 'bot' | 'user';
   text: string;
   timestamp: Date;
-  buttons?: { text: string; next_key: string }[];
+  buttons?: FlowButton[];
   isForm?: boolean;
   formFields?: string[];
   messageType?: 'text' | 'image' | 'file' | 'form' | 'button' | 'youtube_video' | 'uploaded_video' | 'video_intro';
