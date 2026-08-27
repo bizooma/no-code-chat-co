@@ -21,6 +21,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSearchParams } from 'react-router-dom';
 import AvatarChatbot from '@/components/avatar/AvatarChatbot';
 import { VideoFlowWidget } from '@/components/chatbot/VideoFlowWidget';
+import { FlowButton, safeExternalUrl } from '@/lib/buttonLink';
 
 interface Chatbot {
   id: string;
