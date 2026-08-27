@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useWorkspace } from '@/contexts/WorkspaceContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -40,6 +41,7 @@ interface Integration {
 
 const LeadIntegrations = () => {
   const { user } = useAuth();
+  const { currentWorkspace } = useWorkspace();
   const { toast } = useToast();
   
   const [integrations, setIntegrations] = useState<Integration[]>([]);
@@ -82,17 +84,23 @@ const LeadIntegrations = () => {
 
   useEffect(() => {
     fetchIntegrations();
-  }, []);
+  }, [currentWorkspace?.id]);
 
   const fetchIntegrations = async () => {
+    if (!currentWorkspace) {
+      setIntegrations([]);
+      setLoading(false);
+      return;
+    }
     try {
       const { data, error } = await supabase
         .from('integrations')
         .select('*')
+        .eq('workspace_id', currentWorkspace.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      
+
       setIntegrations(data || []);
       populateFormData(data || []);
     } catch (error) {
@@ -159,8 +167,17 @@ const LeadIntegrations = () => {
   };
 
   const saveIntegration = async (type: string, name: string, config: any, enabled: boolean) => {
+    if (!currentWorkspace) {
+      toast({
+        title: "No workspace selected",
+        description: "Please select a workspace before saving integrations.",
+        variant: "destructive",
+      });
+      return;
+    }
     try {
-      // First check if integration exists
+      // First check if integration exists (integrations state is already
+      // scoped to the current workspace by fetchIntegrations)
       const existingIntegration = integrations.find(i => i.integration_type === type);
 
       if (existingIntegration) {
@@ -177,18 +194,10 @@ const LeadIntegrations = () => {
         if (error) throw error;
       } else {
         // Create new
-        const { data: workspaceData } = await supabase
-          .from('workspaces')
-          .select('id')
-          .limit(1)
-          .single();
-
-        if (!workspaceData) throw new Error('No workspace found');
-
         const { error } = await supabase
           .from('integrations')
           .insert({
-            workspace_id: workspaceData.id,
+            workspace_id: currentWorkspace.id,
             integration_type: type as any,
             name,
             config,
