@@ -465,34 +465,71 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
                     </Button>
                   </div>
                   
-                  {newMessage.buttons.map((button, index) => (
-                    <div key={index} className="flex gap-2 items-end">
-                      <div className="flex-1 space-y-2">
-                        <Label>Button Text</Label>
-                        <Input
-                          placeholder="Button text"
-                          value={button.text}
-                          onChange={(e) => updateButton(index, 'text', e.target.value)}
-                        />
+                  {newMessage.buttons.map((button, index) => {
+                    const isLink = button.url !== undefined;
+                    const urlInvalid = !!button.url && !isSafeExternalUrl(button.url);
+                    return (
+                      <div key={index} className="flex gap-2 items-end">
+                        <div className="flex-1 space-y-2">
+                          <Label>Button Text</Label>
+                          <Input
+                            placeholder="Button text"
+                            value={button.text}
+                            onChange={(e) => updateButton(index, 'text', e.target.value)}
+                          />
+                        </div>
+                        <div className="w-32 space-y-2">
+                          <Label>Action</Label>
+                          <Select
+                            value={isLink ? 'url' : 'next_key'}
+                            onValueChange={(mode) => setButtonMode(index, mode as 'next_key' | 'url')}
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="next_key">Message</SelectItem>
+                              <SelectItem value="url">Link (URL)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="flex-1 space-y-2">
+                          {isLink ? (
+                            <>
+                              <Label>Destination URL</Label>
+                              <Input
+                                placeholder="https://example.com/checkout"
+                                value={button.url || ''}
+                                onChange={(e) => updateButton(index, 'url', e.target.value)}
+                              />
+                              {urlInvalid && (
+                                <p className="text-xs text-yellow-600">
+                                  Must be a full https:// URL — this button won't render until it is.
+                                </p>
+                              )}
+                            </>
+                          ) : (
+                            <>
+                              <Label>Next Message Key</Label>
+                              <MessageKeyPicker
+                                value={button.next_key || ''}
+                                onChange={(value) => updateButton(index, 'next_key', value)}
+                                placeholder="Select or type a key..."
+                              />
+                            </>
+                          )}
+                        </div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => removeButton(index)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
-                      <div className="flex-1 space-y-2">
-                        <Label>Next Message Key</Label>
-                        <MessageKeyPicker
-                          value={button.next_key}
-                          onChange={(value) => updateButton(index, 'next_key', value)}
-                          placeholder="Select or type a key..."
-                        />
-                      </div>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => removeButton(index)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
 
