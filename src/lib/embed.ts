@@ -8,4 +8,4 @@
  * only when the env var is unset, so local development still works.
  */
 export const EMBED_ORIGIN =
-  import.meta.env.VITE_PUBLIC_APP_ORIGIN || window.location.origin;
+  import.meta.env.VITE_PUBLIC_APP_ORIGIN || globalThis.location.origin;
