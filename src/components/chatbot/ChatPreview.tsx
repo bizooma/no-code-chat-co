@@ -189,7 +189,7 @@ export const ChatPreview: React.FC<ChatPreviewProps> = ({
     }, 400);
   };
 
-  const handleButtonClick = (button: { text: string; next_key: string }) => {
+  const handleButtonClick = (button: FlowButton) => {
     handleUserMessage(button.text, button.next_key);
   };
 
