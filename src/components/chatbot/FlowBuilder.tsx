@@ -417,9 +417,17 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
                   <Label htmlFor="message_type">Message Type</Label>
                   <Select
                     value={newMessage.message_type}
-                    onValueChange={(value: NewMessageData['message_type']) => 
-                      setNewMessage(prev => ({ ...prev, message_type: value }))
+                    onValueChange={(value: NewMessageData['message_type']) =>
+                      setNewMessage(prev => ({
+                        ...prev,
+                        message_type: value,
+                        // Form-only settings must not survive a switch to another type — the
+                        // toggle that controls them is hidden unless type === 'form', so a stale
+                        // true would be invisible AND unfixable from the UI.
+                        ...(value !== 'form' ? { collect_lead_info: false, lead_fields: [] } : {}),
+                      }))
                     }
+
                   >
                     <SelectTrigger>
                       <SelectValue />
