@@ -1373,6 +1373,7 @@ export type Database = {
         | "message_sent"
         | "lead_captured"
         | "bot_triggered"
+        | "link_clicked"
       integration_type:
         | "zapier"
         | "hubspot"
@@ -1532,6 +1533,7 @@ export const Constants = {
         "message_sent",
         "lead_captured",
         "bot_triggered",
+        "link_clicked",
       ],
       integration_type: [
         "zapier",
