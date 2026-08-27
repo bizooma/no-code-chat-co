@@ -9,6 +9,7 @@ import { Plus, Bot, Settings, Copy, Play, Pause, Trash2, MoreHorizontal, Video, 
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { EMBED_ORIGIN } from '@/lib/embed';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -133,7 +134,7 @@ const Chatbots = () => {
     const embedCode = `<script>
   (function() {
     var script = document.createElement('script');
-    script.src = '${window.location.origin}/widget.js';
+    script.src = '${EMBED_ORIGIN}/widget.js';
     script.setAttribute('data-chatbot-id', '${botId}');
     document.head.appendChild(script);
   })();
