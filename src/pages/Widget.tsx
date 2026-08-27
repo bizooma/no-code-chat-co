@@ -291,15 +291,16 @@ const Widget = () => {
 
   const sendBotMessage = async (message: ChatbotMessage, convId?: string) => {
     const hasVideo = ['youtube_video', 'uploaded_video', 'video_intro'].includes(message.message_type);
-    
+    const isLeadForm = message.message_type === 'form' && !!message.collect_lead_info;
+
     const newMessage: ConversationMessage = {
       id: Date.now().toString(),
       sender: 'bot',
       text: message.message_text,
       timestamp: new Date(),
       buttons: message.buttons ? message.buttons : undefined,
-      isForm: message.collect_lead_info,
-      formFields: message.collect_lead_info && message.conditions?.lead_fields ? message.conditions.lead_fields : undefined,
+      isForm: isLeadForm,
+      formFields: isLeadForm && message.conditions?.lead_fields ? message.conditions.lead_fields : undefined,
       hasVideo,
       videoProps: hasVideo ? {
         type: message.video_type === 'video_intro' ? 'video_intro' : 'uploaded',
@@ -311,6 +312,7 @@ const Widget = () => {
         chapters: message.video_chapters
       } : undefined
     };
+
 
     setConversation(prev => [...prev, newMessage]);
     await saveMessage('bot', message.message_text, convId);
