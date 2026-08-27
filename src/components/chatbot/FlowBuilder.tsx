@@ -65,7 +65,7 @@ interface NewMessageData {
   message_key: string;
   message_text: string;
   message_type: 'text' | 'form' | 'button' | 'youtube_video' | 'uploaded_video' | 'video_intro';
-  buttons: { text: string; next_key: string }[];
+  buttons: FlowButton[];
   collect_lead_info: boolean;
   lead_fields: string[];
   video_url?: string;
@@ -238,7 +238,7 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
     }));
   };
 
-  const updateButton = (index: number, field: 'text' | 'next_key', value: string) => {
+  const updateButton = (index: number, field: 'text' | 'next_key' | 'url', value: string) => {
     setNewMessage(prev => ({
       ...prev,
       buttons: prev.buttons.map((btn, i) => 
@@ -654,7 +654,9 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
                           <div key={btnIndex} className="flex items-center gap-2 text-xs">
                             <Badge variant="outline">{button.text}</Badge>
                             <ArrowRight className="h-3 w-3" />
-                            <span className="text-muted-foreground">{button.next_key || 'End'}</span>
+                            <span className="text-muted-foreground break-all">
+                              {button.url ? button.url : (button.next_key || 'End')}
+                            </span>
                           </div>
                         ))}
                       </div>
