@@ -110,7 +110,7 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
       message_type: (['text','form','button','youtube_video','uploaded_video','video_intro'].includes(msg.message_type)
         ? msg.message_type
         : 'text') as NewMessageData['message_type'],
-      buttons: Array.isArray(msg.buttons) ? msg.buttons : [],
+      buttons: Array.isArray(msg.buttons) ? msg.buttons.map(normalizeFlowButton) : [],
       collect_lead_info: !!msg.collect_lead_info,
       lead_fields: (msg.conditions && Array.isArray(msg.conditions.lead_fields)) ? msg.conditions.lead_fields : [],
       video_url: msg.video_url || '',
@@ -136,7 +136,13 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
       message_key: newMessage.message_key,
       message_text: newMessage.message_text,
       message_type: newMessage.message_type,
-      buttons: newMessage.message_type === 'button' ? newMessage.buttons : null,
+      buttons: newMessage.message_type === 'button'
+        ? newMessage.buttons.map((b) =>
+            b.url !== undefined
+              ? { text: b.text, url: (b.url || '').trim() }
+              : { text: b.text, next_key: b.next_key || '' }
+          )
+        : null,
       collect_lead_info: newMessage.collect_lead_info,
       conditions: newMessage.collect_lead_info ? { lead_fields: newMessage.lead_fields } : null,
       video_url: newMessage.video_url || null,
