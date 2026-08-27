@@ -575,15 +575,42 @@ const Widget = () => {
         {message.buttons && message.buttons.length > 0 && (
           <div className="mt-2 space-y-1">
             {message.buttons.map((button, index) => (
-              <Button
-                key={index}
-                variant="outline"
-                size="sm"
-                className="mr-2 mb-1 text-xs"
-                onClick={() => handleButtonClick(button)}
-              >
-                {button.text}
-              </Button>
+              (() => {
+                const href = safeExternalUrl(button.url);
+                if (href) {
+                  return (
+                    <Button
+                      key={index}
+                      asChild
+                      variant="outline"
+                      size="sm"
+                      className="mr-2 mb-1 text-xs"
+                    >
+                      <a
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => handleLinkClick(button, href)}
+                      >
+                        {button.text}
+                        <ExternalLink className="ml-1 h-3 w-3" />
+                      </a>
+                    </Button>
+                  );
+                }
+                if (button.url) return null; // unsafe/malformed url: render nothing
+                return (
+                  <Button
+                    key={index}
+                    variant="outline"
+                    size="sm"
+                    className="mr-2 mb-1 text-xs"
+                    onClick={() => handleButtonClick(button)}
+                  >
+                    {button.text}
+                  </Button>
+                );
+              })()
             ))}
           </div>
         )}
