@@ -14,7 +14,8 @@ import {
   Phone,
   Mail,
   Building,
-  UserIcon
+  UserIcon,
+  ExternalLink
 } from 'lucide-react';
 import { VideoPlayer } from '@/components/video/VideoPlayer';
 import { supabase } from '@/integrations/supabase/client';
