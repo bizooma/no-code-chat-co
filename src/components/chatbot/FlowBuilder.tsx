@@ -364,10 +364,10 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
                       </div>
                       <div className="flex-1 space-y-2">
                         <Label>Next Message Key</Label>
-                        <Input
-                          placeholder="Next message key"
+                        <MessageKeyPicker
                           value={button.next_key}
-                          onChange={(e) => updateButton(index, 'next_key', e.target.value)}
+                          onChange={(value) => updateButton(index, 'next_key', value)}
+                          placeholder="Select or type a key..."
                         />
                       </div>
                       <Button
