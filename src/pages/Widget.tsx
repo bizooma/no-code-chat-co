@@ -300,7 +300,9 @@ const Widget = () => {
       sender: 'bot',
       text: message.message_text,
       timestamp: new Date(),
-      buttons: message.buttons ? message.buttons : undefined,
+      buttons: Array.isArray(message.buttons)
+        ? message.buttons.map(normalizeFlowButton)
+        : undefined,
       isForm: isLeadForm,
       formFields: isLeadForm && message.conditions?.lead_fields ? message.conditions.lead_fields : undefined,
       hasVideo,
