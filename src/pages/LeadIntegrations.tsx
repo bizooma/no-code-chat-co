@@ -779,15 +779,9 @@ const LeadIntegrations = () => {
 
                       setTestingIntegration('slack');
                       try {
-                        const { data: workspaceData } = await supabase
-                          .from('workspaces')
-                          .select('id')
-                          .limit(1)
-                          .single();
-
                         const { error } = await supabase.functions.invoke('slack-notifications', {
                           body: {
-                            workspace_id: workspaceData?.id,
+                            workspace_id: currentWorkspace?.id,
                             test: true,
                             lead: {
                               name: "Test User",
