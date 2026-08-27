@@ -406,8 +406,33 @@ const Widget = () => {
     }, 400);
   };
 
-  const handleButtonClick = (button: { text: string; next_key: string }) => {
+  const handleButtonClick = (button: FlowButton) => {
     handleUserMessage(button.text, button.next_key);
+  };
+
+  const handleLinkClick = async (button: FlowButton, url: string) => {
+    // Record the click in the transcript so the conversation doesn't go silent
+    const userMessage: ConversationMessage = {
+      id: Date.now().toString(),
+      sender: 'user',
+      text: button.text,
+      timestamp: new Date(),
+    };
+    setConversation((prev) => [...prev, userMessage]);
+    await saveMessage('user', button.text);
+
+    if (!chatbotId) return;
+    try {
+      await supabase.from('analytics_events').insert({
+        chatbot_id: chatbotId,
+        conversation_id: conversationId,
+        event_type: 'link_clicked',
+        event_data: { button_text: button.text, url },
+        visitor_id: visitorId,
+      });
+    } catch (e) {
+      console.error('Error tracking link click:', e);
+    }
   };
 
   const handleFormSubmit = async (formData: Record<string, string>) => {
