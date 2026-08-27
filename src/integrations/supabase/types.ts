@@ -1271,6 +1271,14 @@ export type Database = {
         Args: { _workspace_id: string }
         Returns: undefined
       }
+      end_stale_conversations: {
+        Args: { _idle_minutes?: number }
+        Returns: number
+      }
+      end_widget_conversation: {
+        Args: { _conversation_id: string; _visitor_id: string }
+        Returns: boolean
+      }
       get_avatar_widget_config: {
         Args: { _chatbot_id: string }
         Returns: {
