@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Code, ExternalLink, Smartphone, Monitor, Tablet } from 'lucide-react';
 import { useSearchParams, Link } from 'react-router-dom';
+import { EMBED_ORIGIN } from '@/lib/embed';
 
 const EmbedDemo = () => {
   const [searchParams] = useSearchParams();
@@ -32,7 +33,7 @@ const EmbedDemo = () => {
   const embedCode = `<script>
   (function() {
     var script = document.createElement('script');
-    script.src = '${window.location.origin}/widget.js';
+    script.src = '${EMBED_ORIGIN}/widget.js';
     script.setAttribute('data-chatbot-id', '${chatbotId}');
     document.head.appendChild(script);
   })();
@@ -255,7 +256,7 @@ const EmbedDemo = () => {
           __html: `
             (function() {
               var script = document.createElement('script');
-              script.src = '${window.location.origin}/widget.js';
+              script.src = '${EMBED_ORIGIN}/widget.js';
               script.setAttribute('data-chatbot-id', '${chatbotId}');
               document.head.appendChild(script);
             })();

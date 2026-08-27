@@ -12,6 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useWorkspace } from '@/contexts/WorkspaceContext';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
+import { EMBED_ORIGIN } from '@/lib/embed';
 import AvatarChatbot from '@/components/avatar/AvatarChatbot';
 import { FloatingAvatarWidget } from '@/components/avatar/FloatingAvatarWidget';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -74,6 +75,22 @@ const AvatarChatbotEditor = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const getAvatarEmbedCode = () => {
+    return `<script>
+  (function() {
+    var script = document.createElement('script');
+    script.src = '${EMBED_ORIGIN}/avatar-widget.js';
+    script.async = true;
+    script.onload = function() {
+      window.AvatarChatbotWidget.init({
+        chatbotId: '${id}'
+      });
+    };
+    document.head.appendChild(script);
+  })();
+</script>`;
   };
 
   const handleSave = async () => {
@@ -435,38 +452,14 @@ const AvatarChatbotEditor = () => {
               <CardContent className="space-y-4">
                 <div className="relative">
                   <pre className="bg-muted p-4 rounded-lg overflow-x-auto">
-                    <code>{`<script>
-  (function() {
-    var script = document.createElement('script');
-    script.src = '${window.location.origin}/avatar-widget.js';
-    script.async = true;
-    script.onload = function() {
-      window.AvatarChatbotWidget.init({
-        chatbotId: '${id}'
-      });
-    };
-    document.head.appendChild(script);
-  })();
-</script>`}</code>
+                    <code>{getAvatarEmbedCode()}</code>
                   </pre>
                   <Button
                     size="sm"
                     variant="outline"
                     className="absolute top-2 right-2"
                     onClick={() => {
-                      navigator.clipboard.writeText(`<script>
-  (function() {
-    var script = document.createElement('script');
-    script.src = '${window.location.origin}/avatar-widget.js';
-    script.async = true;
-    script.onload = function() {
-      window.AvatarChatbotWidget.init({
-        chatbotId: '${id}'
-      });
-    };
-    document.head.appendChild(script);
-  })();
-</script>`);
+                      navigator.clipboard.writeText(getAvatarEmbedCode());
                       toast({
                         title: 'Copied!',
                         description: 'Embed code copied to clipboard',

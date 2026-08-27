@@ -27,6 +27,7 @@ import {
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { EMBED_ORIGIN } from '@/lib/embed';
 import { FlowBuilder } from '@/components/chatbot/FlowBuilder';
 import { VideoAnalytics } from '@/components/video/VideoAnalytics';
 import { VideoTemplateLibrary } from '@/components/templates/VideoTemplateLibrary';
@@ -203,7 +204,7 @@ const ChatbotEditor = () => {
     return `<script>
   (function() {
     var script = document.createElement('script');
-    script.src = '${window.location.origin}/widget.js';
+    script.src = '${EMBED_ORIGIN}/widget.js';
     script.setAttribute('data-chatbot-id', '${id}');
     document.head.appendChild(script);
   })();
