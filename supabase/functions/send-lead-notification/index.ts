@@ -14,6 +14,14 @@ interface EmailRequest {
   workspaceId?: string;
 }
 
+// additional_data and the standard lead fields are visitor-supplied via public
+// forms — escape before interpolating into HTML.
+const escapeHtml = (s: string) =>
+  s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+   .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+const STANDARD_FIELDS = ['name', 'email', 'phone', 'company'];
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -97,21 +105,34 @@ const handler = async (req: Request): Promise<Response> => {
     const subject = ((body as any).subject || config?.subject || config?.subject_template || 'New Lead Captured')
       .replace('{chatbot_name}', lead.chatbots?.name || 'Chatbot');
 
+    // Render only fields not already shown as their own rows, as labelled
+    // rows. Omit the section entirely when nothing remains.
+    const extraRows = Object.entries(lead.additional_data ?? {})
+      .filter(([k, v]) =>
+        !STANDARD_FIELDS.includes(k.toLowerCase()) &&
+        v !== null && v !== undefined && String(v).trim() !== ''
+      )
+      .map(([k, v]) => {
+        const label = k.replace(/[_-]+/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        return `<p><strong>${escapeHtml(label)}:</strong> ${escapeHtml(String(v))}</p>`;
+      })
+      .join('');
+
     const emailPayload: Record<string, unknown> = {
       from: fromEmail,
       to: recipients,
       subject,
       html: `
         <h2>New Lead Captured${body.test ? ' (Test)' : ''}</h2>
-        <p><strong>Chatbot:</strong> ${lead.chatbots?.name || 'Unknown'}</p>
-        <p><strong>Workspace:</strong> ${lead.workspaces?.name || 'Unknown'}</p>
-        <p><strong>Name:</strong> ${lead.name || 'Not provided'}</p>
-        <p><strong>Email:</strong> ${lead.email || 'Not provided'}</p>
-        <p><strong>Phone:</strong> ${lead.phone || 'Not provided'}</p>
-        <p><strong>Company:</strong> ${lead.company || 'Not provided'}</p>
-        <p><strong>Source:</strong> ${lead.source}</p>
+        <p><strong>Chatbot:</strong> ${escapeHtml(lead.chatbots?.name || 'Unknown')}</p>
+        <p><strong>Workspace:</strong> ${escapeHtml(lead.workspaces?.name || 'Unknown')}</p>
+        <p><strong>Name:</strong> ${escapeHtml(lead.name || 'Not provided')}</p>
+        <p><strong>Email:</strong> ${escapeHtml(lead.email || 'Not provided')}</p>
+        <p><strong>Phone:</strong> ${escapeHtml(lead.phone || 'Not provided')}</p>
+        <p><strong>Company:</strong> ${escapeHtml(lead.company || 'Not provided')}</p>
+        <p><strong>Source:</strong> ${escapeHtml(String(lead.source))}</p>
         <p><strong>Date:</strong> ${new Date(lead.created_at).toLocaleString()}</p>
-        ${lead.additional_data ? `<p><strong>Additional Data:</strong> ${JSON.stringify(lead.additional_data, null, 2)}</p>` : ''}
+        ${extraRows}
       `,
     };
 
