@@ -164,10 +164,20 @@ export const useVideoFlowState = (chatbotId: string, visitorId: string) => {
         
         // Mark conversation as completed
         if (state.conversationId) {
-          await supabase
-            .from('conversations')
-            .update({ status: 'ended', ended_at: new Date().toISOString() })
-            .eq('id', state.conversationId);
+          const { data: ended, error: endError } = await (supabase.rpc as any)(
+            'end_widget_conversation',
+            {
+              _conversation_id: state.conversationId,
+              _visitor_id: visitorId,
+            }
+          );
+
+          if (endError) {
+            console.error('[VIDEO-FLOW] Error ending conversation:', endError);
+          } else if (!ended) {
+            console.log('[VIDEO-FLOW] Conversation was already ended');
+          }
+            
             
           await supabase.from('analytics_events').insert([{
             chatbot_id: chatbotId,
