@@ -77,6 +77,22 @@ const AvatarChatbotEditor = () => {
     }
   };
 
+  const getAvatarEmbedCode = () => {
+    return `<script>
+  (function() {
+    var script = document.createElement('script');
+    script.src = '${EMBED_ORIGIN}/avatar-widget.js';
+    script.async = true;
+    script.onload = function() {
+      window.AvatarChatbotWidget.init({
+        chatbotId: '${id}'
+      });
+    };
+    document.head.appendChild(script);
+  })();
+</script>`;
+  };
+
   const handleSave = async () => {
     if (!user) return;
 
