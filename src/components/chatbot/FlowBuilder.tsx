@@ -8,6 +8,9 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 import { 
   Plus, 
   MessageSquare, 
@@ -21,7 +24,9 @@ import {
   FileText,
   Video,
   Youtube,
-  Play
+  Play,
+  Check,
+  ChevronsUpDown
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -267,6 +272,111 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
     return messages.find(msg => msg.message_key === messageKey);
   };
 
+  const MessageKeyPicker: React.FC<{
+    value: string;
+    onChange: (key: string) => void;
+    placeholder?: string;
+  }> = ({ value, onChange, placeholder = 'Select next message...' }) => {
+    const [open, setOpen] = useState(false);
+    const [search, setSearch] = useState('');
+
+    const matched = messages.find((m) => m.message_key === value);
+    const dangling = !!value && !matched;
+
+    return (
+      <div className="space-y-1">
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              type="button"
+              variant="outline"
+              role="combobox"
+              aria-expanded={open}
+              className="w-full justify-between font-normal"
+            >
+              {value || placeholder}
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+            <Command>
+              <CommandInput
+                placeholder="Search or type a new key..."
+                value={search}
+                onValueChange={setSearch}
+              />
+              <CommandList>
+                <CommandEmpty className="px-2 py-2 text-sm text-muted-foreground">
+                  {search ? (
+                    <button
+                      type="button"
+                      className="w-full text-left rounded px-2 py-1.5 hover:bg-accent hover:text-accent-foreground"
+                      onClick={() => {
+                        onChange(search);
+                        setSearch('');
+                        setOpen(false);
+                      }}
+                    >
+                      Use "{search}"
+                    </button>
+                  ) : (
+                    'No message keys found.'
+                  )}
+                </CommandEmpty>
+                <CommandGroup>
+                  {messages.map((m) => (
+                    <CommandItem
+                      key={m.id}
+                      value={m.message_key}
+                      onSelect={() => {
+                        onChange(m.message_key);
+                        setSearch('');
+                        setOpen(false);
+                      }}
+                    >
+                      <Check
+                        className={cn(
+                          'mr-2 h-4 w-4',
+                          value === m.message_key ? 'opacity-100' : 'opacity-0'
+                        )}
+                      />
+                      <div className="flex flex-col overflow-hidden">
+                        <span>{m.message_key}</span>
+                        <span className="text-xs text-muted-foreground truncate">
+                          {m.message_text}
+                        </span>
+                      </div>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+                {search && !messages.some((m) => m.message_key === search) && (
+                  <CommandGroup>
+                    <CommandItem
+                      value={search}
+                      onSelect={() => {
+                        onChange(search);
+                        setSearch('');
+                        setOpen(false);
+                      }}
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      Use "{search}"
+                    </CommandItem>
+                  </CommandGroup>
+                )}
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+        {dangling && (
+          <p className="text-xs text-yellow-600">
+            No message with this key yet — this button will end the conversation.
+          </p>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="p-4 h-full overflow-y-auto">
       <div className="mb-6 flex items-center justify-between">
@@ -359,10 +469,10 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
                       </div>
                       <div className="flex-1 space-y-2">
                         <Label>Next Message Key</Label>
-                        <Input
-                          placeholder="Next message key"
+                        <MessageKeyPicker
                           value={button.next_key}
-                          onChange={(e) => updateButton(index, 'next_key', e.target.value)}
+                          onChange={(value) => updateButton(index, 'next_key', value)}
+                          placeholder="Select or type a key..."
                         />
                       </div>
                       <Button
