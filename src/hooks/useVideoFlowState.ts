@@ -177,8 +177,7 @@ export const useVideoFlowState = (chatbotId: string, visitorId: string) => {
           } else if (!ended) {
             console.log('[VIDEO-FLOW] Conversation was already ended');
           }
-            
-            
+
           await supabase.from('analytics_events').insert([{
             chatbot_id: chatbotId,
             conversation_id: state.conversationId,
