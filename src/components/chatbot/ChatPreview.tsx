@@ -107,7 +107,7 @@ export const ChatPreview: React.FC<ChatPreviewProps> = ({
       sender: 'bot',
       text: message.message_text,
       timestamp: new Date(),
-      buttons: message.buttons && Array.isArray(message.buttons) ? message.buttons : undefined,
+      buttons: Array.isArray(message.buttons) ? message.buttons.map(normalizeFlowButton) : undefined,
       isForm: message.collect_lead_info,
       formFields: message.collect_lead_info && message.conditions?.lead_fields ? message.conditions.lead_fields : undefined,
       messageType: message.message_type,
