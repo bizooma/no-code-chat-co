@@ -28,6 +28,7 @@ import {
   Check,
   ChevronsUpDown
 } from 'lucide-react';
+import { FlowButton, isSafeExternalUrl, normalizeFlowButton } from '@/lib/buttonLink';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -243,6 +244,19 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
       ...prev,
       buttons: prev.buttons.map((btn, i) => 
         i === index ? { ...btn, [field]: value } : btn
+      )
+    }));
+  };
+
+  const setButtonMode = (index: number, mode: 'next_key' | 'url') => {
+    setNewMessage(prev => ({
+      ...prev,
+      buttons: prev.buttons.map((btn, i) =>
+        i === index
+          ? (mode === 'url'
+              ? { text: btn.text, url: btn.url || '' }
+              : { text: btn.text, next_key: btn.next_key || '' })
+          : btn
       )
     }));
   };
